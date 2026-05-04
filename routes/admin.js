@@ -9,6 +9,32 @@ const upload = require('../config/multer');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
+
+// ── Git Sync Helper ──
+function gitSync(action, details = '') {
+  try {
+    const projectRoot = path.join(__dirname, '..');
+    const timestamp = new Date().toLocaleString('es-ES');
+    const message = `[AUTO] ${action} - ${details || ''} (${timestamp})`;
+    
+    // Agregar cambios a Git
+    execSync('git add -A', { cwd: projectRoot, stdio: 'pipe' });
+    
+    // Hacer commit
+    execSync(`git commit -m "${message}" --allow-empty`, { cwd: projectRoot, stdio: 'pipe' });
+    
+    // Intentar push al repositorio remoto
+    try {
+      execSync('git push', { cwd: projectRoot, stdio: 'pipe', timeout: 5000 });
+      console.log('✓ Git sync exitoso:', message);
+    } catch (pushError) {
+      console.log('⚠ Commit guardado localmente. Push no disponible:', pushError.message);
+    }
+  } catch (error) {
+    console.error('Error en Git sync:', error.message);
+  }
+}
 
 // ── Auth Middleware ──
 function requireAuth(req, res, next) {
@@ -151,6 +177,9 @@ router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (re
       });
     }
 
+    // Sync to Git
+    gitSync('NUEVO AUTO', `${marca} ${modelo} ${anio}`);
+
     res.redirect('/admin/autos');
   } catch (err) {
     console.error(err);
@@ -213,6 +242,9 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
       });
     }
 
+    // Sync to Git
+    gitSync('ACTUALIZAR AUTO', `${marca} ${modelo} ${anio}`);
+
     res.redirect('/admin/autos');
   } catch (err) {
     console.error(err);
@@ -223,6 +255,9 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
 // ── DELETE VEHICLE ──
 router.post('/autos/eliminar/:id', requireAuth, async (req, res) => {
   try {
+    // Get auto info before deleting
+    const auto = await db.prepare('SELECT marca, modelo, anio FROM autos WHERE id = ?').get([req.params.id]);
+    
     const imagenes = await db.prepare('SELECT filename FROM auto_imagenes WHERE auto_id = ?').all([req.params.id]);
     imagenes.forEach(img => {
       const filepath = path.join(__dirname, '..', 'public', 'uploads', 'autos', img.filename);
@@ -233,6 +268,11 @@ router.post('/autos/eliminar/:id', requireAuth, async (req, res) => {
 
     await db.prepare('DELETE FROM auto_imagenes WHERE auto_id = ?').run([req.params.id]);
     await db.prepare('DELETE FROM autos WHERE id = ?').run([req.params.id]);
+
+    // Sync to Git
+    if (auto) {
+      gitSync('ELIMINAR AUTO', `${auto.marca} ${auto.modelo} ${auto.anio}`);
+    }
 
     res.redirect('/admin/autos');
   } catch (error) {

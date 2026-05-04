@@ -1,0 +1,43 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5f5f5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bgGradient)"/>
+  <rect x="25" y="25" width="1150" height="350" fill="none" stroke="#0564c7" stroke-width="8" rx="10"/>
+  
+  <!-- Main Title -->
+  <text x="600" y="140" font-family="Arial, sans-serif" font-size="90" font-weight="bold" text-anchor="middle" fill="#dc2f45" letter-spacing="2">
+    Abelardo Villa
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="240" font-family="Arial, sans-serif" font-size="60" font-weight="900" text-anchor="middle" fill="#000000" letter-spacing="8">
+    MULTIMARCA
+  </text>
+  
+  <!-- Decorative line -->
+  <line x1="150" y1="280" x2="1050" y2="280" stroke="#c4a35a" stroke-width="2"/>
+  
+  <!-- Small cars representation (simplified) -->
+  <g opacity="0.3">
+    <circle cx="250" cy="320" r="25" fill="none" stroke="#0564c7" stroke-width="2"/>
+    <rect x="235" y="310" width="30" height="15" fill="none" stroke="#0564c7" stroke-width="2"/>
+    
+    <circle cx="450" cy="320" r="25" fill="none" stroke="#dc2f45" stroke-width="2"/>
+    <rect x="435" y="310" width="30" height="15" fill="none" stroke="#dc2f45" stroke-width="2"/>
+    
+    <circle cx="650" cy="320" r="25" fill="none" stroke="#c4a35a" stroke-width="2"/>
+    <rect x="635" y="310" width="30" height="15" fill="none" stroke="#c4a35a" stroke-width="2"/>
+    
+    <circle cx="850" cy="320" r="25" fill="none" stroke="#0564c7" stroke-width="2"/>
+    <rect x="835" y="310" width="30" height="15" fill="none" stroke="#0564c7" stroke-width="2"/>
+    
+    <circle cx="1050" cy="320" r="25" fill="none" stroke="#dc2f45" stroke-width="2"/>
+    <rect x="1035" y="310" width="30" height="15" fill="none" stroke="#dc2f45" stroke-width="2"/>
+  </g>
+</svg>

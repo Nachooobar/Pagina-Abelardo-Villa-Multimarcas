@@ -116,8 +116,22 @@ textarea {
 }
 
 .navbar-brand img {
-  height: 42px;
+  height: 60px;
   width: auto;
+  object-fit: contain;
+}
+
+.logo-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.footer-logo {
+  max-width: 280px;
+  height: auto;
+  margin-bottom: 1rem;
+  display: block;
 }
 
 .nav-links {
