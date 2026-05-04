@@ -14,10 +14,14 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error('✗ Error al conectar a la base de datos:', err.message);
     process.exit(1);
   }
+  console.log(`✓ Base de datos conectada: ${dbPath}`);
 });
 
-// Habilitar foreign keys
+// Habilitar foreign keys y optimizaciones para persistencia
 db.run('PRAGMA foreign_keys = ON');
+db.run('PRAGMA journal_mode = WAL'); // Write-Ahead Logging para mejor concurrencia
+db.run('PRAGMA synchronous = FULL'); // Asegurar que se escriba en disco
+db.run('PRAGMA cache_size = 10000'); // Caché para mejor performance
 
 // ── Promisify database methods ──
 const database = {
@@ -40,8 +44,16 @@ const database = {
   run: (sql, params = []) => {
     return new Promise((resolve, reject) => {
       db.run(sql, params, function(err) {
-        if (err) reject(err);
-        else resolve({ id: this.lastID, changes: this.changes });
+        if (err) {
+          console.error('✗ Error en query:', err, 'SQL:', sql);
+          reject(err);
+        } else {
+          // Log para confirmar que se guardó
+          if (sql.toUpperCase().includes('INSERT') || sql.toUpperCase().includes('UPDATE') || sql.toUpperCase().includes('DELETE')) {
+            console.log(`✓ Datos guardados: ${this.changes} fila(s) afectada(s)`);
+          }
+          resolve({ id: this.lastID, changes: this.changes });
+        }
       });
     });
   },
@@ -108,12 +120,41 @@ database.exec(`
     await database.run(
       'INSERT INTO admin_users (username, password) VALUES (?, ?)',
       ['admin', hashedPassword]
-    );
-    console.log('✓ Usuario admin creado: admin / admin123');
-  }
-  console.log('✓ Base de datos inicializada');
-}).catch((err) => {
-  console.error('✗ Error al inicializar BD:', err.message);
+   Función para hacer VACUUM (optimizar la BD)
+database.vacuum = () => {
+  return new Promise((resolve, reject) => {
+    db.run('VACUUM', (err) => {
+      if (err) {
+        console.error('✗ Error en VACUUM:', err);
+        reject(err);
+      } else {
+        console.log('✓ Base de datos optimizada (VACUUM)');
+        resolve();
+      }
+    });
+  });
+};
+
+// Hacer VACUUM cada hora
+setInterval(() => {
+  database.vacuum().catch(err => console.error('Error en VACUUM automático:', err));
+}, 60 * 60 * 1000);
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n✓ Cerrando aplicación...');
+  try {
+    // Hacer VACUUM antes de cerrar
+    await database.vacuum();
+    db.close((err) => {
+      if (err) console.error('✗ Error al cerrar BD:', err);
+      else console.log('✓ Conexión a BD cerrada correctamente');
+      process.exit(0);
+    });
+  } catch (error) {
+    console.error('Error en shutdown:', error);
+    process.exit(1);
+  }sole.error('✗ Error al inicializar BD:', err.message);
 });
 
 // Graceful shutdown
