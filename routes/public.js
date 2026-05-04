@@ -93,7 +93,7 @@ router.get('/catalogo', async (req, res) => {
     if (orden === 'anio_asc') orderClause = 'a.anio ASC';
     if (orden === 'km_asc') orderClause = 'a.kilometraje ASC';
 
-    const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos a WHERE ${whereClause}`).get(...params);
+    const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos a WHERE ${whereClause}`).get(params);
     const totalPages = Math.ceil(totalResult.total / perPage);
 
     const autos = await db.prepare(`
@@ -104,7 +104,7 @@ router.get('/catalogo', async (req, res) => {
       WHERE ${whereClause}
       ORDER BY ${orderClause}
       LIMIT ? OFFSET ?
-    `).all(...params, perPage, offset);
+    `).all([...params, perPage, offset]);
 
     const marcas = await db.prepare('SELECT DISTINCT marca FROM autos WHERE activo = 1 ORDER BY marca ASC').all();
     const anios = await db.prepare('SELECT DISTINCT anio FROM autos WHERE activo = 1 ORDER BY anio DESC').all();
