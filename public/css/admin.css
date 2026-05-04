@@ -52,7 +52,6 @@
 
 /* Estilos mejorados para formularios de admin */
 .form-group input,
-.form-group select,
 .form-group textarea {
   background: rgba(255,255,255,0.08) !important;
   border: 1.5px solid rgba(255,255,255,0.15) !important;
@@ -65,12 +64,18 @@
 
 .form-group select {
   appearance: none;
-  padding-right: 2rem;
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  padding: 0.75rem 2rem 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
   background-position: right 0.75rem center !important;
   background-size: 12px !important;
-  cursor: pointer;
 }
 
 .form-group input:focus,
@@ -82,15 +87,22 @@
   box-shadow: 0 0 0 3px rgba(196,163,90,0.15) !important;
 }
 
+.form-group select:focus {
+  background: #1a1a1a !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(196,163,90,0.15) !important;
+}
+
 .form-group select option {
-  background: var(--primary);
-  color: var(--white);
-  padding: 0.5rem;
+  background: #000000;
+  color: #ffffff;
+  padding: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .form-group select option:checked {
   background: var(--accent);
-  color: var(--primary);
+  color: #000000;
 }
 
 table { width: 100%; border-collapse: collapse; }
