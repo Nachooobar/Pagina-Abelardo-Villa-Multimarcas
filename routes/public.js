@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
       WHERE a.activo = 1 AND a.destacado = 1
       ORDER BY a.created_at DESC
       LIMIT 8
-    `).all();
+    `).all([]);
 
     // Get latest vehicles
     const ultimos = await db.prepare(`
@@ -43,13 +43,13 @@ router.get('/', async (req, res) => {
       WHERE a.activo = 1
       ORDER BY a.created_at DESC
       LIMIT 12
-    `).all();
+    `).all([]);
 
     // Get distinct brands, models, years for filters
-    const marcas = await db.prepare('SELECT DISTINCT marca FROM autos WHERE activo = 1 ORDER BY marca ASC').all();
-    const anios = await db.prepare('SELECT DISTINCT anio FROM autos WHERE activo = 1 ORDER BY anio DESC').all();
+    const marcas = await db.prepare('SELECT DISTINCT marca FROM autos WHERE activo = 1 ORDER BY marca ASC').all([]);
+    const anios = await db.prepare('SELECT DISTINCT anio FROM autos WHERE activo = 1 ORDER BY anio DESC').all([]);
 
-    const totalAutos = await db.prepare('SELECT COUNT(*) as total FROM autos WHERE activo = 1').get();
+    const totalAutos = await db.prepare('SELECT COUNT(*) as total FROM autos WHERE activo = 1').get([]);
 
     res.render('index', {
       title: 'Abelardo Villa Multimarcas - Concesionaria',
