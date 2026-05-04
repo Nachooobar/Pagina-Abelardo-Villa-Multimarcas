@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node --watch app.js",
+    "start": "node INICIO.js",
+    "dev": "node --watch INICIO.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
