@@ -50,6 +50,49 @@
 .admin-search select { appearance: none; padding-right: 1.8rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23c4a35a' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.6rem center; }
 .admin-search select option { background: var(--primary); }
 
+/* Estilos mejorados para formularios de admin */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1.5px solid rgba(255,255,255,0.15) !important;
+  color: var(--white) !important;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.form-group select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+  cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: var(--accent) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(196,163,90,0.15) !important;
+}
+
+.form-group select option {
+  background: var(--primary);
+  color: var(--white);
+  padding: 0.5rem;
+}
+
+.form-group select option:checked {
+  background: var(--accent);
+  color: var(--primary);
+}
+
 table { width: 100%; border-collapse: collapse; }
 table th { text-align: left; padding: 0.85rem 1.25rem; font-size: 0.7rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-light); }
 table td { padding: 0.85rem 1.25rem; font-size: 0.85rem; color: var(--text); border-bottom: 1px solid var(--border-light); vertical-align: middle; }
