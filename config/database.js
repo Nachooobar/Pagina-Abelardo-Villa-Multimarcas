@@ -114,13 +114,21 @@ database.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `).then(async () => {
-  const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users');
+  const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users', []);
   if (adminCount.count === 0) {
     const hashedPassword = bcrypt.hashSync('admin123', 10);
     await database.run(
       'INSERT INTO admin_users (username, password) VALUES (?, ?)',
       ['admin', hashedPassword]
-   Función para hacer VACUUM (optimizar la BD)
+    );
+    console.log('✓ Usuario admin creado: admin / admin123');
+  }
+  console.log('✓ Base de datos inicializada');
+}).catch((err) => {
+  console.error('✗ Error al inicializar BD:', err.message);
+});
+
+// ── Función para hacer VACUUM (optimizar la BD) ──
 database.vacuum = () => {
   return new Promise((resolve, reject) => {
     db.run('VACUUM', (err) => {
@@ -135,16 +143,15 @@ database.vacuum = () => {
   });
 };
 
-// Hacer VACUUM cada hora
+// ── Hacer VACUUM cada hora ──
 setInterval(() => {
   database.vacuum().catch(err => console.error('Error en VACUUM automático:', err));
 }, 60 * 60 * 1000);
 
-// Graceful shutdown
+// ── Graceful shutdown ──
 process.on('SIGINT', async () => {
   console.log('\n✓ Cerrando aplicación...');
   try {
-    // Hacer VACUUM antes de cerrar
     await database.vacuum();
     db.close((err) => {
       if (err) console.error('✗ Error al cerrar BD:', err);
@@ -154,15 +161,7 @@ process.on('SIGINT', async () => {
   } catch (error) {
     console.error('Error en shutdown:', error);
     process.exit(1);
-  }sole.error('✗ Error al inicializar BD:', err.message);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) console.error('✗ Error al cerrar BD:', err);
-    else console.log('✓ Conexión a BD cerrada');
-  });
+  }
 });
 
 module.exports = database;
