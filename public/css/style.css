@@ -109,6 +109,7 @@ textarea {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--white);
+  height: 72px;
 }
 
 .navbar-brand .logo-text {
@@ -123,15 +124,18 @@ textarea {
 
 .logo-img {
   display: block;
-  max-width: 100%;
-  height: auto;
+  width: auto;
+  height: 60px;
+  object-fit: contain;
 }
 
 .footer-logo {
-  max-width: 280px;
+  width: 100%;
+  max-width: 300px;
   height: auto;
   margin-bottom: 1rem;
   display: block;
+  object-fit: contain;
 }
 
 .nav-links {
