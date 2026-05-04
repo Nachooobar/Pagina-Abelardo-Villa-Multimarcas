@@ -4,9 +4,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --primary: #8acdec;
-  --primary-light: #5f82e1;
-  --accent: #dd540f;
+  --primary: #05254b;
+  --primary-light: #e8ca1f;
+  --accent: #dd9c0f;
   --accent-hover: #d4b76a;
   --accent-dark: #e7b542;
   --text: #000000;
