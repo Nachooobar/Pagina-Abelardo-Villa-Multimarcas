@@ -125,7 +125,7 @@ router.get('/autos/nuevo', requireAuth, (req, res) => {
 });
 
 // ── CREATE POST ──
-router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 20), async (req, res) => {
+router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (req, res) => {
   try {
     const { marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
       transmision, color, puertas, motor, descripcion, condicion, destacado, activo } = req.body;
@@ -184,7 +184,7 @@ router.get('/autos/editar/:id', requireAuth, async (req, res) => {
 });
 
 // ── EDIT POST ──
-router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 20), async (req, res) => {
+router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), async (req, res) => {
   try {
     const { marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
       transmision, color, puertas, motor, descripcion, condicion, destacado, activo } = req.body;

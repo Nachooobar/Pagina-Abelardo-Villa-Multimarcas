@@ -29,13 +29,14 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('env', NODE_ENV);
+app.set('trust proxy', 1);
 
 // ── Middlewares globales ──
 app.use(express.static(path.join(__dirname, 'public'), { 
   maxAge: NODE_ENV === 'production' ? '1d' : 0 
 }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 
 // ── Sesiones ──
 app.use(session({
@@ -43,8 +44,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    maxAge: 1000 * 60 * 60 * 4,
-    secure: NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 12,
+    secure: false,
     httpOnly: true,
     sameSite: 'lax'
   }
