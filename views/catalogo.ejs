@@ -1,0 +1,110 @@
+<%- include('partials/header') %>
+
+<section class="catalog-page">
+  <div class="container">
+    <div class="section-header fade-in" style="margin-top:1rem;">
+      <div class="section-tag">🚗 Nuestro Stock</div>
+      <h1 class="section-title">Catálogo de Vehículos</h1>
+    </div>
+
+    <!-- Filters -->
+    <div class="catalog-filters fade-in">
+      <form class="filters-row" action="/catalogo" method="GET" id="catalogFilters">
+        <div class="filter-group">
+          <label for="f-marca">Marca</label>
+          <select name="marca" id="f-marca">
+            <option value="">Todas</option>
+            <% marcas.forEach(m => { %>
+              <option value="<%= m.marca %>" <%= filtros.marca === m.marca ? 'selected' : '' %>><%= m.marca %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-modelo">Modelo</label>
+          <input type="text" name="modelo" id="f-modelo" placeholder="Buscar modelo..." value="<%= filtros.modelo || '' %>">
+        </div>
+        <div class="filter-group">
+          <label for="f-anio">Año</label>
+          <select name="anio" id="f-anio">
+            <option value="">Todos</option>
+            <% anios.forEach(a => { %>
+              <option value="<%= a.anio %>" <%= filtros.anio == a.anio ? 'selected' : '' %>><%= a.anio %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-combustible">Combustible</label>
+          <select name="combustible" id="f-combustible">
+            <option value="">Todos</option>
+            <% ['Nafta','Diesel','GNC','Híbrido','Eléctrico'].forEach(c => { %>
+              <option value="<%= c %>" <%= filtros.combustible === c ? 'selected' : '' %>><%= c %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-orden">Ordenar</label>
+          <select name="orden" id="f-orden">
+            <option value="">Más recientes</option>
+            <option value="precio_asc" <%= filtros.orden === 'precio_asc' ? 'selected' : '' %>>Menor precio</option>
+            <option value="precio_desc" <%= filtros.orden === 'precio_desc' ? 'selected' : '' %>>Mayor precio</option>
+            <option value="anio_desc" <%= filtros.orden === 'anio_desc' ? 'selected' : '' %>>Más nuevo</option>
+            <option value="anio_asc" <%= filtros.orden === 'anio_asc' ? 'selected' : '' %>>Más antiguo</option>
+          </select>
+        </div>
+        <div class="filter-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary" style="white-space:nowrap;">Filtrar</button>
+        </div>
+      </form>
+    </div>
+
+    <p class="catalog-results"><strong><%= totalAutos %></strong> vehículos encontrados</p>
+
+    <!-- Vehicle Grid -->
+    <% if (autos.length > 0) { %>
+      <div class="vehicles-grid">
+        <% autos.forEach(auto => { %>
+          <%- include('partials/vehicle-card', { auto, generateSlug }) %>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (totalPages > 1) { %>
+      <div class="pagination">
+        <% if (currentPage > 1) { %>
+          <a href="/catalogo?<%= Object.entries(filtros).filter(([k,v]) => v && k !== 'page').map(([k,v]) => k+'='+encodeURIComponent(v)).join('&') %>&page=<%= currentPage - 1 %>">← Anterior</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="active"><%= i %></span>
+          <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+            <a href="/catalogo?<%= Object.entries(filtros).filter(([k,v]) => v && k !== 'page').map(([k,v]) => k+'='+encodeURIComponent(v)).join('&') %>&page=<%= i %>"><%= i %></a>
+          <% } %>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+          <a href="/catalogo?<%= Object.entries(filtros).filter(([k,v]) => v && k !== 'page').map(([k,v]) => k+'='+encodeURIComponent(v)).join('&') %>&page=<%= currentPage + 1 %>">Siguiente →</a>
+        <% } %>
+      </div>
+      <% } %>
+    <% } else { %>
+      <div style="text-align:center; padding:4rem 0;">
+        <p style="font-size:3rem; margin-bottom:1rem;">🔍</p>
+        <h3 style="color:var(--white); margin-bottom:0.5rem;">No se encontraron vehículos</h3>
+        <p style="color:var(--text-muted);">Probá cambiando los filtros de búsqueda</p>
+        <a href="/catalogo" class="btn btn-outline" style="margin-top:1.5rem;">Ver todos</a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const lazyImgs = document.querySelectorAll('.lazy-img');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.src = e.target.dataset.src; e.target.classList.remove('lazy-img'); obs.unobserve(e.target); }});
+    }, { rootMargin: '200px' });
+    lazyImgs.forEach(img => obs.observe(img));
+  });
+</script>
+
+<%- include('partials/footer') %>

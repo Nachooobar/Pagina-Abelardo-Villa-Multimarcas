@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+
+<section class="detail-page">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">Inicio</a> / <a href="/catalogo">Catálogo</a> / <a href="/catalogo?marca=<%= auto.marca %>"><%= auto.marca %></a> / <span><%= auto.modelo %></span>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Gallery -->
+      <div class="gallery">
+        <div class="gallery-main" id="galleryMain">
+          <% if (imagenes.length > 0) { %>
+            <img src="/uploads/autos/<%= imagenes[0].filename %>" alt="<%= auto.marca %> <%= auto.modelo %>" id="mainImage" onclick="openLightbox(this.src)">
+          <% } else { %>
+            <div class="no-image" style="height:100%;">📷 Sin imágenes disponibles</div>
+          <% } %>
+        </div>
+        <% if (imagenes.length > 1) { %>
+        <div class="gallery-thumbs">
+          <% imagenes.forEach((img, i) => { %>
+            <div class="gallery-thumb <%= i === 0 ? 'active' : '' %>" onclick="changeImage('/uploads/autos/<%= img.filename %>', this)">
+              <img src="/uploads/autos/<%= img.filename %>" alt="Foto <%= i + 1 %>" loading="lazy">
+            </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+
+      <!-- Vehicle Info -->
+      <div class="detail-info">
+        <span class="detail-condition"><%= auto.condicion %></span>
+        <div class="detail-brand"><%= auto.marca %></div>
+        <h1 class="detail-title"><%= auto.modelo %> <%= auto.version %></h1>
+        <% if (auto.precio > 0) { %>
+          <div class="detail-price"><span class="currency"><%= auto.moneda %></span> <%= auto.precio.toLocaleString('es-AR') %></div>
+        <% } else { %>
+          <div class="detail-price" style="font-size:1.5rem;">Consultar precio</div>
+        <% } %>
+
+        <div class="specs-grid">
+          <div class="spec-item"><span class="spec-label">Año</span><span class="spec-value"><%= auto.anio %></span></div>
+          <div class="spec-item"><span class="spec-label">Kilómetros</span><span class="spec-value"><%= auto.kilometraje > 0 ? auto.kilometraje.toLocaleString('es-AR') + ' km' : '0 km' %></span></div>
+          <div class="spec-item"><span class="spec-label">Combustible</span><span class="spec-value"><%= auto.combustible %></span></div>
+          <div class="spec-item"><span class="spec-label">Transmisión</span><span class="spec-value"><%= auto.transmision %></span></div>
+          <div class="spec-item"><span class="spec-label">Color</span><span class="spec-value"><%= auto.color || 'Consultar' %></span></div>
+          <div class="spec-item"><span class="spec-label">Puertas</span><span class="spec-value"><%= auto.puertas %></span></div>
+          <% if (auto.motor) { %>
+          <div class="spec-item" style="grid-column:span 2;"><span class="spec-label">Motor</span><span class="spec-value"><%= auto.motor %></span></div>
+          <% } %>
+        </div>
+
+        <% if (auto.descripcion) { %>
+        <div class="detail-description">
+          <h3>Descripción</h3>
+          <p><%= auto.descripcion %></p>
+        </div>
+        <% } %>
+
+        <div class="detail-actions">
+          <a href="https://wa.me/5493430000000?text=Hola! Estoy interesado en el <%= auto.marca %> <%= auto.modelo %> <%= auto.anio %>. ¿Está disponible?" target="_blank" class="btn-whatsapp">
+            💬 Consultar por WhatsApp
+          </a>
+          <a href="/contacto" class="btn-contact">📧 Enviar consulta</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <% if (relacionados.length > 0) { %>
+    <div class="related-section">
+      <div class="section-header"><h2 class="section-title">Vehículos Similares</h2></div>
+      <div class="vehicles-grid">
+        <% relacionados.forEach(auto => { %>
+          <%- include('partials/vehicle-card', { auto, generateSlug }) %>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img src="" alt="Imagen ampliada" id="lightboxImg">
+</div>
+
+<script>
+  function changeImage(src, thumb) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+  function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('active'); }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+  // Lazy load related
+  document.querySelectorAll('.lazy-img').forEach(img => {
+    const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.src=e.target.dataset.src; obs.unobserve(e.target); }}); }, {rootMargin:'200px'});
+    obs.observe(img);
+  });
+</script>
+
+<%- include('partials/footer') %>

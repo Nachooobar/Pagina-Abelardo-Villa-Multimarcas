@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <%- include('sidebar') %>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1><%= auto ? '✏️ Editar Vehículo' : '➕ Agregar Vehículo' %></h1>
+        <a href="/admin/autos" class="btn btn-outline btn-sm">← Volver</a>
+      </div>
+
+      <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+      <form class="admin-form" method="POST" action="/admin/autos/<%= auto && auto.id ? 'editar/' + auto.id : 'nuevo' %>" enctype="multipart/form-data">
+
+        <!-- Info Básica -->
+        <div class="form-section">
+          <h3>Información del Vehículo</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="marca">Marca *</label>
+              <input type="text" id="marca" name="marca" required value="<%= auto ? auto.marca : '' %>" placeholder="Ej: Toyota, Ford, Volkswagen">
+            </div>
+            <div class="form-group">
+              <label for="modelo">Modelo *</label>
+              <input type="text" id="modelo" name="modelo" required value="<%= auto ? auto.modelo : '' %>" placeholder="Ej: Corolla, Ranger">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="version">Versión</label>
+              <input type="text" id="version" name="version" value="<%= auto ? (auto.version || '') : '' %>" placeholder="Ej: XEI 1.8 CVT">
+            </div>
+            <div class="form-group">
+              <label for="anio">Año *</label>
+              <input type="number" id="anio" name="anio" required min="1990" max="2030" value="<%= auto ? auto.anio : new Date().getFullYear() %>">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="condicion">Condición</label>
+              <select id="condicion" name="condicion">
+                <option value="Usado" <%= auto && auto.condicion === 'Usado' ? 'selected' : '' %>>Usado</option>
+                <option value="0km" <%= auto && auto.condicion === '0km' ? 'selected' : '' %>>0km</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="color">Color</label>
+              <input type="text" id="color" name="color" value="<%= auto ? (auto.color || '') : '' %>" placeholder="Ej: Blanco, Gris Plata">
+            </div>
+          </div>
+        </div>
+
+        <!-- Precio y KM -->
+        <div class="form-section">
+          <h3>Precio y Kilometraje</h3>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="precio">Precio</label>
+              <input type="number" id="precio" name="precio" step="0.01" value="<%= auto ? auto.precio : 0 %>" placeholder="0 = Consultar">
+            </div>
+            <div class="form-group">
+              <label for="moneda">Moneda</label>
+              <select id="moneda" name="moneda">
+                <option value="USD" <%= auto && auto.moneda === 'USD' ? 'selected' : '' %>>USD</option>
+                <option value="ARS" <%= auto && auto.moneda === 'ARS' ? 'selected' : '' %>>ARS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="kilometraje">Kilómetros</label>
+              <input type="number" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Especificaciones -->
+        <div class="form-section">
+          <h3>Especificaciones Técnicas</h3>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="combustible">Combustible</label>
+              <select id="combustible" name="combustible">
+                <% ['Nafta','Diesel','GNC','Híbrido','Eléctrico'].forEach(c => { %>
+                  <option value="<%= c %>" <%= auto && auto.combustible === c ? 'selected' : '' %>><%= c %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="transmision">Transmisión</label>
+              <select id="transmision" name="transmision">
+                <option value="Manual" <%= auto && auto.transmision === 'Manual' ? 'selected' : '' %>>Manual</option>
+                <option value="Automática" <%= auto && auto.transmision === 'Automática' ? 'selected' : '' %>>Automática</option>
+                <option value="CVT" <%= auto && auto.transmision === 'CVT' ? 'selected' : '' %>>CVT</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="puertas">Puertas</label>
+              <select id="puertas" name="puertas">
+                <% [2,3,4,5].forEach(p => { %>
+                  <option value="<%= p %>" <%= auto && auto.puertas == p ? 'selected' : '' %>><%= p %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="motor">Motor</label>
+            <input type="text" id="motor" name="motor" value="<%= auto ? (auto.motor || '') : '' %>" placeholder="Ej: 1.8L 4 cilindros 140cv">
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-section">
+          <h3>Descripción</h3>
+          <div class="form-group">
+            <label for="descripcion">Descripción detallada</label>
+            <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describí el estado, equipamiento, detalles del vehículo..."><%= auto ? (auto.descripcion || '') : '' %></textarea>
+          </div>
+          <div style="display:flex; gap:2rem;">
+            <div class="form-check">
+              <input type="checkbox" id="destacado" name="destacado" value="1" <%= auto && auto.destacado ? 'checked' : '' %>>
+              <label for="destacado">⭐ Vehículo Destacado</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="activo" name="activo" value="1" <%= !auto || auto.activo ? 'checked' : '' %>>
+              <label for="activo">✅ Activo (visible en la web)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Imágenes -->
+        <div class="form-section">
+          <h3>Imágenes</h3>
+          <% if (imagenes && imagenes.length > 0) { %>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Imágenes actuales (<%= imagenes.length %>):</p>
+          <div class="current-images">
+            <% imagenes.forEach(img => { %>
+            <div class="img-thumb <%= img.es_principal ? 'is-main' : '' %>">
+              <img src="/uploads/autos/<%= img.filename %>" alt="Foto">
+              <% if (img.es_principal) { %><span class="img-main-badge">Principal</span><% } %>
+              <div class="img-thumb-actions">
+                <% if (!img.es_principal) { %>
+                <form method="POST" action="/admin/autos/imagen/principal/<%= img.id %>" style="display:inline;">
+                  <button type="submit" style="background:var(--accent);color:var(--primary);" title="Hacer principal">⭐</button>
+                </form>
+                <% } %>
+                <form method="POST" action="/admin/autos/imagen/eliminar/<%= img.id %>" onsubmit="return confirm('¿Eliminar esta imagen?')" style="display:inline;">
+                  <button type="submit" style="background:var(--danger);color:white;" title="Eliminar">✕</button>
+                </form>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <% } %>
+
+          <div class="drop-zone" onclick="document.getElementById('fileInput').click();">
+            <div class="drop-icon">📁</div>
+            <p>Hacé clic para seleccionar fotos o arrastralas aquí</p>
+            <p style="font-size:0.75rem; margin-top:0.5rem;">JPG, PNG o WebP — Máximo 10MB por imagen — Hasta 20 fotos</p>
+          </div>
+          <input type="file" id="fileInput" name="imagenes" multiple accept="image/*" style="display:none;" onchange="previewFiles(this)">
+          <div id="previewArea" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:0.75rem; margin-top:1rem;"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding:1rem; font-size:1rem;">
+          <%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %>
+        </button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    function previewFiles(input) {
+      const area = document.getElementById('previewArea');
+      area.innerHTML = '';
+      Array.from(input.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const div = document.createElement('div');
+          div.style.cssText = 'aspect-ratio:16/10;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);';
+          div.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">';
+          area.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">ABELARDO VILLA <span>MULTIMARCAS</span></div>
+          <p class="footer-text">Tu concesionaria de confianza. Vehículos usados seleccionados y 0km de todas las marcas al mejor precio del mercado.</p>
+        </div>
+        <div>
+          <h4>Navegación</h4>
+          <div class="footer-links">
+            <a href="/">Inicio</a>
+            <a href="/catalogo">Catálogo</a>
+            <a href="/nosotros">Nosotros</a>
+            <a href="/contacto">Contacto</a>
+          </div>
+        </div>
+        <div>
+          <h4>Marcas Populares</h4>
+          <div class="footer-links">
+            <a href="/catalogo?marca=Toyota">Toyota</a>
+            <a href="/catalogo?marca=Volkswagen">Volkswagen</a>
+            <a href="/catalogo?marca=Ford">Ford</a>
+            <a href="/catalogo?marca=Chevrolet">Chevrolet</a>
+            <a href="/catalogo?marca=Fiat">Fiat</a>
+          </div>
+        </div>
+        <div>
+          <h4>Contacto</h4>
+          <div class="footer-links">
+            <a href="#">📍 Dirección de la concesionaria</a>
+            <a href="tel:+5493430000000">📞 (343) 000-0000</a>
+            <a href="https://wa.me/5493430000000" target="_blank">💬 WhatsApp</a>
+            <a href="https://www.instagram.com/" target="_blank">📸 Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <%= currentYear %> Abelardo Villa Multimarcas. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('active');
+    });
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
