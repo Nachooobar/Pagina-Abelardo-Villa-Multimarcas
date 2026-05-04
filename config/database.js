@@ -1,19 +1,69 @@
 // ============================================================
-// Configuración de la Base de Datos SQLite
+// Configuración de la Base de Datos SQLite (sqlite3)
 // ============================================================
 
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
 const dbPath = path.join(__dirname, '..', 'database.db');
-const db = new Database(dbPath);
 
-// Enable WAL mode for better performance
-db.pragma('journal_mode = WAL');
+// Crear conexión a la base de datos
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('✗ Error al conectar a la base de datos:', err.message);
+    process.exit(1);
+  }
+});
 
-// ── Create Tables ──
-db.exec(`
+// Habilitar foreign keys
+db.run('PRAGMA foreign_keys = ON');
+
+// ── Promisify database methods ──
+const database = {
+  all: (sql, params = []) => {
+    return new Promise((resolve, reject) => {
+      db.all(sql, params, (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      });
+    });
+  },
+  get: (sql, params = []) => {
+    return new Promise((resolve, reject) => {
+      db.get(sql, params, (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  },
+  run: (sql, params = []) => {
+    return new Promise((resolve, reject) => {
+      db.run(sql, params, function(err) {
+        if (err) reject(err);
+        else resolve({ id: this.lastID, changes: this.changes });
+      });
+    });
+  },
+  exec: (sql) => {
+    return new Promise((resolve, reject) => {
+      db.exec(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+  prepare: (sql) => {
+    return {
+      all: (params = []) => database.all(sql, params),
+      get: (params = []) => database.get(sql, params),
+      run: (params = []) => database.run(sql, params)
+    };
+  }
+};
+
+// ── Initialize database ──
+database.exec(`
   CREATE TABLE IF NOT EXISTS autos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     marca TEXT NOT NULL,
@@ -51,14 +101,27 @@ db.exec(`
     password TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
-`);
+`).then(async () => {
+  const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users');
+  if (adminCount.count === 0) {
+    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    await database.run(
+      'INSERT INTO admin_users (username, password) VALUES (?, ?)',
+      ['admin', hashedPassword]
+    );
+    console.log('✓ Usuario admin creado: admin / admin123');
+  }
+  console.log('✓ Base de datos inicializada');
+}).catch((err) => {
+  console.error('✗ Error al inicializar BD:', err.message);
+});
 
-// ── Create default admin user if none exists ──
-const adminCount = db.prepare('SELECT COUNT(*) as count FROM admin_users').get();
-if (adminCount.count === 0) {
-  const hashedPassword = bcrypt.hashSync('admin123', 10);
-  db.prepare('INSERT INTO admin_users (username, password) VALUES (?, ?)').run('admin', hashedPassword);
-  console.log('✅ Usuario admin creado: admin / admin123');
-}
+// Graceful shutdown
+process.on('SIGINT', () => {
+  db.close((err) => {
+    if (err) console.error('✗ Error al cerrar BD:', err);
+    else console.log('✓ Conexión a BD cerrada');
+  });
+});
 
-module.exports = db;
+module.exports = database;
