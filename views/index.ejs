@@ -1,130 +1,140 @@
 <%- include('partials/header') %>
 
-<!-- Hero Section -->
-<section class="hero" id="hero">
-  <div class="hero-content container">
-    <div class="hero-badge">🚗 Concesionaria Multimarcas</div>
-    <h1>Encontrá tu próximo<br><span>vehículo ideal</span></h1>
-    <p class="hero-subtitle">Vehículos usados seleccionados y 0km de todas las marcas. Financiación y los mejores precios del mercado.</p>
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-content container">
+      <div class="hero-badge">🚗 Concesionaria Multimarcas</div>
+      <h1>Encontrá tu próximo<br><span>vehículo ideal</span></h1>
+      <p class="hero-subtitle">Vehículos usados seleccionados y 0km de todas las marcas. Financiación y los mejores
+        precios del mercado.</p>
 
-    <!-- Search Box -->
-    <form class="hero-search" action="/catalogo" method="GET" id="heroSearch">
-      <div class="search-grid">
-        <div class="search-field">
-          <label for="hero-marca">Marca</label>
-          <select name="marca" id="hero-marca">
-            <option value="">Todas las marcas</option>
-            <% marcas.forEach(m => { %>
-              <option value="<%= m.marca %>"><%= m.marca %></option>
-            <% }) %>
-          </select>
+      <!-- Search Box -->
+      <form class="hero-search" action="/catalogo" method="GET" id="heroSearch">
+        <div class="search-grid">
+          <div class="search-field">
+            <label for="hero-marca">Marca</label>
+            <select name="marca" id="hero-marca">
+              <option value="">Todas las marcas</option>
+              <% marcas.forEach(m=> { %>
+                <option value="<%= m.marca %>">
+                  <%= m.marca %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+          <div class="search-field">
+            <label for="hero-modelo">Modelo</label>
+            <select name="modelo" id="hero-modelo">
+              <option value="">Todos los modelos</option>
+            </select>
+          </div>
+          <div class="search-field">
+            <label for="hero-anio">Año</label>
+            <select name="anio" id="hero-anio">
+              <option value="">Todos los años</option>
+              <% anios.forEach(a=> { %>
+                <option value="<%= a.anio %>">
+                  <%= a.anio %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+          <button type="submit" class="btn-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            Buscar
+          </button>
         </div>
-        <div class="search-field">
-          <label for="hero-modelo">Modelo</label>
-          <select name="modelo" id="hero-modelo">
-            <option value="">Todos los modelos</option>
-          </select>
+      </form>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="number">
+            <%= totalAutos %>+
+          </div>
+          <div class="label">Vehículos</div>
         </div>
-        <div class="search-field">
-          <label for="hero-anio">Año</label>
-          <select name="anio" id="hero-anio">
-            <option value="">Todos los años</option>
-            <% anios.forEach(a => { %>
-              <option value="<%= a.anio %>"><%= a.anio %></option>
-            <% }) %>
-          </select>
+        <div class="hero-stat">
+          <div class="number">15+</div>
+          <div class="label">Marcas</div>
         </div>
-        <button type="submit" class="btn-search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          Buscar
-        </button>
-      </div>
-    </form>
-
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="number"><%= totalAutos %>+</div>
-        <div class="label">Vehículos</div>
-      </div>
-      <div class="hero-stat">
-        <div class="number">15+</div>
-        <div class="label">Marcas</div>
-      </div>
-      <div class="hero-stat">
-        <div class="number">100%</div>
-        <div class="label">Garantía</div>
+        <div class="hero-stat">
+          <div class="number">100%</div>
+          <div class="label">Garantía</div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Featured Vehicles -->
-<% if (destacados.length > 0) { %>
-<section class="section" id="destacados">
-  <div class="container">
-    <div class="section-header fade-in">
-      <div class="section-tag">⭐ Selección Premium</div>
-      <h2 class="section-title">Vehículos Destacados</h2>
-      <p class="section-subtitle">Nuestra selección especial de los mejores vehículos disponibles</p>
-    </div>
-    <div class="vehicles-grid">
-      <% destacados.forEach(auto => { %>
-        <%- include('partials/vehicle-card', { auto, generateSlug }) %>
-      <% }) %>
-    </div>
-  </div>
-</section>
-<% } %>
+  <!-- Featured Vehicles -->
+  <% if (destacados.length> 0) { %>
+    <section class="section" id="destacados">
+      <div class="container">
+        <div class="section-header fade-in">
+          <div class="section-tag">⭐ Selección Premium</div>
+          <h2 class="section-title">Vehículos Destacados</h2>
+          <p class="section-subtitle">Nuestra selección especial de los mejores vehículos disponibles</p>
+        </div>
+        <div class="vehicles-grid">
+          <% destacados.forEach(auto=> { %>
+            <%- include('partials/vehicle-card', { auto, generateSlug }) %>
+              <% }) %>
+        </div>
+      </div>
+    </section>
+    <% } %>
 
-<!-- Latest Vehicles -->
-<section class="section" id="ultimos">
-  <div class="container">
-    <div class="section-header fade-in">
-      <div class="section-tag">🆕 Recién Llegados</div>
-      <h2 class="section-title">Últimos Ingresos</h2>
-      <p class="section-subtitle">Los vehículos más recientes que ingresaron a nuestro stock</p>
-    </div>
-    <div class="vehicles-grid">
-      <% ultimos.forEach(auto => { %>
-        <%- include('partials/vehicle-card', { auto, generateSlug }) %>
-      <% }) %>
-    </div>
-    <div style="text-align:center; margin-top:2.5rem;">
-      <a href="/catalogo" class="btn btn-outline">Ver todo el catálogo →</a>
-    </div>
-  </div>
-</section>
+      <!-- Latest Vehicles -->
+      <section class="section" id="ultimos">
+        <div class="container">
+          <div class="section-header fade-in">
+            <div class="section-tag">🆕 Recién Llegados</div>
+            <h2 class="section-title">Últimos Ingresos</h2>
+            <p class="section-subtitle">Los vehículos más recientes que ingresaron a nuestro stock</p>
+          </div>
+          <div class="vehicles-grid">
+            <% ultimos.forEach(auto=> { %>
+              <%- include('partials/vehicle-card', { auto, generateSlug }) %>
+                <% }) %>
+          </div>
+          <div style="text-align:center; margin-top:2.5rem;">
+            <a href="/catalogo" class="btn btn-outline">Ver todo el catálogo →</a>
+          </div>
+        </div>
+      </section>
 
-<!-- Lazy Loading + Dynamic Filters Script -->
-<script>
-  // Lazy loading images
-  document.addEventListener('DOMContentLoaded', () => {
-    const lazyImgs = document.querySelectorAll('.lazy-img');
-    const imgObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          img.classList.remove('lazy-img');
-          imgObserver.unobserve(img);
-        }
-      });
-    }, { rootMargin: '100px' });
-    lazyImgs.forEach(img => imgObserver.observe(img));
-  });
+      <!-- Lazy Loading + Dynamic Filters Script -->
+      <script>
+        // Lazy loading images
+        document.addEventListener('DOMContentLoaded', () => {
+          const lazyImgs = document.querySelectorAll('.lazy-img');
+          const imgObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy-img');
+                imgObserver.unobserve(img);
+              }
+            });
+          }, { rootMargin: '100px' });
+          lazyImgs.forEach(img => imgObserver.observe(img));
+        });
 
-  // Dynamic filter: load models when brand changes
-  document.getElementById('hero-marca').addEventListener('change', async function() {
-    const modeloSelect = document.getElementById('hero-modelo');
-    modeloSelect.innerHTML = '<option value="">Todos los modelos</option>';
-    if (this.value) {
-      const res = await fetch('/api/modelos/' + encodeURIComponent(this.value));
-      const modelos = await res.json();
-      modelos.forEach(m => {
-        modeloSelect.innerHTML += '<option value="' + m.modelo + '">' + m.modelo + '</option>';
-      });
-    }
-  });
-</script>
+        // Dynamic filter: load models when brand changes
+        document.getElementById('hero-marca').addEventListener('change', async function () {
+          const modeloSelect = document.getElementById('hero-modelo');
+          modeloSelect.innerHTML = '<option value="">Todos los modelos</option>';
+          if (this.value) {
+            const res = await fetch('/api/modelos/' + encodeURIComponent(this.value));
+            const modelos = await res.json();
+            modelos.forEach(m => {
+              modeloSelect.innerHTML += '<option value="' + m.modelo + '">' + m.modelo + '</option>';
+            });
+          }
+        });
+      </script>
 
-<%- include('partials/footer') %>
+      <%- include('partials/footer') %>

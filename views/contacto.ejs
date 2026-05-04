@@ -1,49 +1,51 @@
 <%- include('partials/header') %>
-<section class="contact-page">
-  <div class="container">
-    <div class="section-header fade-in" style="margin-top:1rem;">
-      <div class="section-tag">📞 Contacto</div>
-      <h1 class="section-title">Ponete en contacto</h1>
-      <p class="section-subtitle">Estamos para ayudarte a encontrar el vehículo ideal</p>
-    </div>
-    <div class="contact-grid">
-      <div>
-        <div class="contact-info-card fade-in">
-          <h3>📍 Ubicación</h3>
-          <p>Dirección de la concesionaria<br>Ciudad, Provincia</p>
+  <section class="contact-page">
+    <div class="container">
+      <div class="section-header fade-in" style="margin-top:1rem;">
+        <div class="section-tag">📞 Contacto</div>
+        <h1 class="section-title">Ponete en contacto</h1>
+        <p class="section-subtitle">Estamos para ayudarte a encontrar el vehículo ideal</p>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-info-card fade-in">
+            <h3>📍 Ubicación</h3>
+            <p>Dirección de la concesionaria<br>Rincon, Santa Fe</p>
+          </div>
+          <div class="contact-info-card fade-in">
+            <h3>📞 Teléfonos</h3>
+            <p>(343) 000-0000<br>Lunes a Viernes: 8:00 - 18:00<br>Sábados: 9:00 - 13:00</p>
+          </div>
+          <div class="contact-info-card fade-in">
+            <h3>💬 WhatsApp</h3>
+            <p>Escribinos directamente por WhatsApp para una atención más rápida.</p>
+            <a href="https://wa.me/5493430000000" target="_blank" class="btn btn-primary" style="margin-top:1rem;">Abrir
+              WhatsApp</a>
+          </div>
         </div>
-        <div class="contact-info-card fade-in">
-          <h3>📞 Teléfonos</h3>
-          <p>(343) 000-0000<br>Lunes a Viernes: 8:00 - 18:00<br>Sábados: 9:00 - 13:00</p>
-        </div>
-        <div class="contact-info-card fade-in">
-          <h3>💬 WhatsApp</h3>
-          <p>Escribinos directamente por WhatsApp para una atención más rápida.</p>
-          <a href="https://wa.me/5493430000000" target="_blank" class="btn btn-primary" style="margin-top:1rem;">Abrir WhatsApp</a>
+        <div class="fade-in">
+          <form class="admin-form" action="/contacto" method="POST">
+            <div class="form-group">
+              <label for="nombre">Nombre completo</label>
+              <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="tu@email.com">
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" id="telefono" name="telefono" placeholder="(343) 000-0000">
+            </div>
+            <div class="form-group">
+              <label for="mensaje">Mensaje</label>
+              <textarea id="mensaje" name="mensaje" rows="5" required
+                placeholder="Contanos en qué podemos ayudarte..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Enviar Consulta</button>
+          </form>
         </div>
       </div>
-      <div class="fade-in">
-        <form class="admin-form" action="/contacto" method="POST">
-          <div class="form-group">
-            <label for="nombre">Nombre completo</label>
-            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="tu@email.com">
-          </div>
-          <div class="form-group">
-            <label for="telefono">Teléfono</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="(343) 000-0000">
-          </div>
-          <div class="form-group">
-            <label for="mensaje">Mensaje</label>
-            <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Contanos en qué podemos ayudarte..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Enviar Consulta</button>
-        </form>
-      </div>
     </div>
-  </div>
-</section>
-<%- include('partials/footer') %>
+  </section>
+  <%- include('partials/footer') %>
