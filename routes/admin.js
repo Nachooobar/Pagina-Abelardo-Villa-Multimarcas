@@ -26,7 +26,7 @@ function gitSync(action, details = '') {
     
     // Intentar push al repositorio remoto
     try {
-      execSync('git push', { cwd: projectRoot, stdio: 'pipe', timeout: 5000 });
+      execSync('git push', { cwd: projectRoot, stdio: 'pipe', timeout: 30000 });
       console.log('✓ Git sync exitoso:', message);
     } catch (pushError) {
       console.log('⚠ Commit guardado localmente. Push no disponible:', pushError.message);
