@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
@@ -16,23 +15,23 @@
       </div>
       <div class="admin-form" style="max-width:500px;">
         <div class="form-section">
-          <h3>Cambiar Contraseña</h3>
-          <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
-          <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+          <h3>🔒 Cambiar Contraseña</h3>
+          <% if (success) { %><div class="alert alert-success">✅ <%= success %></div><% } %>
+          <% if (error) { %><div class="alert alert-danger">⚠️ <%= error %></div><% } %>
           <form method="POST" action="/admin/config/password">
             <div class="form-group">
               <label for="current_password">Contraseña Actual</label>
-              <input type="password" id="current_password" name="current_password" required>
+              <input type="password" id="current_password" name="current_password" required placeholder="Tu contraseña actual">
             </div>
             <div class="form-group">
               <label for="new_password">Nueva Contraseña</label>
-              <input type="password" id="new_password" name="new_password" required minlength="6">
+              <input type="password" id="new_password" name="new_password" required minlength="6" placeholder="Mínimo 6 caracteres">
             </div>
             <div class="form-group">
               <label for="confirm_password">Confirmar Contraseña</label>
-              <input type="password" id="confirm_password" name="confirm_password" required>
+              <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repetí la nueva contraseña">
             </div>
-            <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0.5rem;">🔐 Actualizar Contraseña</button>
           </form>
         </div>
       </div>

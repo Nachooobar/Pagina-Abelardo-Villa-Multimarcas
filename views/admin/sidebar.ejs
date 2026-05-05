@@ -1,15 +1,20 @@
 <!-- Admin Sidebar -->
-<aside class="admin-sidebar">
-  <div class="admin-sidebar-brand">ABELARDO VILLA <span>MVM</span></div>
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="admin-sidebar-brand">
+    <img src="/images/logo.png" alt="Logo" style="width:100%;max-width:200px;margin:0 auto 0.5rem;display:block;border-radius:8px;">
+  </div>
   <div class="admin-sidebar-sub">Panel de Control</div>
   <nav class="admin-nav">
     <a href="/admin" class="<%= typeof title !== 'undefined' && title.includes('Panel') ? 'active' : '' %>">📊 Dashboard</a>
-    <a href="/admin/autos" class="<%= typeof title !== 'undefined' && title.includes('Gestión') ? 'active' : '' %>">🚗 Vehículos</a>
+    <a href="/admin/autos" class="<%= typeof title !== 'undefined' && (title.includes('Gestión') || title.includes('Editar')) ? 'active' : '' %>">🚗 Vehículos</a>
     <a href="/admin/autos/nuevo" class="<%= typeof title !== 'undefined' && title.includes('Agregar') ? 'active' : '' %>">➕ Agregar Auto</a>
     <div class="admin-nav-divider"></div>
     <a href="/admin/config" class="<%= typeof title !== 'undefined' && title.includes('Configuración') ? 'active' : '' %>">⚙️ Configuración</a>
-    <a href="/" target="_blank">🌐 Ver Sitio</a>
+    <a href="/" target="_blank">🌐 Ver Sitio Web</a>
     <div class="admin-nav-divider"></div>
-    <a href="/admin/logout" style="color:var(--danger);">🚪 Cerrar Sesión</a>
+    <a href="/admin/logout" style="color:#EF4444;">🚪 Cerrar Sesión</a>
   </nav>
 </aside>
+<!-- Mobile menu button -->
+<button class="mobile-menu-toggle" id="mobileMenuBtn" onclick="document.getElementById('adminSidebar').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('active');">☰</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="document.getElementById('adminSidebar').classList.remove('open');this.classList.remove('active');"></div>

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
@@ -13,29 +12,37 @@
     <main class="admin-main">
       <div class="admin-header">
         <h1>📊 Dashboard</h1>
-        <span style="color:var(--text-muted); font-size:0.85rem;">Bienvenido, Admin</span>
+        <span style="color:var(--admin-text-secondary); font-size:0.88rem;">👋 ¡Bienvenido, Admin!</span>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon blue">🚗</div>
-          <div class="stat-number"><%= stats.totalAutos %></div>
-          <div class="stat-label">Vehículos Total</div>
+          <div>
+            <div class="stat-number"><%= stats.totalAutos %></div>
+            <div class="stat-label">Vehículos Total</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green">✅</div>
-          <div class="stat-number"><%= stats.totalActivos %></div>
-          <div class="stat-label">Activos / Publicados</div>
+          <div>
+            <div class="stat-number"><%= stats.totalActivos %></div>
+            <div class="stat-label">Publicados</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon gold">⭐</div>
-          <div class="stat-number"><%= stats.totalDestacados %></div>
-          <div class="stat-label">Destacados</div>
+          <div>
+            <div class="stat-number"><%= stats.totalDestacados %></div>
+            <div class="stat-label">Destacados</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple">📷</div>
-          <div class="stat-number"><%= stats.totalImagenes %></div>
-          <div class="stat-label">Imágenes Cargadas</div>
+          <div>
+            <div class="stat-number"><%= stats.totalImagenes %></div>
+            <div class="stat-label">Fotos Cargadas</div>
+          </div>
         </div>
       </div>
 
@@ -44,6 +51,7 @@
           <h2>Últimos Vehículos Cargados</h2>
           <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm">+ Agregar Vehículo</a>
         </div>
+        <div style="overflow-x:auto;">
         <table>
           <thead>
             <tr><th>Imagen</th><th>Vehículo</th><th>Año</th><th>Precio</th><th>Estado</th></tr>
@@ -51,18 +59,22 @@
           <tbody>
             <% ultimosAutos.forEach(auto => { %>
             <tr>
-              <td><% if(auto.imagen){ %><img src="/uploads/autos/<%= auto.imagen %>" class="table-img"><% } else { %><div class="table-img" style="background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--text-muted);">—</div><% } %></td>
-              <td><strong style="color:var(--white);"><%= auto.marca %> <%= auto.modelo %></strong></td>
+              <td><% if(auto.imagen){ %><img src="/uploads/autos/<%= auto.imagen %>" class="table-img" loading="lazy"><% } else { %><div class="table-img" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--admin-text-muted);">Sin foto</div><% } %></td>
+              <td><strong><%= auto.marca %> <%= auto.modelo %></strong></td>
               <td><%= auto.anio %></td>
               <td><% if(auto.precio > 0){ %><%= auto.moneda %> <%= auto.precio.toLocaleString('es-AR') %><% } else { %>Consultar<% } %></td>
-              <td><span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? 'Activo' : 'Inactivo' %></span></td>
+              <td><span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? '✅ Activo' : '⏸️ Inactivo' %></span></td>
             </tr>
             <% }) %>
             <% if(ultimosAutos.length === 0) { %>
-            <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">No hay vehículos cargados aún. <a href="/admin/autos/nuevo" style="color:var(--accent);">Cargar el primero →</a></td></tr>
+            <tr><td colspan="5" style="text-align:center; padding:2.5rem; color:var(--admin-text-muted);">
+              No hay vehículos cargados aún.<br>
+              <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">+ Cargar el primero</a>
+            </td></tr>
             <% } %>
           </tbody>
         </table>
+        </div>
       </div>
     </main>
   </div>

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
@@ -18,9 +17,9 @@
 
       <div class="admin-table-wrap">
         <div class="admin-table-header">
-          <h2><%= autos.length %> vehículos</h2>
+          <h2><%= autos.length %> vehículo<%= autos.length !== 1 ? 's' : '' %></h2>
           <form class="admin-search" action="/admin/autos" method="GET">
-            <input type="text" name="buscar" placeholder="Buscar..." value="<%= filtros.buscar || '' %>">
+            <input type="text" name="buscar" placeholder="🔍 Buscar..." value="<%= filtros.buscar || '' %>">
             <select name="marca">
               <option value="">Todas las marcas</option>
               <% marcas.forEach(m => { %><option value="<%= m.marca %>" <%= filtros.marca === m.marca ? 'selected' : '' %>><%= m.marca %></option><% }) %>
@@ -36,34 +35,54 @@
         <div style="overflow-x:auto;">
         <table>
           <thead>
-            <tr><th>Img</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Precio</th><th>Km</th><th>Fotos</th><th>Estado</th><th>Acciones</th></tr>
+            <tr>
+              <th>Foto</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Año</th>
+              <th>Precio</th>
+              <th>Km</th>
+              <th>Fotos</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
           </thead>
           <tbody>
             <% autos.forEach(auto => { %>
             <tr>
-              <td><% if(auto.imagen){ %><img src="/uploads/autos/<%= auto.imagen %>" class="table-img" loading="lazy"><% } else { %><div class="table-img" style="background:var(--primary-light);"></div><% } %></td>
-              <td><strong><%= auto.marca %></strong></td>
-              <td style="color:var(--white);"><%= auto.modelo %> <small style="color:var(--text-muted);"><%= auto.version || '' %></small></td>
-              <td><%= auto.anio %></td>
-              <td><% if(auto.precio>0){ %><%= auto.moneda %> <%= auto.precio.toLocaleString('es-AR') %><% } else { %>—<% } %></td>
-              <td><%= auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') : '0' %></td>
-              <td><%= auto.total_imagenes %></td>
               <td>
-                <span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? 'Activo' : 'Inactivo' %></span>
+                <% if(auto.imagen){ %>
+                  <img src="/uploads/autos/<%= auto.imagen %>" class="table-img" loading="lazy">
+                <% } else { %>
+                  <div class="table-img" style="display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--admin-text-muted);">Sin foto</div>
+                <% } %>
+              </td>
+              <td><strong><%= auto.marca %></strong></td>
+              <td><%= auto.modelo %> <% if(auto.version) { %><br><small style="color:var(--admin-text-muted);"><%= auto.version %></small><% } %></td>
+              <td><%= auto.anio %></td>
+              <td><% if(auto.precio > 0){ %><strong><%= auto.moneda %> <%= auto.precio.toLocaleString('es-AR') %></strong><% } else { %><span style="color:var(--admin-text-muted);">Consultar</span><% } %></td>
+              <td><%= auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') + ' km' : '0 km' %></td>
+              <td><span class="badge" style="background:rgba(46,110,181,0.1);color:var(--av-blue);">📷 <%= auto.total_imagenes %></span></td>
+              <td>
+                <span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? '✅ Activo' : '⏸️ Inactivo' %></span>
                 <% if(auto.destacado) { %><span class="badge badge-warning">⭐</span><% } %>
               </td>
               <td>
                 <div class="table-actions">
-                  <a href="/admin/autos/editar/<%= auto.id %>" class="btn btn-outline btn-sm">Editar</a>
-                  <form method="POST" action="/admin/autos/eliminar/<%= auto.id %>" onsubmit="return confirm('¿Eliminar este vehículo?')" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">✕</button>
+                  <a href="/admin/autos/editar/<%= auto.id %>" class="btn btn-outline btn-sm">✏️ Editar</a>
+                  <form method="POST" action="/admin/autos/eliminar/<%= auto.id %>" onsubmit="return confirm('⚠️ ¿Estás seguro de eliminar este vehículo?\n\nEsta acción no se puede deshacer.')" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
                   </form>
                 </div>
               </td>
             </tr>
             <% }) %>
             <% if(autos.length === 0) { %>
-            <tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">No se encontraron vehículos</td></tr>
+            <tr><td colspan="9" style="text-align:center; padding:3rem; color:var(--admin-text-muted);">
+              <div style="font-size:2.5rem;margin-bottom:0.75rem;">🚗</div>
+              <p style="font-size:1rem;margin-bottom:0.5rem;">No se encontraron vehículos</p>
+              <p style="font-size:0.85rem;">Probá ajustando los filtros o <a href="/admin/autos/nuevo" style="color:var(--av-blue);font-weight:600;">cargá uno nuevo</a></p>
+            </td></tr>
             <% } %>
           </tbody>
         </table>
