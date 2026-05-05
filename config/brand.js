@@ -22,7 +22,7 @@ module.exports = {
       }
     },
     phone: '+54-3425-352093',
-    email: 'contacto@abelardovilla.com.ar',
+    email: 'abelardoraul_villa@hotmail.com',
     // Google Maps link
     maps: {
       url: 'https://maps.google.com/maps?q=Abelardo+Villa+Multimarcas',

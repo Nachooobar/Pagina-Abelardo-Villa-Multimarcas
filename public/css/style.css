@@ -1179,7 +1179,7 @@ textarea {
 .btn-danger {
   background: var(--danger);
   color: var(--text-primary);
-}}
+}
 
 .btn-danger:hover {
   opacity: 0.9;
