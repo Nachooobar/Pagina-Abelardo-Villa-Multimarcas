@@ -148,20 +148,15 @@ setInterval(() => {
   database.vacuum().catch(err => console.error('Error en VACUUM automático:', err));
 }, 60 * 60 * 1000);
 
-// ── Graceful shutdown ──
-process.on('SIGINT', async () => {
-  console.log('\n✓ Cerrando aplicación...');
-  try {
-    await database.vacuum();
+// ── Close DB function (called by server on shutdown) ──
+database.close = () => {
+  return new Promise((resolve) => {
     db.close((err) => {
       if (err) console.error('✗ Error al cerrar BD:', err);
       else console.log('✓ Conexión a BD cerrada correctamente');
-      process.exit(0);
+      resolve();
     });
-  } catch (error) {
-    console.error('Error en shutdown:', error);
-    process.exit(1);
-  }
-});
+  });
+};
 
 module.exports = database;

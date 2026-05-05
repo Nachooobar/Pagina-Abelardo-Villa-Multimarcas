@@ -186,31 +186,25 @@ const server = app.listen(PORT, HOST, () => {
 });
 
 // ── Manejo de cierre graceful ──
-process.on('SIGTERM', () => {
-  console.log('\n⚠ SIGTERM recibido. Cerrando servidor...');
-  server.close(() => {
+async function gracefulShutdown(signal) {
+  console.log(`\n⚠ ${signal} recibido. Cerrando servidor...`);
+  server.close(async () => {
     console.log('✓ Servidor cerrado correctamente');
+    try { await db.close(); } catch(e) { /* silencioso */ }
     process.exit(0);
   });
-});
+}
 
-process.on('SIGINT', () => {
-  console.log('\n⚠ SIGINT recibido. Cerrando servidor...');
-  server.close(() => {
-    console.log('✓ Servidor cerrado correctamente');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // ── Manejo de errores no capturados ──
 process.on('uncaughtException', (error) => {
   console.error('\n✗ Excepción no capturada:', error);
-  process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   console.error('\n✗ Promise rechazada sin manejo:', reason);
-  process.exit(1);
 });
 
 // ── Exportar para testing (opcional) ──
