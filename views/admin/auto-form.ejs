@@ -4,7 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin.css?v=3">
+  <style>
+    /* Estilos críticos inline para garantizar el layout */
+    .car-form-grid-2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+    .car-form-grid-3 { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 16px !important; }
+    .car-form-grid-4 { display: grid !important; grid-template-columns: 1fr 1fr 1fr 1fr !important; gap: 16px !important; }
+    .car-field label { display: block; font-size: 13px; font-weight: 600; color: #64748B; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .car-field input, .car-field select, .car-field textarea {
+      width: 100%; padding: 12px 14px; background: #F8FAFC; border: 1.5px solid #E2E8F0;
+      border-radius: 8px; color: #1E293B; font-size: 15px; font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+    }
+    .car-field input:focus, .car-field select:focus, .car-field textarea:focus {
+      outline: none; border-color: #2E6EB5; box-shadow: 0 0 0 3px rgba(46,110,181,0.1); background: #fff;
+    }
+    .car-field input::placeholder, .car-field textarea::placeholder { color: #94A3B8; }
+    .car-field textarea { resize: vertical; min-height: 90px; }
+    .car-field select { appearance: none; cursor: pointer; padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%232E6EB5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .car-section { background: #fff; border-radius: 16px; padding: 28px 32px; margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(27,58,92,0.06); border: 1px solid #E2E8F0; }
+    .car-section h3 { font-size: 17px; font-weight: 700; color: #1B3A5C; margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 2px solid #E2E8F0; }
+    .car-checks { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+    .car-check { display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+      background: #F8FAFC; border-radius: 8px; border: 1.5px solid #E2E8F0; cursor: pointer; }
+    .car-check:hover { border-color: #2E6EB5; }
+    .car-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: #2E6EB5; cursor: pointer; }
+    .car-check label { cursor: pointer; font-size: 14px; font-weight: 500; color: #1E293B; margin: 0; }
+    .car-submit { width: 100%; padding: 14px; font-size: 16px; font-weight: 700; font-family: inherit;
+      background: #2E6EB5; color: #fff; border: none; border-radius: 12px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(46,110,181,0.3); transition: all 0.2s; margin-top: 8px; }
+    .car-submit:hover { background: #3A85D6; transform: translateY(-2px); }
+    @media (max-width: 768px) {
+      .car-form-grid-2, .car-form-grid-3, .car-form-grid-4 { grid-template-columns: 1fr !important; }
+      .car-section { padding: 20px 16px; }
+    }
+  </style>
 </head>
 <body>
   <div class="admin-layout">
@@ -17,204 +56,170 @@
 
       <% if (error) { %><div class="alert alert-danger">⚠️ <%= error %></div><% } %>
 
-      <form class="admin-form" method="POST" action="/admin/autos/<%= auto && auto.id ? 'editar/' + auto.id : 'nuevo' %>" enctype="multipart/form-data">
+      <form method="POST" action="/admin/autos/<%= auto && auto.id ? 'editar/' + auto.id : 'nuevo' %>" enctype="multipart/form-data" style="width:100%;max-width:1100px;">
 
-        <!-- ═══ PASO 1: ¿Qué auto es? ═══ -->
-        <div class="form-section">
+        <!-- PASO 1 -->
+        <div class="car-section">
           <h3>🚗 ¿Qué vehículo vas a cargar?</h3>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="marca">Marca *</label>
-              <input type="text" id="marca" name="marca" required value="<%= auto ? auto.marca : '' %>" placeholder="Toyota, Ford, Chevrolet...">
+          <div class="car-form-grid-2">
+            <div class="car-field">
+              <label>Marca *</label>
+              <input type="text" name="marca" required value="<%= auto ? auto.marca : '' %>" placeholder="Toyota, Ford, Chevrolet...">
             </div>
-            <div class="form-group">
-              <label for="modelo">Modelo *</label>
-              <input type="text" id="modelo" name="modelo" required value="<%= auto ? auto.modelo : '' %>" placeholder="Corolla, Ranger, Cruze...">
+            <div class="car-field">
+              <label>Modelo *</label>
+              <input type="text" name="modelo" required value="<%= auto ? auto.modelo : '' %>" placeholder="Corolla, Ranger, Cruze...">
             </div>
-            <div class="form-group">
-              <label for="version">Versión (opcional)</label>
-              <input type="text" id="version" name="version" value="<%= auto ? (auto.version || '') : '' %>" placeholder="XEI 1.8 CVT, XLS 4x4...">
+          </div>
+          <div class="car-form-grid-2" style="margin-top:16px;">
+            <div class="car-field">
+              <label>Versión (opcional)</label>
+              <input type="text" name="version" value="<%= auto ? (auto.version || '') : '' %>" placeholder="XEI 1.8 CVT, XLS 4x4...">
             </div>
-            <div class="form-group">
-              <label for="anio">Año *</label>
-              <input type="number" id="anio" name="anio" required min="1990" max="2030" value="<%= auto ? auto.anio : new Date().getFullYear() %>">
+            <div class="car-field">
+              <label>Año *</label>
+              <input type="number" name="anio" required min="1990" max="2030" value="<%= auto ? auto.anio : new Date().getFullYear() %>">
             </div>
-            <div class="form-group">
-              <label for="condicion">¿Es usado o 0km?</label>
-              <select id="condicion" name="condicion">
+          </div>
+          <div class="car-form-grid-2" style="margin-top:16px;">
+            <div class="car-field">
+              <label>¿Es usado o 0km?</label>
+              <select name="condicion">
                 <option value="Usado" <%= auto && auto.condicion === 'Usado' ? 'selected' : '' %>>🔄 Usado</option>
                 <option value="0km" <%= auto && auto.condicion === '0km' ? 'selected' : '' %>>✨ 0km (Nuevo)</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="color">Color</label>
-              <input type="text" id="color" name="color" value="<%= auto ? (auto.color || '') : '' %>" placeholder="Blanco, Negro, Gris...">
+            <div class="car-field">
+              <label>Color</label>
+              <input type="text" name="color" value="<%= auto ? (auto.color || '') : '' %>" placeholder="Blanco, Negro, Gris...">
             </div>
           </div>
         </div>
 
-        <!-- ═══ PASO 2: Precio ═══ -->
-        <div class="form-section">
+        <!-- PASO 2 -->
+        <div class="car-section">
           <h3>💰 ¿A cuánto lo vendés?</h3>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label for="moneda">Moneda</label>
-              <select id="moneda" name="moneda">
+          <div class="car-form-grid-3">
+            <div class="car-field">
+              <label>Moneda</label>
+              <select name="moneda">
                 <option value="USD" <%= auto && auto.moneda === 'USD' ? 'selected' : '' %>>🇺🇸 Dólares (USD)</option>
                 <option value="ARS" <%= auto && auto.moneda === 'ARS' ? 'selected' : '' %>>🇦🇷 Pesos (ARS)</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="precio">Precio (0 = Consultar)</label>
-              <input type="number" id="precio" name="precio" step="0.01" value="<%= auto ? auto.precio : 0 %>" placeholder="Ej: 15000">
+            <div class="car-field">
+              <label>Precio (0 = Consultar)</label>
+              <input type="number" name="precio" step="0.01" value="<%= auto ? auto.precio : 0 %>" placeholder="15000">
             </div>
-            <div class="form-group">
-              <label for="kilometraje">Kilómetros</label>
-              <input type="number" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>" placeholder="Ej: 45000">
+            <div class="car-field">
+              <label>Kilómetros</label>
+              <input type="number" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>" placeholder="45000">
             </div>
           </div>
         </div>
 
-        <!-- ═══ PASO 3: Motor y detalles ═══ -->
-        <div class="form-section">
+        <!-- PASO 3 -->
+        <div class="car-section">
           <h3>⚙️ Datos del motor</h3>
-          <div class="form-grid-4">
-            <div class="form-group">
-              <label for="combustible">Combustible</label>
-              <select id="combustible" name="combustible">
+          <div class="car-form-grid-4">
+            <div class="car-field">
+              <label>Combustible</label>
+              <select name="combustible">
                 <% ['Nafta','Diesel','GNC','Híbrido','Eléctrico'].forEach(c => { %>
                   <option value="<%= c %>" <%= auto && auto.combustible === c ? 'selected' : '' %>><%= c %></option>
                 <% }) %>
               </select>
             </div>
-            <div class="form-group">
-              <label for="transmision">Transmisión</label>
-              <select id="transmision" name="transmision">
+            <div class="car-field">
+              <label>Transmisión</label>
+              <select name="transmision">
                 <option value="Manual" <%= auto && auto.transmision === 'Manual' ? 'selected' : '' %>>Manual</option>
                 <option value="Automática" <%= auto && auto.transmision === 'Automática' ? 'selected' : '' %>>Automática</option>
                 <option value="CVT" <%= auto && auto.transmision === 'CVT' ? 'selected' : '' %>>CVT</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="puertas">Puertas</label>
-              <select id="puertas" name="puertas">
+            <div class="car-field">
+              <label>Puertas</label>
+              <select name="puertas">
                 <% [2,3,4,5].forEach(p => { %>
                   <option value="<%= p %>" <%= auto && auto.puertas == p ? 'selected' : '' %>><%= p %> puertas</option>
                 <% }) %>
               </select>
             </div>
-            <div class="form-group">
-              <label for="motor">Motor</label>
-              <input type="text" id="motor" name="motor" value="<%= auto ? (auto.motor || '') : '' %>" placeholder="1.8L 140cv">
+            <div class="car-field">
+              <label>Motor</label>
+              <input type="text" name="motor" value="<%= auto ? (auto.motor || '') : '' %>" placeholder="1.8L 140cv">
             </div>
           </div>
         </div>
 
-        <!-- ═══ PASO 4: Descripción ═══ -->
-        <div class="form-section">
+        <!-- PASO 4 -->
+        <div class="car-section">
           <h3>📝 Descripción y visibilidad</h3>
-          <div class="form-group">
-            <label for="descripcion">Contá algo del vehículo (opcional)</label>
-            <textarea id="descripcion" name="descripcion" rows="4" placeholder="Estado general, equipamiento extra, detalles que destaquen..."><%= auto ? (auto.descripcion || '') : '' %></textarea>
+          <div class="car-field">
+            <label>Contá algo del vehículo (opcional)</label>
+            <textarea name="descripcion" rows="4" placeholder="Estado general, equipamiento, detalles..."><%= auto ? (auto.descripcion || '') : '' %></textarea>
           </div>
-          <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.5rem;">
-            <div class="form-check">
+          <div class="car-checks">
+            <div class="car-check">
               <input type="checkbox" id="destacado" name="destacado" value="1" <%= auto && auto.destacado ? 'checked' : '' %>>
               <label for="destacado">⭐ Destacar en la página principal</label>
             </div>
-            <div class="form-check">
+            <div class="car-check">
               <input type="checkbox" id="activo" name="activo" value="1" <%= !auto || auto.activo ? 'checked' : '' %>>
               <label for="activo">✅ Visible en la web (publicado)</label>
             </div>
           </div>
         </div>
 
-        <!-- ═══ PASO 5: Fotos ═══ -->
-        <div class="form-section">
+        <!-- PASO 5: Fotos -->
+        <div class="car-section">
           <h3>📷 Fotos del vehículo</h3>
-
           <% if (imagenes && imagenes.length > 0) { %>
-          <p style="font-size:0.85rem; color:var(--admin-text-secondary); margin-bottom:0.75rem;">
-            Fotos actuales (<%= imagenes.length %>) — Pasá el mouse encima para ver opciones
-          </p>
-          <div class="current-images">
+          <p style="font-size:14px; color:#64748B; margin-bottom:12px;">Fotos actuales (<%= imagenes.length %>):</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; margin-bottom:20px;">
             <% imagenes.forEach(img => { %>
-            <div class="img-thumb <%= img.es_principal ? 'is-main' : '' %>">
-              <img src="/uploads/autos/<%= img.filename %>" alt="Foto" loading="lazy">
-              <% if (img.es_principal) { %><span class="img-main-badge">Principal</span><% } %>
-              <div class="img-thumb-actions">
+            <div style="position:relative; border-radius:10px; overflow:hidden; aspect-ratio:4/3; border:2px solid <%= img.es_principal ? '#2E6EB5' : '#E2E8F0' %>;">
+              <img src="/uploads/autos/<%= img.filename %>" alt="Foto" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+              <% if (img.es_principal) { %><span style="position:absolute;top:4px;left:4px;background:#2E6EB5;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:50px;">PRINCIPAL</span><% } %>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:6px;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent);display:flex;justify-content:center;gap:6px;">
                 <% if (!img.es_principal) { %>
-                <form method="POST" action="/admin/autos/imagen/principal/<%= img.id %>" style="display:inline;">
-                  <button type="submit" style="background:var(--av-blue);color:#fff;" title="Hacer foto principal">⭐</button>
-                </form>
+                <form method="POST" action="/admin/autos/imagen/principal/<%= img.id %>" style="display:inline;"><button type="submit" style="background:#2E6EB5;color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;" title="Hacer principal">⭐</button></form>
                 <% } %>
-                <form method="POST" action="/admin/autos/imagen/eliminar/<%= img.id %>" onsubmit="return confirm('¿Eliminar esta foto?')" style="display:inline;">
-                  <button type="submit" style="background:var(--admin-danger);color:#fff;" title="Eliminar foto">✕</button>
-                </form>
+                <form method="POST" action="/admin/autos/imagen/eliminar/<%= img.id %>" onsubmit="return confirm('¿Eliminar esta foto?')" style="display:inline;"><button type="submit" style="background:#EF4444;color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;" title="Eliminar">✕</button></form>
               </div>
             </div>
             <% }) %>
           </div>
           <% } %>
 
-          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click();">
-            <div class="drop-icon">📁</div>
-            <p><strong>Hacé clic acá</strong> para elegir fotos desde tu computadora</p>
-            <p style="font-size:0.75rem; margin-top:0.4rem; color:var(--admin-text-muted);">
-              JPG, PNG o WebP — Máximo 10MB cada una — Podés subir hasta 20 fotos
-            </p>
+          <div id="dropZone" onclick="document.getElementById('fileInput').click();" style="border:2px dashed #2E6EB5;background:rgba(46,110,181,0.03);border-radius:16px;padding:32px 20px;text-align:center;cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:36px;margin-bottom:8px;">📁</div>
+            <p style="color:#64748B;font-size:15px;"><strong>Hacé clic acá</strong> para elegir fotos</p>
+            <p style="font-size:12px;margin-top:6px;color:#94A3B8;">JPG, PNG o WebP — Máx 10MB — Hasta 20 fotos</p>
           </div>
           <input type="file" id="fileInput" name="imagenes" multiple accept="image/*" style="display:none;" onchange="previewFiles(this)">
-          <div id="previewArea" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:0.75rem; margin-top:1rem;"></div>
+          <div id="previewArea" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px;"></div>
         </div>
 
-        <!-- ═══ BOTÓN FINAL ═══ -->
-        <div class="submit-bar">
-          <button type="submit" class="btn btn-primary btn-block" style="padding:0.9rem; font-size:1rem; border-radius:var(--radius);">
-            <%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %>
-          </button>
-        </div>
+        <!-- BOTÓN -->
+        <button type="submit" class="car-submit">
+          <%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %>
+        </button>
       </form>
     </main>
   </div>
 
   <script>
-    var dropZone = document.getElementById('dropZone');
-    var fileInput = document.getElementById('fileInput');
-
-    if (dropZone) {
-      ['dragenter','dragover'].forEach(function(e) {
-        dropZone.addEventListener(e, function(ev) {
-          ev.preventDefault();
-          dropZone.style.borderColor = 'var(--av-blue-light)';
-          dropZone.style.background = 'rgba(46,110,181,0.08)';
-        });
-      });
-      ['dragleave','drop'].forEach(function(e) {
-        dropZone.addEventListener(e, function(ev) {
-          ev.preventDefault();
-          dropZone.style.borderColor = '';
-          dropZone.style.background = '';
-        });
-      });
-      dropZone.addEventListener('drop', function(ev) {
-        ev.preventDefault();
-        if (ev.dataTransfer.files.length > 0) {
-          fileInput.files = ev.dataTransfer.files;
-          previewFiles(fileInput);
-        }
-      });
-    }
-
     function previewFiles(input) {
       var area = document.getElementById('previewArea');
       area.innerHTML = '';
-      if (!input.files || input.files.length === 0) return;
+      if (!input.files) return;
       Array.from(input.files).forEach(function(file) {
         var reader = new FileReader();
         reader.onload = function(e) {
           var div = document.createElement('div');
-          div.style.cssText = 'aspect-ratio:4/3;border-radius:10px;overflow:hidden;border:2px solid var(--admin-border);';
+          div.style.cssText = 'aspect-ratio:4/3;border-radius:10px;overflow:hidden;border:2px solid #E2E8F0;';
           div.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">';
           area.appendChild(div);
         };
