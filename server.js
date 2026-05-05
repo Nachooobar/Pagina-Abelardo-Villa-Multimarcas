@@ -6,6 +6,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const brand = require('./config/brand');
 
 // Configuración de entorno
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -56,6 +57,66 @@ app.use((req, res, next) => {
   res.locals.currentYear = new Date().getFullYear();
   res.locals.isAdmin = req.session && req.session.isAdmin;
   res.locals.NODE_ENV = NODE_ENV;
+  
+  // ── Inyectar configuración de marca ──
+  res.locals.brand = brand;
+  
+  // ── Helper: Generar link de WhatsApp ──
+  res.locals.getWhatsAppLink = (vehicleName = null) => {
+    const baseNumber = brand.contact.whatsapp.number;
+    const baseURL = `https://wa.me/${baseNumber}?text=`;
+    const message = vehicleName 
+      ? encodeURIComponent(brand.contact.whatsapp.messages.vehicleInfo(vehicleName))
+      : encodeURIComponent(brand.contact.whatsapp.messages.general);
+    return baseURL + message;
+  };
+  
+  // ── Helper: Generar link de WhatsApp para coming soon ──
+  res.locals.getWhatsAppComingSoon = () => {
+    const baseNumber = brand.contact.whatsapp.number;
+    const baseURL = `https://wa.me/${baseNumber}?text=`;
+    const message = encodeURIComponent(brand.contact.whatsapp.messages.inventory);
+    return baseURL + message;
+  };
+
+  next();
+});
+
+// ── Middleware: Verificar estado del inventario ──
+app.use(async (req, res, next) => {
+  try {
+    const inventoryCount = await db.get('SELECT COUNT(*) as count FROM autos WHERE activo = 1');
+    res.locals.inventoryStatus = inventoryCount.count === 0 ? 'coming_soon' : 'available';
+    res.locals.hasInventory = inventoryCount.count > 0;
+    res.locals.totalInventoryCount = inventoryCount.count;
+  } catch (error) {
+    console.error('Error verificando inventario:', error);
+    res.locals.inventoryStatus = 'available';
+    res.locals.hasInventory = true;
+    res.locals.totalInventoryCount = 0;
+  }
+  next();
+});
+
+// ── Middleware: SEO Dinámico ──
+app.use((req, res, next) => {
+  const originalRender = res.render;
+  
+  res.render = function(view, locals = {}) {
+    // Establecer título por defecto si no existe
+    if (!locals.seoTitle) {
+      locals.seoTitle = brand.seo.baseTitle;
+    }
+    
+    // Establecer descripción por defecto
+    if (!locals.seoDescription) {
+      locals.seoDescription = brand.description;
+    }
+    
+    // Pasar al render original
+    return originalRender.call(this, view, locals);
+  };
+  
   next();
 });
 

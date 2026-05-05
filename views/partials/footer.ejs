@@ -3,8 +3,8 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <img src="/images/logo.png" alt="Abelardo Villa Multimarcas" class="footer-logo">
-          <p class="footer-text">Tu concesionaria de confianza. Vehículos usados seleccionados y 0km de todas las marcas al mejor precio del mercado.</p>
+          <img src="/images/logo.png" alt="<%= brand.name %>" class="footer-logo">
+          <p class="footer-text"><%= brand.bio %></p>
         </div>
         <div>
           <h4>Navegación</h4>
@@ -28,15 +28,17 @@
         <div>
           <h4>Contacto</h4>
           <div class="footer-links">
-            <a href="#">📍 Ruta 1 KM 5.5</a>
-            <a href="tel:+5493425352093">📞 (342) 535-2093</a>
-            <a href="https://wa.me/5493425352093" target="_blank">💬 WhatsApp</a>
-            <a href="https://www.instagram.com/abelardo_raul_villa/" target="_blank">📸 Instagram</a>
+            <a href="<%= brand.contact.maps.url %>" target="_blank">📍 <%= brand.contact.maps.address %></a>
+            <a href="tel:<%= brand.contact.phone %>">📞 <%= brand.contact.phone %></a>
+            <a href="<%= getWhatsAppLink() %>" target="_blank">💬 WhatsApp</a>
+            <% if (brand.social.instagram) { %>
+              <a href="<%= brand.social.instagram %>" target="_blank">📸 Instagram</a>
+            <% } %>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; <%= currentYear %> Abelardo Villa Multimarcas. Todos los derechos reservados.</p>
+        <p>&copy; <%= currentYear %> <%= brand.name %>. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>

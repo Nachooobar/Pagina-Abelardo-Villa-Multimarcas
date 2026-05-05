@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Abelardo Villa Multimarcas - Concesionaria de vehículos usados y 0km. Encontrá tu próximo auto al mejor precio.">
-  <title><%= typeof title !== 'undefined' ? title : 'Abelardo Villa Multimarcas' %></title>
+  <meta name="description" content="<%= seoDescription || brand.description %>">
+  <meta name="keywords" content="<%= brand.seo.keywords %>">
+  <!-- Open Graph -->
+  <meta property="og:title" content="<%= seoTitle || brand.seo.baseTitle %>">
+  <meta property="og:description" content="<%= seoDescription || brand.description %>">
+  <meta property="og:image" content="<%= brand.seo.ogImage %>">
+  <meta property="og:type" content="website">
+  <title><%= seoTitle || brand.seo.baseTitle %></title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" type="image/png" href="/images/logo.png">
   <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
@@ -14,14 +20,14 @@
   <nav class="navbar" id="navbar">
     <div class="container">
       <a href="/" class="navbar-brand">
-        <img src="/images/logo.png" alt="Abelardo Villa Multimarcas" class="logo-img">
+        <img src="/images/logo.png" alt="<%= brand.name %>" class="logo-img">
       </a>
       <div class="nav-links" id="navLinks">
         <a href="/" class="<%= typeof title !== 'undefined' && title.includes('Concesionaria') ? 'active' : '' %>">Inicio</a>
         <a href="/catalogo" class="<%= typeof title !== 'undefined' && title.includes('Catálogo') ? 'active' : '' %>">Catálogo</a>
         <a href="/nosotros" class="<%= typeof title !== 'undefined' && title.includes('Nosotros') ? 'active' : '' %>">Nosotros</a>
         <a href="/contacto" class="<%= typeof title !== 'undefined' && title.includes('Contacto') ? 'active' : '' %>">Contacto</a>
-        <a href="https://wa.me/5493425352093?text=Hola! Me contacto desde la web." target="_blank" class="nav-cta">WhatsApp</a>
+        <a href="<%= getWhatsAppLink() %>" target="_blank" class="nav-cta">WhatsApp</a>
       </div>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Menú">☰</button>
     </div>
