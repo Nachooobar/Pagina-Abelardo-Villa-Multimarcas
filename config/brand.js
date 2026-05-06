@@ -8,7 +8,7 @@ module.exports = {
   name: 'Abelardo Villa Multimarcas',
   tagline: 'Vehículos Seleccionados. Garantía Asegurada.',
   description: 'Concesionaria multimarcas oriunda de Santa Fe especializada en vehículos usados y 0km con las mejores opciones de financiación.',
-  
+
   // Contacto
   contact: {
     whatsapp: {
@@ -25,11 +25,11 @@ module.exports = {
     email: 'abelardoraul_villa@hotmail.com',
     // Google Maps link
     maps: {
-      url: 'https://maps.google.com/maps?q=Abelardo+Villa+Multimarcas',
-      address: 'Ubicación a definir'
+      url: 'https://maps.app.goo.gl/WR7Adumr4MafSjJX9',
+      address: 'Ruta 1 KM 5.5, Rincon, Santa Fe, Argentina'
     }
   },
-  
+
   // Redes Sociales
   social: {
     instagram: 'https://instagram.com/abelardo_raul_villa',
@@ -44,5 +44,5 @@ module.exports = {
   },
 
   // Breve Bio / Descripción
-  bio: 'Somos una concesionaria multimarcas con más de 40 años en el mercado. Ofrecemos vehículos seleccionados, asesoría personalizada y las mejores opciones de financiación. 100% garantía en todas nuestras unidades.'
+  bio: 'Somos una concesionaria multimarcas con más de 40 años en el mercado. Ofrecemos vehículos seleccionados, asesoría personalizada y las mejores opciones de financiación.'
 };
