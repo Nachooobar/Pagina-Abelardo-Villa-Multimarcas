@@ -170,7 +170,7 @@ router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (re
       marca, modelo, version || '', parseInt(anio), parseFloat(stripFormatting(precio)) || 0, moneda || 'USD',
       parseInt(stripFormatting(kilometraje)) || 0, combustible || 'Nafta', transmision || 'Manual',
       color || '', parseInt(puertas) || 4, motor || '', descripcion || '',
-      condicion || 'Usado', destacado ? 1 : 0, activo ? 1 : 1
+      condicion || 'Usado', destacado ? 1 : 0, activo ? 1 : 0
     ]);
 
     const autoId = result.id;

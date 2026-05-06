@@ -3,7 +3,7 @@
   <!-- Hero Section -->
   <section class="hero" id="hero">
     <div class="hero-content container">
-      <% if (inventoryStatus === 'coming_soon') { %>
+      <% if (inventoryStatus==='coming_soon' ) { %>
         <!-- Coming Soon State -->
         <div class="coming-soon-hero">
           <div class="coming-soon-icon">🚗</div>
@@ -12,11 +12,12 @@
             Nuestros vehículos exclusivos y cuidadosamente seleccionados estarán listos muy pronto.
             Sé de los primeros en acceder a nuestro catálogo.
           </p>
-          
+
           <div class="coming-soon-actions">
             <a href="<%= getWhatsAppComingSoon() %>" target="_blank" class="btn btn-primary">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378l-.361.214-3.741-.982.998 3.645-.235.364a9.964 9.964 0 001.523 5.074c.711 1.103 1.632 2.053 2.692 2.792 1.393.953 3.042 1.464 4.782 1.464 1.487 0 2.926-.358 4.206-1.031l.364-.214 3.758.981-.997-3.648.236-.363a9.968 9.968 0 00-1.522-5.037c-.71-1.097-1.628-2.043-2.687-2.787-.695-.477-1.477-.885-2.313-1.107-.338-.089-.681-.135-1.025-.127z"/>
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378l-.361.214-3.741-.982.998 3.645-.235.364a9.964 9.964 0 001.523 5.074c.711 1.103 1.632 2.053 2.692 2.792 1.393.953 3.042 1.464 4.782 1.464 1.487 0 2.926-.358 4.206-1.031l.364-.214 3.758.981-.997-3.648.236-.363a9.968 9.968 0 00-1.522-5.037c-.71-1.097-1.628-2.043-2.687-2.787-.695-.477-1.477-.885-2.313-1.107-.338-.089-.681-.135-1.025-.127z" />
               </svg>
               Notificarme en WhatsApp
             </a>
@@ -24,83 +25,83 @@
               Conocer más sobre nosotros
             </a>
           </div>
-          
+
           <p class="coming-soon-notice">
             ✓ Más de 15 años en el mercado<br>
-            ✓ Vehículos 100% garantizados<br>
+            ✓ Vehículos cuidadosamente seleccionados<br>
             ✓ Financiación personalizada
           </p>
         </div>
-      <% } else { %>
-        <!-- Normal Hero with Search -->
-        <div class="hero-badge">🚗 Concesionaria Multimarcas</div>
-        <h1>Encontrá tu próximo<br><span>vehículo ideal</span></h1>
-        <p class="hero-subtitle">Vehículos usados seleccionados y 0km de todas las marcas. Financiación y los mejores
-          precios del mercado.</p>
+        <% } else { %>
+          <!-- Normal Hero with Search -->
+          <div class="hero-badge">🚗 Concesionaria Multimarcas</div>
+          <h1>Encontrá tu próximo<br><span>vehículo ideal</span></h1>
+          <p class="hero-subtitle">Vehículos usados seleccionados y 0km de todas las marcas. Financiación y los mejores
+            precios del mercado.</p>
 
-        <!-- Search Box -->
-        <form class="hero-search" action="/catalogo" method="GET" id="heroSearch">
-          <div class="search-grid">
-            <div class="search-field">
-              <label for="hero-marca">Marca</label>
-              <select name="marca" id="hero-marca">
-                <option value="">Todas las marcas</option>
-                <% marcas.forEach(m=> { %>
-                  <option value="<%= m.marca %>">
-                    <%= m.marca %>
-                  </option>
-                  <% }) %>
-              </select>
+          <!-- Search Box -->
+          <form class="hero-search" action="/catalogo" method="GET" id="heroSearch">
+            <div class="search-grid">
+              <div class="search-field">
+                <label for="hero-marca">Marca</label>
+                <select name="marca" id="hero-marca">
+                  <option value="">Todas las marcas</option>
+                  <% marcas.forEach(m=> { %>
+                    <option value="<%= m.marca %>">
+                      <%= m.marca %>
+                    </option>
+                    <% }) %>
+                </select>
+              </div>
+              <div class="search-field">
+                <label for="hero-modelo">Modelo</label>
+                <select name="modelo" id="hero-modelo">
+                  <option value="">Todos los modelos</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label for="hero-anio">Año</label>
+                <select name="anio" id="hero-anio">
+                  <option value="">Todos los años</option>
+                  <% anios.forEach(a=> { %>
+                    <option value="<%= a.anio %>">
+                      <%= a.anio %>
+                    </option>
+                    <% }) %>
+                </select>
+              </div>
+              <button type="submit" class="btn-search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                Buscar
+              </button>
             </div>
-            <div class="search-field">
-              <label for="hero-modelo">Modelo</label>
-              <select name="modelo" id="hero-modelo">
-                <option value="">Todos los modelos</option>
-              </select>
-            </div>
-            <div class="search-field">
-              <label for="hero-anio">Año</label>
-              <select name="anio" id="hero-anio">
-                <option value="">Todos los años</option>
-                <% anios.forEach(a=> { %>
-                  <option value="<%= a.anio %>">
-                    <%= a.anio %>
-                  </option>
-                  <% }) %>
-              </select>
-            </div>
-            <button type="submit" class="btn-search">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-              Buscar
-            </button>
-          </div>
-        </form>
+          </form>
 
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="number">
-              <%= totalAutos %>+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="number">
+                <%= totalAutos %>+
+              </div>
+              <div class="label">Vehículos</div>
             </div>
-            <div class="label">Vehículos</div>
+            <div class="hero-stat">
+              <div class="number">15+</div>
+              <div class="label">Marcas</div>
+            </div>
+            <div class="hero-stat">
+              <div class="number">100%</div>
+              <div class="label">Atencion Personalizada</div>
+            </div>
           </div>
-          <div class="hero-stat">
-            <div class="number">15+</div>
-            <div class="label">Marcas</div>
-          </div>
-          <div class="hero-stat">
-            <div class="number">100%</div>
-            <div class="label">Garantía</div>
-          </div>
-        </div>
-      <% } %>
+          <% } %>
     </div>
   </section>
 
   <!-- Featured Vehicles -->
-  <% if (inventoryStatus !== 'coming_soon' && destacados.length> 0) { %>
+  <% if (inventoryStatus !=='coming_soon' && destacados.length> 0) { %>
     <section class="section" id="destacados">
       <div class="container">
         <div class="section-header fade-in">
@@ -118,7 +119,7 @@
     <% } %>
 
       <!-- Latest Vehicles -->
-      <% if (inventoryStatus !== 'coming_soon' && ultimos.length> 0) { %>
+      <% if (inventoryStatus !=='coming_soon' && ultimos.length> 0) { %>
         <section class="section" id="ultimos">
           <div class="container">
             <div class="section-header fade-in">
@@ -136,38 +137,38 @@
             </div>
           </div>
         </section>
-      <% } %>
+        <% } %>
 
-      <!-- Lazy Loading + Dynamic Filters Script -->
-      <script>
-        // Lazy loading images
-        document.addEventListener('DOMContentLoaded', () => {
-          const lazyImgs = document.querySelectorAll('.lazy-img');
-          const imgObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.remove('lazy-img');
-                imgObserver.unobserve(img);
+          <!-- Lazy Loading + Dynamic Filters Script -->
+          <script>
+            // Lazy loading images
+            document.addEventListener('DOMContentLoaded', () => {
+              const lazyImgs = document.querySelectorAll('.lazy-img');
+              const imgObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy-img');
+                    imgObserver.unobserve(img);
+                  }
+                });
+              }, { rootMargin: '100px' });
+              lazyImgs.forEach(img => imgObserver.observe(img));
+            });
+
+            // Dynamic filter: load models when brand changes
+            document.getElementById('hero-marca') && document.getElementById('hero-marca').addEventListener('change', async function () {
+              const modeloSelect = document.getElementById('hero-modelo');
+              modeloSelect.innerHTML = '<option value="">Todos los modelos</option>';
+              if (this.value) {
+                const res = await fetch('/api/modelos/' + encodeURIComponent(this.value));
+                const modelos = await res.json();
+                modelos.forEach(m => {
+                  modeloSelect.innerHTML += '<option value="' + m.modelo + '">' + m.modelo + '</option>';
+                });
               }
             });
-          }, { rootMargin: '100px' });
-          lazyImgs.forEach(img => imgObserver.observe(img));
-        });
+          </script>
 
-        // Dynamic filter: load models when brand changes
-        document.getElementById('hero-marca') && document.getElementById('hero-marca').addEventListener('change', async function () {
-          const modeloSelect = document.getElementById('hero-modelo');
-          modeloSelect.innerHTML = '<option value="">Todos los modelos</option>';
-          if (this.value) {
-            const res = await fetch('/api/modelos/' + encodeURIComponent(this.value));
-            const modelos = await res.json();
-            modelos.forEach(m => {
-              modeloSelect.innerHTML += '<option value="' + m.modelo + '">' + m.modelo + '</option>';
-            });
-          }
-        });
-      </script>
-
-      <%- include('partials/footer') %>
+          <%- include('partials/footer') %>

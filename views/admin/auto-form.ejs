@@ -1,277 +1,319 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>
+    <%= title %>
+  </title>
   <link rel="stylesheet" href="/css/admin.css?v=5">
 </head>
+
 <body>
   <div class="admin-layout">
     <%- include('sidebar') %>
-    <main class="admin-main">
+      <main class="admin-main">
 
-      <!-- HEADER -->
-      <div class="admin-header">
-        <div>
-          <h1><%= auto ? '✏️ Editar Vehículo' : '➕ Nuevo Vehículo' %></h1>
-          <p class="admin-header-sub">Completá los datos del vehículo paso a paso</p>
-        </div>
-        <a href="/admin/autos" class="btn btn-outline btn-sm">← Volver a la lista</a>
-      </div>
-
-      <!-- STEP INDICATOR -->
-      <div class="step-indicator">
-        <div class="step-item active" data-step="1">
-          <div class="step-circle">1</div>
-          <span class="step-label">Vehículo</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step-item" data-step="2">
-          <div class="step-circle">2</div>
-          <span class="step-label">Precio</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step-item" data-step="3">
-          <div class="step-circle">3</div>
-          <span class="step-label">Motor</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step-item" data-step="4">
-          <div class="step-circle">4</div>
-          <span class="step-label">Detalles</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step-item" data-step="5">
-          <div class="step-circle">5</div>
-          <span class="step-label">Fotos</span>
-        </div>
-      </div>
-
-      <% if (error) { %><div class="alert alert-danger">⚠️ <%= error %></div><% } %>
-
-      <form method="POST" action="/admin/autos/<%= auto && auto.id ? 'editar/' + auto.id : 'nuevo' %>" enctype="multipart/form-data" class="admin-form" id="autoForm">
-
-        <!-- PASO 1: Identificación -->
-        <div class="form-section" data-section="1">
-          <h3>🚗 ¿Qué vehículo vas a cargar?</h3>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="marca">Marca *</label>
-              <input type="text" id="marca" name="marca" required value="<%= auto ? auto.marca : '' %>" placeholder="Toyota, Ford, Chevrolet...">
-            </div>
-            <div class="form-group">
-              <label for="modelo">Modelo *</label>
-              <input type="text" id="modelo" name="modelo" required value="<%= auto ? auto.modelo : '' %>" placeholder="Corolla, Ranger, Cruze...">
-            </div>
+        <!-- HEADER -->
+        <div class="admin-header">
+          <div>
+            <h1>
+              <%= auto ? '✏️ Editar Vehículo' : '➕ Nuevo Vehículo' %>
+            </h1>
+            <p class="admin-header-sub">Completá los datos del vehículo paso a paso</p>
           </div>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="version">Versión <span class="label-hint">(opcional)</span></label>
-              <input type="text" id="version" name="version" value="<%= auto ? (auto.version || '') : '' %>" placeholder="XEI 1.8 CVT, XLS 4x4...">
-            </div>
-            <div class="form-group">
-              <label for="anio">Año *</label>
-              <input type="number" id="anio" name="anio" required min="1990" max="2030" value="<%= auto ? auto.anio : new Date().getFullYear() %>">
-            </div>
+          <a href="/admin/autos" class="btn btn-outline btn-sm">← Volver a la lista</a>
+        </div>
+
+        <!-- STEP INDICATOR -->
+        <div class="step-indicator">
+          <div class="step-item active" data-step="1">
+            <div class="step-circle">1</div>
+            <span class="step-label">Vehículo</span>
           </div>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="condicion">¿Es usado o 0km?</label>
-              <select id="condicion" name="condicion">
-                <option value="Usado" <%= auto && auto.condicion === 'Usado' ? 'selected' : '' %>>🔄 Usado</option>
-                <option value="0km" <%= auto && auto.condicion === '0km' ? 'selected' : '' %>>✨ 0km (Nuevo)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="color">Color</label>
-              <input type="text" id="color" name="color" value="<%= auto ? (auto.color || '') : '' %>" placeholder="Blanco, Negro, Gris...">
-            </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="2">
+            <div class="step-circle">2</div>
+            <span class="step-label">Precio</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="3">
+            <div class="step-circle">3</div>
+            <span class="step-label">Motor</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="4">
+            <div class="step-circle">4</div>
+            <span class="step-label">Detalles</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="5">
+            <div class="step-circle">5</div>
+            <span class="step-label">Fotos</span>
           </div>
         </div>
 
-        <!-- PASO 2: Precio -->
-        <div class="form-section" data-section="2">
-          <h3>💰 ¿A cuánto lo vendés?</h3>
-
-          <!-- Currency Toggle -->
-          <div class="currency-toggle-wrapper">
-            <label class="currency-toggle-label">Moneda</label>
-            <div class="currency-toggle" id="currencyToggle">
-              <button type="button" class="currency-option <%= !auto || auto.moneda === 'USD' ? 'active' : '' %>" data-value="USD">
-                <span class="currency-flag">🇺🇸</span>
-                <span class="currency-code">USD</span>
-                <span class="currency-symbol">U$S</span>
-              </button>
-              <button type="button" class="currency-option <%= auto && auto.moneda === 'ARS' ? 'active' : '' %>" data-value="ARS">
-                <span class="currency-flag">🇦🇷</span>
-                <span class="currency-code">ARS</span>
-                <span class="currency-symbol">$</span>
-              </button>
-            </div>
-            <input type="hidden" id="moneda" name="moneda" value="<%= auto && auto.moneda ? auto.moneda : 'USD' %>">
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="precioDisplay">Precio <span class="label-hint">(0 = Consultar)</span></label>
-              <div class="input-with-prefix">
-                <span class="input-prefix" id="precioPrefix"><%= auto && auto.moneda === 'ARS' ? '$' : 'U$S' %></span>
-                <input type="text" id="precioDisplay" inputmode="numeric" maxlength="17" value="<%= auto && auto.precio ? auto.precio.toLocaleString('es-AR') : '0' %>" placeholder="15.000.000" autocomplete="off">
-              </div>
-              <input type="hidden" id="precio" name="precio" value="<%= auto ? auto.precio : 0 %>">
-              <!-- Low price warning -->
-              <div class="price-warning" id="priceWarning" style="display:none;">
-                <span class="price-warning-icon">⚠️</span>
-                <span>¿El precio es correcto? Parece muy bajo para pesos argentinos</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="kilometrajeDisplay">Kilómetros</label>
-              <div class="input-with-suffix">
-                <input type="text" id="kilometrajeDisplay" inputmode="numeric" maxlength="17" value="<%= auto && auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') : '0' %>" placeholder="45.000" autocomplete="off">
-                <span class="input-suffix">km</span>
-              </div>
-              <input type="hidden" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>">
-            </div>
-          </div>
-        </div>
-
-        <!-- PASO 3: Motor -->
-        <div class="form-section" data-section="3">
-          <h3>⚙️ Datos del motor</h3>
-          <div class="form-grid-4">
-            <div class="form-group">
-              <label for="combustible">Combustible</label>
-              <select id="combustible" name="combustible">
-                <% ['Nafta','Diesel','GNC','Híbrido','Eléctrico'].forEach(c => { %>
-                  <option value="<%= c %>" <%= auto && auto.combustible === c ? 'selected' : '' %>><%= c %></option>
-                <% }) %>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="transmision">Transmisión</label>
-              <select id="transmision" name="transmision">
-                <option value="Manual" <%= auto && auto.transmision === 'Manual' ? 'selected' : '' %>>Manual</option>
-                <option value="Automática" <%= auto && auto.transmision === 'Automática' ? 'selected' : '' %>>Automática</option>
-                <option value="CVT" <%= auto && auto.transmision === 'CVT' ? 'selected' : '' %>>CVT</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="puertas">Puertas</label>
-              <select id="puertas" name="puertas">
-                <% [2,3,4,5].forEach(p => { %>
-                  <option value="<%= p %>" <%= auto && auto.puertas == p ? 'selected' : '' %>><%= p %> puertas</option>
-                <% }) %>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="motor">Motor</label>
-              <input type="text" id="motor" name="motor" value="<%= auto ? (auto.motor || '') : '' %>" placeholder="1.8L 140cv">
-            </div>
-          </div>
-        </div>
-
-        <!-- PASO 4: Descripción -->
-        <div class="form-section" data-section="4">
-          <h3>📝 Descripción y visibilidad</h3>
-          <div class="form-group">
-            <label for="descripcion">Contá algo del vehículo <span class="label-hint">(opcional)</span></label>
-            <textarea id="descripcion" name="descripcion" rows="4" placeholder="Estado general, equipamiento, detalles importantes..." maxlength="2000"><%= auto ? (auto.descripcion || '') : '' %></textarea>
-            <div class="char-counter"><span id="charCount">0</span> / 2000 caracteres</div>
-          </div>
-          <div class="form-toggles">
-            <label class="form-toggle" for="destacado">
-              <input type="checkbox" id="destacado" name="destacado" value="1" <%= auto && auto.destacado ? 'checked' : '' %>>
-              <span class="toggle-slider"></span>
-              <span class="toggle-content">
-                <span class="toggle-icon">⭐</span>
-                <span class="toggle-text">
-                  <strong>Destacar en la página principal</strong>
-                  <small>Aparecerá en la sección de vehículos destacados</small>
-                </span>
-              </span>
-            </label>
-            <label class="form-toggle" for="activo">
-              <input type="checkbox" id="activo" name="activo" value="1" <%= !auto || auto.activo ? 'checked' : '' %>>
-              <span class="toggle-slider"></span>
-              <span class="toggle-content">
-                <span class="toggle-icon">✅</span>
-                <span class="toggle-text">
-                  <strong>Visible en la web (publicado)</strong>
-                  <small>Desactivá esto para ocultar el vehículo temporalmente</small>
-                </span>
-              </span>
-            </label>
-          </div>
-        </div>
-
-        <!-- PASO 5: Fotos -->
-        <div class="form-section" data-section="5">
-          <h3>📷 Fotos del vehículo</h3>
-
-          <% if (imagenes && imagenes.length > 0) { %>
-          <div class="current-images-header">
-            <span class="images-count-badge">📸 <%= imagenes.length %> foto<%= imagenes.length !== 1 ? 's' : '' %> cargada<%= imagenes.length !== 1 ? 's' : '' %></span>
-          </div>
-          <div class="current-images">
-            <% imagenes.forEach(img => { %>
-            <div class="img-thumb <%= img.es_principal ? 'is-main' : '' %>">
-              <img src="/uploads/autos/<%= img.filename %>" alt="Foto del vehículo" loading="lazy">
-              <% if (img.es_principal) { %><span class="img-main-badge">PRINCIPAL</span><% } %>
-              <div class="img-thumb-actions">
-                <% if (!img.es_principal) { %>
-                <form method="POST" action="/admin/autos/imagen/principal/<%= img.id %>" style="display:inline;">
-                  <button type="submit" class="img-action-btn img-action-star" title="Hacer principal">⭐</button>
-                </form>
-                <% } %>
-                <form method="POST" action="/admin/autos/imagen/eliminar/<%= img.id %>" onsubmit="return confirm('¿Eliminar esta foto?')" style="display:inline;">
-                  <button type="submit" class="img-action-btn img-action-delete" title="Eliminar">✕</button>
-                </form>
-              </div>
-            </div>
-            <% }) %>
+        <% if (error) { %>
+          <div class="alert alert-danger">⚠️ <%= error %>
           </div>
           <% } %>
 
-          <div class="drop-zone" id="dropZone">
-            <div class="drop-zone-content">
-              <div class="drop-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
+            <form method="POST" action="/admin/autos/<%= auto && auto.id ? 'editar/' + auto.id : 'nuevo' %>"
+              enctype="multipart/form-data" class="admin-form" id="autoForm">
+
+              <!-- PASO 1: Identificación -->
+              <div class="form-section" data-section="1">
+                <h3>🚗 ¿Qué vehículo vas a cargar?</h3>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="marca">Marca *</label>
+                    <input type="text" id="marca" name="marca" required value="<%= auto ? auto.marca : '' %>"
+                      placeholder="Toyota, Ford, Chevrolet...">
+                  </div>
+                  <div class="form-group">
+                    <label for="modelo">Modelo *</label>
+                    <input type="text" id="modelo" name="modelo" required value="<%= auto ? auto.modelo : '' %>"
+                      placeholder="Corolla, Ranger, Cruze...">
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="version">Versión <span class="label-hint">(opcional)</span></label>
+                    <input type="text" id="version" name="version" value="<%= auto ? (auto.version || '') : '' %>"
+                      placeholder="XEI 1.8 CVT, XLS 4x4...">
+                  </div>
+                  <div class="form-group">
+                    <label for="anio">Año *</label>
+                    <input type="number" id="anio" name="anio" required min="1990" max="2030"
+                      value="<%= auto ? auto.anio : new Date().getFullYear() %>">
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="condicion">¿Es usado o 0km?</label>
+                    <select id="condicion" name="condicion">
+                      <option value="Usado" <%=auto && auto.condicion==='Usado' ? 'selected' : '' %>>🔄 Usado</option>
+                      <option value="0km" <%=auto && auto.condicion==='0km' ? 'selected' : '' %>>✨ 0km (Nuevo)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" name="color" value="<%= auto ? (auto.color || '') : '' %>"
+                      placeholder="Blanco, Negro, Gris...">
+                  </div>
+                </div>
               </div>
-              <p class="drop-main-text"><strong>Arrastrá las fotos acá</strong> o hacé clic para seleccionar</p>
-              <p class="drop-sub-text">JPG, PNG o WebP · Máximo 10MB por foto · Hasta 20 fotos</p>
-            </div>
-            <div class="drop-zone-active">
-              <div class="drop-icon">📥</div>
-              <p class="drop-main-text"><strong>¡Soltá las fotos acá!</strong></p>
-            </div>
-          </div>
-          <input type="file" id="fileInput" name="imagenes" multiple accept="image/*" style="display:none;">
 
-          <div class="preview-grid" id="previewArea"></div>
-        </div>
+              <!-- PASO 2: Precio -->
+              <div class="form-section" data-section="2">
+                <h3>💰 ¿A cuánto lo vendés?</h3>
 
-        <!-- SUBMIT BAR -->
-        <div class="submit-bar">
-          <div class="submit-bar-inner">
-            <div class="submit-bar-info">
-              <span class="submit-bar-hint">💡 Revisá que toda la información sea correcta antes de guardar</span>
-            </div>
-            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-              <span class="btn-text"><%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %></span>
-              <span class="btn-loading" style="display:none;">
-                <span class="spinner"></span> Guardando...
-              </span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </main>
+                <!-- Currency Toggle -->
+                <div class="currency-toggle-wrapper">
+                  <label class="currency-toggle-label">Moneda</label>
+                  <div class="currency-toggle" id="currencyToggle">
+                    <button type="button" class="currency-option <%= !auto || auto.moneda === 'USD' ? 'active' : '' %>"
+                      data-value="USD">
+                      <span class="currency-flag">🇺🇸</span>
+                      <span class="currency-code">USD</span>
+                      <span class="currency-symbol">U$S</span>
+                    </button>
+                    <button type="button" class="currency-option <%= auto && auto.moneda === 'ARS' ? 'active' : '' %>"
+                      data-value="ARS">
+                      <span class="currency-flag">🇦🇷</span>
+                      <span class="currency-code">ARS</span>
+                      <span class="currency-symbol">$</span>
+                    </button>
+                  </div>
+                  <input type="hidden" id="moneda" name="moneda"
+                    value="<%= auto && auto.moneda ? auto.moneda : 'USD' %>">
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="precioDisplay">Precio <span class="label-hint">(0 = Consultar)</span></label>
+                    <div class="input-with-prefix">
+                      <span class="input-prefix" id="precioPrefix">
+                        <%= auto && auto.moneda==='ARS' ? '$' : 'U$S' %>
+                      </span>
+                      <input type="text" id="precioDisplay" inputmode="numeric" maxlength="17"
+                        value="<%= auto && auto.precio ? auto.precio.toLocaleString('es-AR') : '0' %>"
+                        placeholder="15.000.000" autocomplete="off">
+                    </div>
+                    <input type="hidden" id="precio" name="precio" value="<%= auto ? auto.precio : 0 %>">
+                    <!-- Low price warning -->
+                    <div class="price-warning" id="priceWarning" style="display:none;">
+                      <span class="price-warning-icon">⚠️</span>
+                      <span>¿El precio es correcto? Parece muy bajo para pesos argentinos</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="kilometrajeDisplay">Kilómetros</label>
+                    <div class="input-with-suffix">
+                      <input type="text" id="kilometrajeDisplay" inputmode="numeric" maxlength="17"
+                        value="<%= auto && auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') : '0' %>"
+                        placeholder="45.000" autocomplete="off">
+                      <span class="input-suffix">km</span>
+                    </div>
+                    <input type="hidden" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>">
+                  </div>
+                </div>
+              </div>
+
+              <!-- PASO 3: Motor -->
+              <div class="form-section" data-section="3">
+                <h3>⚙️ Datos del motor</h3>
+                <div class="form-grid-4">
+                  <div class="form-group">
+                    <label for="combustible">Combustible</label>
+                    <select id="combustible" name="combustible">
+                      <% ['Nafta','Diesel','Nafta/GNC','Híbrido','Eléctrico'].forEach(c=> { %>
+                        <option value="<%= c %>" <%=auto && auto.combustible===c ? 'selected' : '' %>><%= c %>
+                        </option>
+                        <% }) %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="transmision">Transmisión</label>
+                    <select id="transmision" name="transmision">
+                      <option value="Manual" <%=auto && auto.transmision==='Manual' ? 'selected' : '' %>>Manual</option>
+                      <option value="Automática" <%=auto && auto.transmision==='Automática' ? 'selected' : '' %>
+                        >Automática</option>
+                      <option value="CVT" <%=auto && auto.transmision==='CVT' ? 'selected' : '' %>>CVT</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="puertas">Puertas</label>
+                    <select id="puertas" name="puertas">
+                      <% [2,3,4,5].forEach(p=> { %>
+                        <option value="<%= p %>" <%=auto && auto.puertas==p ? 'selected' : '' %>><%= p %> puertas
+                        </option>
+                        <% }) %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="motor">Motor</label>
+                    <input type="text" id="motor" name="motor" value="<%= auto ? (auto.motor || '') : '' %>"
+                      placeholder="1.8L 140cv">
+                  </div>
+                </div>
+              </div>
+
+              <!-- PASO 4: Descripción -->
+              <div class="form-section" data-section="4">
+                <h3>📝 Descripción y visibilidad</h3>
+                <div class="form-group">
+                  <label for="descripcion">Contá algo del vehículo <span class="label-hint">(opcional)</span></label>
+                  <textarea id="descripcion" name="descripcion" rows="4"
+                    placeholder="Estado general, equipamiento, detalles importantes..."
+                    maxlength="2000"><%= auto ? (auto.descripcion || '') : '' %></textarea>
+                  <div class="char-counter"><span id="charCount">0</span> / 2000 caracteres</div>
+                </div>
+                <div class="form-toggles">
+                  <label class="form-toggle" for="destacado">
+                    <input type="checkbox" id="destacado" name="destacado" value="1" <%=auto && auto.destacado
+                      ? 'checked' : '' %>>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-content">
+                      <span class="toggle-icon">⭐</span>
+                      <span class="toggle-text">
+                        <strong>Destacar en la página principal</strong>
+                        <small>Aparecerá en la sección de vehículos destacados</small>
+                      </span>
+                    </span>
+                  </label>
+                  <label class="form-toggle" for="activo">
+                    <input type="checkbox" id="activo" name="activo" value="1" <%=!auto || auto.activo ? 'checked' : ''
+                      %>>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-content">
+                      <span class="toggle-icon">✅</span>
+                      <span class="toggle-text">
+                        <strong>Visible en la web (publicado)</strong>
+                        <small>Desactivá esto para ocultar el vehículo temporalmente</small>
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- PASO 5: Fotos -->
+              <div class="form-section" data-section="5">
+                <h3>📷 Fotos del vehículo</h3>
+
+                <% if (imagenes && imagenes.length> 0) { %>
+                  <div class="current-images-header">
+                    <span class="images-count-badge">📸 <%= imagenes.length %> foto<%= imagenes.length !==1 ? 's' : ''
+                          %> cargada<%= imagenes.length !==1 ? 's' : '' %></span>
+                  </div>
+                  <div class="current-images">
+                    <% imagenes.forEach(img=> { %>
+                      <div class="img-thumb <%= img.es_principal ? 'is-main' : '' %>">
+                        <img src="/uploads/autos/<%= img.filename %>" alt="Foto del vehículo" loading="lazy">
+                        <% if (img.es_principal) { %><span class="img-main-badge">PRINCIPAL</span>
+                          <% } %>
+                            <div class="img-thumb-actions">
+                              <% if (!img.es_principal) { %>
+                                <form method="POST" action="/admin/autos/imagen/principal/<%= img.id %>"
+                                  style="display:inline;">
+                                  <button type="submit" class="img-action-btn img-action-star"
+                                    title="Hacer principal">⭐</button>
+                                </form>
+                                <% } %>
+                                  <form method="POST" action="/admin/autos/imagen/eliminar/<%= img.id %>"
+                                    onsubmit="return confirm('¿Eliminar esta foto?')" style="display:inline;">
+                                    <button type="submit" class="img-action-btn img-action-delete"
+                                      title="Eliminar">✕</button>
+                                  </form>
+                            </div>
+                      </div>
+                      <% }) %>
+                  </div>
+                  <% } %>
+
+                    <div class="drop-zone" id="dropZone">
+                      <div class="drop-zone-content">
+                        <div class="drop-icon">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
+                        </div>
+                        <p class="drop-main-text"><strong>Arrastrá las fotos acá</strong> o hacé clic para seleccionar
+                        </p>
+                        <p class="drop-sub-text">JPG, PNG o WebP · Máximo 10MB por foto · Hasta 20 fotos</p>
+                      </div>
+                      <div class="drop-zone-active">
+                        <div class="drop-icon">📥</div>
+                        <p class="drop-main-text"><strong>¡Soltá las fotos acá!</strong></p>
+                      </div>
+                    </div>
+                    <input type="file" id="fileInput" name="imagenes" multiple accept="image/*" style="display:none;">
+
+                    <div class="preview-grid" id="previewArea"></div>
+              </div>
+
+              <!-- SUBMIT BAR -->
+              <div class="submit-bar">
+                <div class="submit-bar-inner">
+                  <div class="submit-bar-info">
+                    <span class="submit-bar-hint">💡 Revisá que toda la información sea correcta antes de guardar</span>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                    <span class="btn-text">
+                      <%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %>
+                    </span>
+                    <span class="btn-loading" style="display:none;">
+                      <span class="spinner"></span> Guardando...
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </form>
+      </main>
   </div>
 
   <script>
@@ -288,7 +330,7 @@
     }
 
     // ── Real-time Formatting Mask for Precio & Kilometraje ──
-    (function() {
+    (function () {
       var precioDisplay = document.getElementById('precioDisplay');
       var precioHidden = document.getElementById('precio');
       var kmDisplay = document.getElementById('kilometrajeDisplay');
@@ -298,7 +340,7 @@
       var precioPrefix = document.getElementById('precioPrefix');
 
       function applyMask(displayInput, hiddenInput, suffix) {
-        displayInput.addEventListener('input', function() {
+        displayInput.addEventListener('input', function () {
           var raw = stripDots(this.value);
           // Limit to 13 digits
           if (raw.length > 13) raw = raw.substring(0, 13);
@@ -320,8 +362,8 @@
         });
 
         // Prevent non-numeric input
-        displayInput.addEventListener('keydown', function(e) {
-          var allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+        displayInput.addEventListener('keydown', function (e) {
+          var allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
           if (allowed.indexOf(e.key) !== -1) return;
           if (e.ctrlKey || e.metaKey) return;
           if (!/^[0-9]$/.test(e.key)) {
@@ -330,9 +372,9 @@
         });
 
         // Select all on focus
-        displayInput.addEventListener('focus', function() {
+        displayInput.addEventListener('focus', function () {
           var self = this;
-          setTimeout(function() { self.select(); }, 50);
+          setTimeout(function () { self.select(); }, 50);
         });
       }
 
@@ -351,9 +393,9 @@
 
       // ── Currency Toggle ──
       var toggleBtns = document.querySelectorAll('#currencyToggle .currency-option');
-      toggleBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          toggleBtns.forEach(function(b) { b.classList.remove('active'); });
+      toggleBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          toggleBtns.forEach(function (b) { b.classList.remove('active'); });
           this.classList.add('active');
           var val = this.getAttribute('data-value');
           monedaInput.value = val;
@@ -372,7 +414,7 @@
     })();
 
     // ── Step Indicator: highlight steps as user scrolls ──
-    (function() {
+    (function () {
       var sections = document.querySelectorAll('.form-section[data-section]');
       var steps = document.querySelectorAll('.step-item[data-step]');
       var lines = document.querySelectorAll('.step-line');
@@ -381,13 +423,13 @@
         var scrollPos = window.scrollY + 200;
         var activeIndex = 0;
 
-        sections.forEach(function(section, i) {
+        sections.forEach(function (section, i) {
           if (section.offsetTop <= scrollPos) {
             activeIndex = i;
           }
         });
 
-        steps.forEach(function(step, i) {
+        steps.forEach(function (step, i) {
           step.classList.remove('active', 'completed');
           if (i < activeIndex) {
             step.classList.add('completed');
@@ -396,7 +438,7 @@
           }
         });
 
-        lines.forEach(function(line, i) {
+        lines.forEach(function (line, i) {
           line.classList.remove('filled');
           if (i < activeIndex) {
             line.classList.add('filled');
@@ -409,7 +451,7 @@
     })();
 
     // ── Char Counter ──
-    (function() {
+    (function () {
       var textarea = document.getElementById('descripcion');
       var counter = document.getElementById('charCount');
       if (textarea && counter) {
@@ -420,34 +462,34 @@
     })();
 
     // ── Drag & Drop + Click Upload ──
-    (function() {
+    (function () {
       var dropZone = document.getElementById('dropZone');
       var fileInput = document.getElementById('fileInput');
       var previewArea = document.getElementById('previewArea');
 
       // Click to open file dialog
-      dropZone.addEventListener('click', function() {
+      dropZone.addEventListener('click', function () {
         fileInput.click();
       });
 
       // Drag events
-      ['dragenter', 'dragover'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) {
+      ['dragenter', 'dragover'].forEach(function (evt) {
+        dropZone.addEventListener(evt, function (e) {
           e.preventDefault();
           e.stopPropagation();
           dropZone.classList.add('drag-over');
         });
       });
 
-      ['dragleave', 'drop'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) {
+      ['dragleave', 'drop'].forEach(function (evt) {
+        dropZone.addEventListener(evt, function (e) {
           e.preventDefault();
           e.stopPropagation();
           dropZone.classList.remove('drag-over');
         });
       });
 
-      dropZone.addEventListener('drop', function(e) {
+      dropZone.addEventListener('drop', function (e) {
         var dt = e.dataTransfer;
         if (dt && dt.files && dt.files.length > 0) {
           fileInput.files = dt.files;
@@ -455,7 +497,7 @@
         }
       });
 
-      fileInput.addEventListener('change', function() {
+      fileInput.addEventListener('change', function () {
         if (this.files && this.files.length > 0) {
           showPreviews(this.files);
         }
@@ -465,9 +507,9 @@
         previewArea.innerHTML = '';
         var count = Math.min(files.length, 20);
         for (var i = 0; i < count; i++) {
-          (function(file, index) {
+          (function (file, index) {
             var reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
               var div = document.createElement('div');
               div.className = 'preview-thumb';
               div.innerHTML =
@@ -487,18 +529,21 @@
     })();
 
     // ── Submit loading state ──
-    (function() {
+    (function () {
       var form = document.getElementById('autoForm');
       var btn = document.getElementById('submitBtn');
       if (form && btn) {
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function () {
           btn.querySelector('.btn-text').style.display = 'none';
           btn.querySelector('.btn-loading').style.display = 'inline-flex';
-          btn.disabled = true;
-          btn.style.opacity = '0.7';
+          setTimeout(function () {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+          }, 10);
         });
       }
     })();
   </script>
 </body>
+
 </html>
