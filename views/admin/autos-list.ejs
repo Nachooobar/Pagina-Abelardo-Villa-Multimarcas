@@ -60,8 +60,8 @@
               <td><strong><%= auto.marca %></strong></td>
               <td><%= auto.modelo %> <% if(auto.version) { %><br><small style="color:var(--admin-text-muted);"><%= auto.version %></small><% } %></td>
               <td><%= auto.anio %></td>
-              <td><% if(auto.precio > 0){ %><strong><%= auto.moneda %> <%= auto.precio.toLocaleString('es-AR') %></strong><% } else { %><span style="color:var(--admin-text-muted);">Consultar</span><% } %></td>
-              <td><%= auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') + ' km' : '0 km' %></td>
+              <td><% if(auto.precio > 0){ %><strong><%= auto.moneda === 'ARS' ? '$' : 'U$S' %> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></strong><% } else { %><span style="color:var(--admin-text-muted);">Consultar</span><% } %></td>
+              <td><%= auto.kilometraje ? new Intl.NumberFormat('es-AR').format(auto.kilometraje) + ' km' : '0 km' %></td>
               <td><span class="badge" style="background:rgba(46,110,181,0.1);color:var(--av-blue);">📷 <%= auto.total_imagenes %></span></td>
               <td>
                 <span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? '✅ Activo' : '⏸️ Inactivo' %></span>

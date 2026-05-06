@@ -32,13 +32,13 @@
       <% if (auto.kilometraje > 0) { %>
       <span class="card-spec">
         <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
-        <%= auto.kilometraje.toLocaleString('es-AR') %> km
+        <%= new Intl.NumberFormat('es-AR').format(auto.kilometraje) %> km
       </span>
       <% } %>
     </div>
     <div class="card-footer">
       <% if (auto.precio > 0) { %>
-        <div class="card-price"><span class="currency"><%= auto.moneda %></span> <%= auto.precio.toLocaleString('es-AR') %></div>
+        <div class="card-price"><span class="currency"><%= auto.moneda === 'ARS' ? '$' : 'U$S' %></span> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></div>
       <% } else { %>
         <div class="card-price" style="font-size:0.9rem;">Consultar</div>
       <% } %>

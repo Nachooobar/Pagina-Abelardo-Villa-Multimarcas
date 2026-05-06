@@ -747,6 +747,164 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 /* ══════════════════════════════
+   CURRENCY TOGGLE
+   ══════════════════════════════ */
+.currency-toggle-wrapper {
+  margin-bottom: 1.25rem;
+}
+
+.currency-toggle-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.currency-toggle {
+  display: inline-flex;
+  background: #F1F5F9;
+  border-radius: var(--radius);
+  padding: 4px;
+  gap: 4px;
+  border: 1.5px solid var(--admin-border);
+}
+
+.currency-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  transition: var(--transition);
+}
+
+.currency-option:hover {
+  background: rgba(255,255,255,0.6);
+  color: var(--admin-text);
+}
+
+.currency-option.active {
+  background: #fff;
+  color: var(--av-navy);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(27,58,92,0.1);
+}
+
+.currency-flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.currency-code {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.currency-symbol {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  font-weight: 400;
+}
+
+.currency-option.active .currency-symbol {
+  color: var(--av-blue);
+}
+
+/* ══════════════════════════════
+   INPUT PREFIX / SUFFIX
+   ══════════════════════════════ */
+.input-with-prefix,
+.input-with-suffix {
+  display: flex;
+  align-items: stretch;
+  background: #F8FAFC;
+  border: 1.5px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.input-with-prefix:focus-within,
+.input-with-suffix:focus-within {
+  border-color: var(--av-blue);
+  box-shadow: 0 0 0 3px rgba(46,110,181,0.1);
+  background: #fff;
+}
+
+.input-prefix,
+.input-suffix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.85rem;
+  background: #E2E8F0;
+  color: var(--av-navy);
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.input-prefix {
+  border-right: 1.5px solid var(--admin-border);
+}
+
+.input-suffix {
+  border-left: 1.5px solid var(--admin-border);
+}
+
+.input-with-prefix input,
+.input-with-suffix input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.75rem 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  font-family: inherit;
+  letter-spacing: 0.3px;
+}
+
+.input-with-prefix input:focus,
+.input-with-suffix input:focus {
+  outline: none;
+}
+
+/* ══════════════════════════════
+   PRICE WARNING
+   ══════════════════════════════ */
+.price-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  margin-top: 0.5rem;
+  background: var(--admin-warning-bg);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #92400E;
+  animation: fadeInUp 0.25s ease-out;
+}
+
+.price-warning-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════
    FORM TOGGLES (checkbox switches)
    ══════════════════════════════ */
 .form-toggles {

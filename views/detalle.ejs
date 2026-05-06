@@ -34,14 +34,14 @@
         <div class="detail-brand"><%= auto.marca %></div>
         <h1 class="detail-title"><%= auto.modelo %> <%= auto.version %></h1>
         <% if (auto.precio > 0) { %>
-          <div class="detail-price"><span class="currency"><%= auto.moneda %></span> <%= auto.precio.toLocaleString('es-AR') %></div>
+          <div class="detail-price"><span class="currency"><%= auto.moneda === 'ARS' ? '$' : 'U$S' %></span> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></div>
         <% } else { %>
           <div class="detail-price" style="font-size:1.5rem;">Consultar precio</div>
         <% } %>
 
         <div class="specs-grid">
           <div class="spec-item"><span class="spec-label">Año</span><span class="spec-value"><%= auto.anio %></span></div>
-          <div class="spec-item"><span class="spec-label">Kilómetros</span><span class="spec-value"><%= auto.kilometraje > 0 ? auto.kilometraje.toLocaleString('es-AR') + ' km' : '0 km' %></span></div>
+          <div class="spec-item"><span class="spec-label">Kilómetros</span><span class="spec-value"><%= auto.kilometraje > 0 ? new Intl.NumberFormat('es-AR').format(auto.kilometraje) + ' km' : '0 km' %></span></div>
           <div class="spec-item"><span class="spec-label">Combustible</span><span class="spec-value"><%= auto.combustible %></span></div>
           <div class="spec-item"><span class="spec-label">Transmisión</span><span class="spec-value"><%= auto.transmision %></span></div>
           <div class="spec-item"><span class="spec-label">Color</span><span class="spec-value"><%= auto.color || 'Consultar' %></span></div>

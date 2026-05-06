@@ -93,21 +93,46 @@
         <!-- PASO 2: Precio -->
         <div class="form-section" data-section="2">
           <h3>💰 ¿A cuánto lo vendés?</h3>
-          <div class="form-grid-3">
+
+          <!-- Currency Toggle -->
+          <div class="currency-toggle-wrapper">
+            <label class="currency-toggle-label">Moneda</label>
+            <div class="currency-toggle" id="currencyToggle">
+              <button type="button" class="currency-option <%= !auto || auto.moneda === 'USD' ? 'active' : '' %>" data-value="USD">
+                <span class="currency-flag">🇺🇸</span>
+                <span class="currency-code">USD</span>
+                <span class="currency-symbol">U$S</span>
+              </button>
+              <button type="button" class="currency-option <%= auto && auto.moneda === 'ARS' ? 'active' : '' %>" data-value="ARS">
+                <span class="currency-flag">🇦🇷</span>
+                <span class="currency-code">ARS</span>
+                <span class="currency-symbol">$</span>
+              </button>
+            </div>
+            <input type="hidden" id="moneda" name="moneda" value="<%= auto && auto.moneda ? auto.moneda : 'USD' %>">
+          </div>
+
+          <div class="form-grid-2">
             <div class="form-group">
-              <label for="moneda">Moneda</label>
-              <select id="moneda" name="moneda">
-                <option value="USD" <%= auto && auto.moneda === 'USD' ? 'selected' : '' %>>🇺🇸 Dólares (USD)</option>
-                <option value="ARS" <%= auto && auto.moneda === 'ARS' ? 'selected' : '' %>>🇦🇷 Pesos (ARS)</option>
-              </select>
+              <label for="precioDisplay">Precio <span class="label-hint">(0 = Consultar)</span></label>
+              <div class="input-with-prefix">
+                <span class="input-prefix" id="precioPrefix"><%= auto && auto.moneda === 'ARS' ? '$' : 'U$S' %></span>
+                <input type="text" id="precioDisplay" inputmode="numeric" maxlength="17" value="<%= auto && auto.precio ? auto.precio.toLocaleString('es-AR') : '0' %>" placeholder="15.000.000" autocomplete="off">
+              </div>
+              <input type="hidden" id="precio" name="precio" value="<%= auto ? auto.precio : 0 %>">
+              <!-- Low price warning -->
+              <div class="price-warning" id="priceWarning" style="display:none;">
+                <span class="price-warning-icon">⚠️</span>
+                <span>¿El precio es correcto? Parece muy bajo para pesos argentinos</span>
+              </div>
             </div>
             <div class="form-group">
-              <label for="precio">Precio <span class="label-hint">(0 = Consultar)</span></label>
-              <input type="number" id="precio" name="precio" step="0.01" value="<%= auto ? auto.precio : 0 %>" placeholder="15000">
-            </div>
-            <div class="form-group">
-              <label for="kilometraje">Kilómetros</label>
-              <input type="number" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>" placeholder="45000">
+              <label for="kilometrajeDisplay">Kilómetros</label>
+              <div class="input-with-suffix">
+                <input type="text" id="kilometrajeDisplay" inputmode="numeric" maxlength="17" value="<%= auto && auto.kilometraje ? auto.kilometraje.toLocaleString('es-AR') : '0' %>" placeholder="45.000" autocomplete="off">
+                <span class="input-suffix">km</span>
+              </div>
+              <input type="hidden" id="kilometraje" name="kilometraje" value="<%= auto ? auto.kilometraje : 0 %>">
             </div>
           </div>
         </div>
@@ -250,6 +275,102 @@
   </div>
 
   <script>
+    // ── Number Formatting Helpers (Argentine locale) ──
+    var arFormatter = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 });
+
+    function formatNumberAR(num) {
+      if (!num && num !== 0) return '0';
+      return arFormatter.format(num);
+    }
+
+    function stripDots(str) {
+      return str.replace(/\./g, '').replace(/[^0-9]/g, '');
+    }
+
+    // ── Real-time Formatting Mask for Precio & Kilometraje ──
+    (function() {
+      var precioDisplay = document.getElementById('precioDisplay');
+      var precioHidden = document.getElementById('precio');
+      var kmDisplay = document.getElementById('kilometrajeDisplay');
+      var kmHidden = document.getElementById('kilometraje');
+      var monedaInput = document.getElementById('moneda');
+      var priceWarning = document.getElementById('priceWarning');
+      var precioPrefix = document.getElementById('precioPrefix');
+
+      function applyMask(displayInput, hiddenInput, suffix) {
+        displayInput.addEventListener('input', function() {
+          var raw = stripDots(this.value);
+          // Limit to 13 digits
+          if (raw.length > 13) raw = raw.substring(0, 13);
+          var numericValue = parseInt(raw) || 0;
+          hiddenInput.value = numericValue;
+
+          // Format with dots
+          var formatted = formatNumberAR(numericValue);
+          this.value = formatted;
+
+          // Restore cursor position
+          var cursorPos = formatted.length;
+          this.setSelectionRange(cursorPos, cursorPos);
+
+          // Check price warning
+          if (displayInput === precioDisplay) {
+            checkPriceWarning(numericValue);
+          }
+        });
+
+        // Prevent non-numeric input
+        displayInput.addEventListener('keydown', function(e) {
+          var allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+          if (allowed.indexOf(e.key) !== -1) return;
+          if (e.ctrlKey || e.metaKey) return;
+          if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+          }
+        });
+
+        // Select all on focus
+        displayInput.addEventListener('focus', function() {
+          var self = this;
+          setTimeout(function() { self.select(); }, 50);
+        });
+      }
+
+      applyMask(precioDisplay, precioHidden);
+      applyMask(kmDisplay, kmHidden);
+
+      // ── Price Warning: ARS < 1.000.000 ──
+      function checkPriceWarning(value) {
+        var moneda = monedaInput.value;
+        if (moneda === 'ARS' && value > 0 && value < 1000000) {
+          priceWarning.style.display = 'flex';
+        } else {
+          priceWarning.style.display = 'none';
+        }
+      }
+
+      // ── Currency Toggle ──
+      var toggleBtns = document.querySelectorAll('#currencyToggle .currency-option');
+      toggleBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          toggleBtns.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          var val = this.getAttribute('data-value');
+          monedaInput.value = val;
+
+          // Update prefix symbol
+          precioPrefix.textContent = val === 'ARS' ? '$' : 'U$S';
+
+          // Re-check price warning
+          var currentPrice = parseInt(precioHidden.value) || 0;
+          checkPriceWarning(currentPrice);
+        });
+      });
+
+      // Initial warning check
+      checkPriceWarning(parseInt(precioHidden.value) || 0);
+    })();
+
     // ── Step Indicator: highlight steps as user scrolls ──
     (function() {
       var sections = document.querySelectorAll('.form-section[data-section]');

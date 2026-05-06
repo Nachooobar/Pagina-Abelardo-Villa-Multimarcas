@@ -62,7 +62,7 @@
               <td><% if(auto.imagen){ %><img src="/uploads/autos/<%= auto.imagen %>" class="table-img" loading="lazy"><% } else { %><div class="table-img" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--admin-text-muted);">Sin foto</div><% } %></td>
               <td><strong><%= auto.marca %> <%= auto.modelo %></strong></td>
               <td><%= auto.anio %></td>
-              <td><% if(auto.precio > 0){ %><%= auto.moneda %> <%= auto.precio.toLocaleString('es-AR') %><% } else { %>Consultar<% } %></td>
+              <td><% if(auto.precio > 0){ %><%= auto.moneda === 'ARS' ? '$' : 'U$S' %> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %><% } else { %>Consultar<% } %></td>
               <td><span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? '✅ Activo' : '⏸️ Inactivo' %></span></td>
             </tr>
             <% }) %>

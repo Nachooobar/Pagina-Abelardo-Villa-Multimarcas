@@ -11,6 +11,12 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// ── Helper: Strip thousand separators (dots) from formatted numbers ──
+function stripFormatting(value) {
+  if (!value) return '0';
+  return String(value).replace(/\./g, '').replace(/[^0-9]/g, '');
+}
+
 // ── Git Sync Helper ──
 function gitSync(action, details = '') {
   try {
@@ -161,8 +167,8 @@ router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (re
         transmision, color, puertas, motor, descripcion, condicion, destacado, activo)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run([
-      marca, modelo, version || '', parseInt(anio), parseFloat(precio) || 0, moneda || 'USD',
-      parseInt(kilometraje) || 0, combustible || 'Nafta', transmision || 'Manual',
+      marca, modelo, version || '', parseInt(anio), parseFloat(stripFormatting(precio)) || 0, moneda || 'USD',
+      parseInt(stripFormatting(kilometraje)) || 0, combustible || 'Nafta', transmision || 'Manual',
       color || '', parseInt(puertas) || 4, motor || '', descripcion || '',
       condicion || 'Usado', destacado ? 1 : 0, activo ? 1 : 1
     ]);
@@ -226,8 +232,8 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run([
-      marca, modelo, version || '', parseInt(anio), parseFloat(precio) || 0, moneda || 'USD',
-      parseInt(kilometraje) || 0, combustible || 'Nafta', transmision || 'Manual',
+      marca, modelo, version || '', parseInt(anio), parseFloat(stripFormatting(precio)) || 0, moneda || 'USD',
+      parseInt(stripFormatting(kilometraje)) || 0, combustible || 'Nafta', transmision || 'Manual',
       color || '', parseInt(puertas) || 4, motor || '', descripcion || '',
       condicion || 'Usado', destacado ? 1 : 0, activo ? 1 : 0,
       req.params.id
