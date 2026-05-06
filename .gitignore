@@ -1,9 +1,15 @@
 node_modules/
+
+# Base de datos SQLite
 database.db
 database.db-shm
 database.db-wal
-public/uploads/autos/*
-!public/uploads/autos/.gitkeep
-public/*.zip
+
+# Carpeta de subida de imágenes
+/public/uploads/*
+!/public/uploads/autos/.gitkeep
+
+# Otros
+/public/*.zip
 .env
 *.log
