@@ -1,69 +1,65 @@
 // ============================================================
-// Configuración de la Base de Datos SQLite (sqlite3)
+// Configuración de la Base de Datos PostgreSQL (Supabase)
 // ============================================================
 
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+require('dotenv').config();
+const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.join(__dirname, '..', 'database.db');
-
-// Crear conexión a la base de datos
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('✗ Error al conectar a la base de datos:', err.message);
-    process.exit(1);
-  }
-  console.log(`✓ Base de datos conectada: ${dbPath}`);
+// Conexión a Supabase usando URL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // Requerido por Supabase
 });
 
-// Habilitar foreign keys y optimizaciones para persistencia
-db.run('PRAGMA foreign_keys = ON');
-db.run('PRAGMA journal_mode = WAL'); // Write-Ahead Logging para mejor concurrencia
-db.run('PRAGMA synchronous = FULL'); // Asegurar que se escriba en disco
-db.run('PRAGMA cache_size = 10000'); // Caché para mejor performance
+pool.connect()
+  .then(client => {
+    console.log('✓ Base de datos PostgreSQL (Supabase) conectada');
+    client.release();
+  })
+  .catch(err => {
+    console.error('✗ Error al conectar a Supabase:', err.message);
+    console.error('Por favor verifica tu DATABASE_URL en el archivo .env');
+  });
 
-// ── Promisify database methods ──
+// ── Función para adaptar consultas de SQLite (?) a PostgreSQL ($1, $2) ──
+function adaptQuery(sql) {
+  let i = 1;
+  let adaptedSql = sql.replace(/\?/g, () => `$${i++}`);
+  
+  // Si es un INSERT, PostgreSQL necesita RETURNING id para devolver el ID insertado
+  if (adaptedSql.trim().toUpperCase().startsWith('INSERT') && !adaptedSql.toUpperCase().includes('RETURNING ID')) {
+    adaptedSql += ' RETURNING id';
+  }
+  return adaptedSql;
+}
+
+// ── Wrapper para mantener compatibilidad con la antigua SQLite ──
 const database = {
-  all: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-      db.all(sql, params, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows || []);
-      });
-    });
+  all: async (sql, params = []) => {
+    const { rows } = await pool.query(adaptQuery(sql), params);
+    return rows;
   },
-  get: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-      db.get(sql, params, (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+  get: async (sql, params = []) => {
+    const { rows } = await pool.query(adaptQuery(sql), params);
+    return rows[0] || null;
   },
-  run: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-      db.run(sql, params, function(err) {
-        if (err) {
-          console.error('✗ Error en query:', err, 'SQL:', sql);
-          reject(err);
-        } else {
-          // Log para confirmar que se guardó
-          if (sql.toUpperCase().includes('INSERT') || sql.toUpperCase().includes('UPDATE') || sql.toUpperCase().includes('DELETE')) {
-            console.log(`✓ Datos guardados: ${this.changes} fila(s) afectada(s)`);
-          }
-          resolve({ id: this.lastID, changes: this.changes });
-        }
-      });
-    });
+  run: async (sql, params = []) => {
+    const adaptedSql = adaptQuery(sql);
+    const result = await pool.query(adaptedSql, params);
+    
+    if (sql.toUpperCase().includes('INSERT') || sql.toUpperCase().includes('UPDATE') || sql.toUpperCase().includes('DELETE')) {
+      console.log(`✓ Datos guardados: ${result.rowCount} fila(s) afectada(s)`);
+    }
+    
+    // Si es insert y devuelve ID, lo capturamos
+    const insertedId = (result.rows && result.rows.length > 0 && result.rows[0].id) ? result.rows[0].id : null;
+    
+    return { id: insertedId, changes: result.rowCount };
   },
-  exec: (sql) => {
-    return new Promise((resolve, reject) => {
-      db.exec(sql, (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+  exec: async (sql) => {
+    // pg no tiene problemas ejecutando múltiples sentencias simples si no tienen parámetros
+    await pool.query(sql);
   },
   prepare: (sql) => {
     return {
@@ -74,48 +70,49 @@ const database = {
   }
 };
 
-// ── Initialize database ──
+// ── Inicializar tablas (Sintaxis PostgreSQL) ──
 database.exec(`
   CREATE TABLE IF NOT EXISTS autos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    marca TEXT NOT NULL,
-    modelo TEXT NOT NULL,
-    version TEXT DEFAULT '',
-    anio INTEGER NOT NULL,
-    precio REAL DEFAULT 0,
-    moneda TEXT DEFAULT 'USD',
-    kilometraje INTEGER DEFAULT 0,
-    combustible TEXT DEFAULT 'Nafta',
-    transmision TEXT DEFAULT 'Manual',
-    color TEXT DEFAULT '',
-    puertas INTEGER DEFAULT 4,
-    motor TEXT DEFAULT '',
-    descripcion TEXT DEFAULT '',
-    condicion TEXT DEFAULT 'Usado',
-    destacado INTEGER DEFAULT 0,
-    activo INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    marca VARCHAR(255) NOT NULL,
+    modelo VARCHAR(255) NOT NULL,
+    version VARCHAR(255) DEFAULT '',
+    anio INT NOT NULL,
+    precio NUMERIC(15, 2) DEFAULT 0,
+    moneda VARCHAR(10) DEFAULT 'USD',
+    kilometraje INT DEFAULT 0,
+    combustible VARCHAR(50) DEFAULT 'Nafta',
+    transmision VARCHAR(50) DEFAULT 'Manual',
+    color VARCHAR(100) DEFAULT '',
+    puertas INT DEFAULT 4,
+    motor VARCHAR(255) DEFAULT '',
+    descripcion TEXT,
+    condicion VARCHAR(50) DEFAULT 'Usado',
+    destacado SMALLINT DEFAULT 0,
+    activo SMALLINT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS auto_imagenes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    auto_id INTEGER NOT NULL,
-    filename TEXT NOT NULL,
-    es_principal INTEGER DEFAULT 0,
-    orden INTEGER DEFAULT 0,
+    id SERIAL PRIMARY KEY,
+    auto_id INT NOT NULL,
+    filename VARCHAR(255) NOT NULL,
+    es_principal SMALLINT DEFAULT 0,
+    orden INT DEFAULT 0,
     FOREIGN KEY (auto_id) REFERENCES autos(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS admin_users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 `).then(async () => {
-  const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users', []);
-  if (adminCount.count === 0) {
+  const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users');
+  // PostgreSQL devuelve count como string ('0') o int dependiendo del driver, validamos ambos:
+  if (parseInt(adminCount.count) === 0) {
     const hashedPassword = bcrypt.hashSync('admin123', 10);
     await database.run(
       'INSERT INTO admin_users (username, password) VALUES (?, ?)',
@@ -123,40 +120,19 @@ database.exec(`
     );
     console.log('✓ Usuario admin creado: admin / admin123');
   }
-  console.log('✓ Base de datos inicializada');
+  console.log('✓ Tablas de Supabase inicializadas');
 }).catch((err) => {
-  console.error('✗ Error al inicializar BD:', err.message);
+  console.error('✗ Error al inicializar tablas Supabase:', err.message);
 });
 
-// ── Función para hacer VACUUM (optimizar la BD) ──
-database.vacuum = () => {
-  return new Promise((resolve, reject) => {
-    db.run('VACUUM', (err) => {
-      if (err) {
-        console.error('✗ Error en VACUUM:', err);
-        reject(err);
-      } else {
-        console.log('✓ Base de datos optimizada (VACUUM)');
-        resolve();
-      }
-    });
-  });
-};
+// Función mock para mantener compatibilidad
+database.vacuum = () => Promise.resolve();
 
-// ── Hacer VACUUM cada hora ──
-setInterval(() => {
-  database.vacuum().catch(err => console.error('Error en VACUUM automático:', err));
-}, 60 * 60 * 1000);
-
-// ── Close DB function (called by server on shutdown) ──
+// Cerrar conexión
 database.close = () => {
-  return new Promise((resolve) => {
-    db.close((err) => {
-      if (err) console.error('✗ Error al cerrar BD:', err);
-      else console.log('✓ Conexión a BD cerrada correctamente');
-      resolve();
-    });
-  });
+  return pool.end()
+    .then(() => console.log('✓ Pool de Supabase cerrado correctamente'))
+    .catch(err => console.error('✗ Error al cerrar pool de Supabase:', err));
 };
 
 module.exports = database;

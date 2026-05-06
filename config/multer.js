@@ -5,9 +5,16 @@
 const multer = require('multer');
 const path = require('path');
 
+const fs = require('fs');
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'public', 'uploads', 'autos'));
+    // Si hay una ruta en .env se usa esa (útil en Hostinger para evitar borrados), de lo contrario la local
+    const uploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '..', 'public', 'uploads', 'autos');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

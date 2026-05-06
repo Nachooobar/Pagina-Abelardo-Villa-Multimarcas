@@ -14,10 +14,14 @@
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "sqlite3": "^5.1.7",
+    "dotenv": "^17.4.2",
     "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
-    "multer": "^2.1.1"
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.3",
+    "pg": "^8.20.0",
+    "sqlite3": "^5.1.7",
+    "@supabase/supabase-js": "^2.0.0"
   }
 }
