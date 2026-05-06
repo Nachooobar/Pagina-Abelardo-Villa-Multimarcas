@@ -1,79 +1,106 @@
 // ============================================================
-// Configuración de la Base de Datos PostgreSQL (Supabase)
+// Configuración de la Base de Datos (Dual: Supabase o SQLite)
 // ============================================================
 
 require('dotenv').config();
-const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
-// Conexión a Supabase usando URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Requerido por Supabase
-});
+let database = {};
 
-pool.connect()
-  .then(client => {
-    console.log('✓ Base de datos PostgreSQL (Supabase) conectada');
-    client.release();
-  })
-  .catch(err => {
-    console.error('✗ Error al conectar a Supabase:', err.message);
-    console.error('Por favor verifica tu DATABASE_URL en el archivo .env');
+if (process.env.DATABASE_URL) {
+  // ── MODO SUPABASE (PostgreSQL) ──
+  console.log('Iniciando en modo nube (Supabase)...');
+  const { Pool } = require('pg');
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   });
 
-// ── Función para adaptar consultas de SQLite (?) a PostgreSQL ($1, $2) ──
-function adaptQuery(sql) {
-  let i = 1;
-  let adaptedSql = sql.replace(/\?/g, () => `$${i++}`);
-  
-  // Si es un INSERT, PostgreSQL necesita RETURNING id para devolver el ID insertado
-  if (adaptedSql.trim().toUpperCase().startsWith('INSERT') && !adaptedSql.toUpperCase().includes('RETURNING ID')) {
-    adaptedSql += ' RETURNING id';
-  }
-  return adaptedSql;
-}
+  pool.connect()
+    .then(client => {
+      console.log('✓ Base de datos PostgreSQL (Supabase) conectada');
+      client.release();
+    })
+    .catch(err => {
+      console.error('✗ Error al conectar a Supabase:', err.message);
+    });
 
-// ── Wrapper para mantener compatibilidad con la antigua SQLite ──
-const database = {
-  all: async (sql, params = []) => {
-    const { rows } = await pool.query(adaptQuery(sql), params);
-    return rows;
-  },
-  get: async (sql, params = []) => {
-    const { rows } = await pool.query(adaptQuery(sql), params);
-    return rows[0] || null;
-  },
-  run: async (sql, params = []) => {
-    const adaptedSql = adaptQuery(sql);
-    const result = await pool.query(adaptedSql, params);
-    
-    if (sql.toUpperCase().includes('INSERT') || sql.toUpperCase().includes('UPDATE') || sql.toUpperCase().includes('DELETE')) {
-      console.log(`✓ Datos guardados: ${result.rowCount} fila(s) afectada(s)`);
+  function adaptQuery(sql) {
+    let i = 1;
+    let adaptedSql = sql.replace(/\?/g, () => `$${i++}`);
+    if (adaptedSql.trim().toUpperCase().startsWith('INSERT') && !adaptedSql.toUpperCase().includes('RETURNING ID')) {
+      adaptedSql += ' RETURNING id';
     }
-    
-    // Si es insert y devuelve ID, lo capturamos
-    const insertedId = (result.rows && result.rows.length > 0 && result.rows[0].id) ? result.rows[0].id : null;
-    
-    return { id: insertedId, changes: result.rowCount };
-  },
-  exec: async (sql) => {
-    // pg no tiene problemas ejecutando múltiples sentencias simples si no tienen parámetros
-    await pool.query(sql);
-  },
-  prepare: (sql) => {
-    return {
+    return adaptedSql;
+  }
+
+  database = {
+    all: async (sql, params = []) => {
+      const { rows } = await pool.query(adaptQuery(sql), params);
+      return rows;
+    },
+    get: async (sql, params = []) => {
+      const { rows } = await pool.query(adaptQuery(sql), params);
+      return rows[0] || null;
+    },
+    run: async (sql, params = []) => {
+      const result = await pool.query(adaptQuery(sql), params);
+      const insertedId = (result.rows && result.rows.length > 0 && result.rows[0].id) ? result.rows[0].id : null;
+      return { id: insertedId, changes: result.rowCount };
+    },
+    exec: async (sql) => { await pool.query(sql); },
+    prepare: (sql) => ({
       all: (params = []) => database.all(sql, params),
       get: (params = []) => database.get(sql, params),
       run: (params = []) => database.run(sql, params)
-    };
-  }
-};
+    }),
+    vacuum: () => Promise.resolve(),
+    close: () => pool.end()
+  };
 
-// ── Inicializar tablas (Sintaxis PostgreSQL) ──
+} else {
+  // ── MODO LOCAL (SQLite) - Fallback para que no se caiga la web ──
+  console.log('DATABASE_URL no detectada. Iniciando en modo local (SQLite)...');
+  const sqlite3 = require('sqlite3').verbose();
+  const path = require('path');
+  const dbPath = path.join(__dirname, '..', 'database.db');
+  
+  const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+      console.error('✗ Error al conectar a SQLite:', err.message);
+    } else {
+      console.log(`✓ Base de datos SQLite conectada: ${dbPath}`);
+    }
+  });
+
+  db.run('PRAGMA foreign_keys = ON');
+  db.run('PRAGMA journal_mode = WAL');
+
+  database = {
+    all: (sql, params = []) => new Promise((resolve, reject) => db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows || []))),
+    get: (sql, params = []) => new Promise((resolve, reject) => db.get(sql, params, (err, row) => err ? reject(err) : resolve(row))),
+    run: (sql, params = []) => new Promise((resolve, reject) => {
+      db.run(sql, params, function(err) { err ? reject(err) : resolve({ id: this.lastID, changes: this.changes }) })
+    }),
+    exec: (sql) => new Promise((resolve, reject) => db.exec(sql, err => err ? reject(err) : resolve())),
+    prepare: (sql) => ({
+      all: (params = []) => database.all(sql, params),
+      get: (params = []) => database.get(sql, params),
+      run: (params = []) => database.run(sql, params)
+    }),
+    vacuum: () => new Promise((resolve, reject) => db.run('VACUUM', err => err ? reject(err) : resolve())),
+    close: () => new Promise(resolve => db.close(() => resolve()))
+  };
+}
+
+// ── Inicializar tablas compartidas (Sintaxis compatible con ambas si ajustamos los tipos) ──
+const isPg = !!process.env.DATABASE_URL;
+const idType = isPg ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+const boolType = isPg ? 'SMALLINT' : 'INTEGER';
+
 database.exec(`
   CREATE TABLE IF NOT EXISTS autos (
-    id SERIAL PRIMARY KEY,
+    id ${idType},
     marca VARCHAR(255) NOT NULL,
     modelo VARCHAR(255) NOT NULL,
     version VARCHAR(255) DEFAULT '',
@@ -88,30 +115,29 @@ database.exec(`
     motor VARCHAR(255) DEFAULT '',
     descripcion TEXT,
     condicion VARCHAR(50) DEFAULT 'Usado',
-    destacado SMALLINT DEFAULT 0,
-    activo SMALLINT DEFAULT 1,
+    destacado ${boolType} DEFAULT 0,
+    activo ${boolType} DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS auto_imagenes (
-    id SERIAL PRIMARY KEY,
+    id ${idType},
     auto_id INT NOT NULL,
     filename VARCHAR(255) NOT NULL,
-    es_principal SMALLINT DEFAULT 0,
+    es_principal ${boolType} DEFAULT 0,
     orden INT DEFAULT 0,
     FOREIGN KEY (auto_id) REFERENCES autos(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS admin_users (
-    id SERIAL PRIMARY KEY,
+    id ${idType},
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 `).then(async () => {
   const adminCount = await database.get('SELECT COUNT(*) as count FROM admin_users');
-  // PostgreSQL devuelve count como string ('0') o int dependiendo del driver, validamos ambos:
   if (parseInt(adminCount.count) === 0) {
     const hashedPassword = bcrypt.hashSync('admin123', 10);
     await database.run(
@@ -120,19 +146,8 @@ database.exec(`
     );
     console.log('✓ Usuario admin creado: admin / admin123');
   }
-  console.log('✓ Tablas de Supabase inicializadas');
 }).catch((err) => {
-  console.error('✗ Error al inicializar tablas Supabase:', err.message);
+  console.error('✗ Error al inicializar tablas:', err.message);
 });
-
-// Función mock para mantener compatibilidad
-database.vacuum = () => Promise.resolve();
-
-// Cerrar conexión
-database.close = () => {
-  return pool.end()
-    .then(() => console.log('✓ Pool de Supabase cerrado correctamente'))
-    .catch(err => console.error('✗ Error al cerrar pool de Supabase:', err));
-};
 
 module.exports = database;
