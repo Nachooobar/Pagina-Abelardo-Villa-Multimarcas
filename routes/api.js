@@ -9,13 +9,15 @@ const db = require('../config/database');
 // ── Get models by brand ──
 router.get('/modelos/:marca', async (req, res) => {
   try {
+    const table = (db.isPg && db.isPg()) ? 'public.vehiculos' : 'autos';
+    const statusCond = (db.isPg && db.isPg()) ? "estado = 'disponible'" : "(activo = 1 OR estado = 'disponible')";
     const modelos = await db.prepare(
-      'SELECT DISTINCT modelo FROM autos WHERE activo = 1 AND marca = ? ORDER BY modelo ASC'
+      `SELECT DISTINCT modelo FROM ${table} WHERE ${statusCond} AND marca = ? ORDER BY modelo ASC`
     ).all([req.params.marca]);
     res.json(modelos);
   } catch (error) {
     console.error('Error en /modelos:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -23,7 +25,9 @@ router.get('/modelos/:marca', async (req, res) => {
 router.get('/anios', async (req, res) => {
   try {
     const { marca, modelo } = req.query;
-    let query = 'SELECT DISTINCT anio FROM autos WHERE activo = 1';
+    const table = (db.isPg && db.isPg()) ? 'public.vehiculos' : 'autos';
+    const statusCond = (db.isPg && db.isPg()) ? "estado = 'disponible'" : "(activo = 1 OR estado = 'disponible')";
+    let query = `SELECT DISTINCT anio FROM ${table} WHERE ${statusCond}`;
     let params = [];
 
     if (marca) { query += ' AND marca = ?'; params.push(marca); }
@@ -34,7 +38,7 @@ router.get('/anios', async (req, res) => {
     res.json(anios);
   } catch (error) {
     console.error('Error en /anios:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -46,35 +50,52 @@ router.get('/buscar', async (req, res) => {
     const perPage = 12;
     const offset = (currentPage - 1) * perPage;
 
-    let where = ['a.activo = 1'];
+    const isPostgres = db.isPg && db.isPg();
+    let where = [isPostgres ? "estado = 'disponible'" : "(activo = 1 OR estado = 'disponible')"];
     let params = [];
 
-    if (marca) { where.push('a.marca = ?'); params.push(marca); }
-    if (modelo) { where.push('a.modelo LIKE ?'); params.push(`%${modelo}%`); }
-    if (anio) { where.push('a.anio = ?'); params.push(parseInt(anio)); }
-    if (combustible) { where.push('a.combustible = ?'); params.push(combustible); }
-    if (precio_min) { where.push('a.precio >= ?'); params.push(parseFloat(precio_min)); }
-    if (precio_max) { where.push('a.precio <= ?'); params.push(parseFloat(precio_max)); }
+    if (marca) { where.push('marca = ?'); params.push(marca); }
+    if (modelo) { where.push('modelo LIKE ?'); params.push(`%${modelo}%`); }
+    if (anio) { where.push('anio = ?'); params.push(parseInt(anio)); }
+    if (combustible) { where.push('combustible = ?'); params.push(combustible); }
+    if (precio_min) { where.push('precio >= ?'); params.push(parseFloat(precio_min)); }
+    if (precio_max) { where.push('precio <= ?'); params.push(parseFloat(precio_max)); }
 
-    let orderClause = 'a.created_at DESC';
-    if (orden === 'precio_asc') orderClause = 'a.precio ASC';
-    if (orden === 'precio_desc') orderClause = 'a.precio DESC';
-    if (orden === 'anio_desc') orderClause = 'a.anio DESC';
-    if (orden === 'anio_asc') orderClause = 'a.anio ASC';
+    let orderClause = 'created_at DESC';
+    if (orden === 'precio_asc') orderClause = 'precio ASC';
+    if (orden === 'precio_desc') orderClause = 'precio DESC';
+    if (orden === 'anio_desc') orderClause = 'anio DESC';
+    if (orden === 'anio_asc') orderClause = 'anio ASC';
 
     const whereClause = where.join(' AND ');
-    const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos a WHERE ${whereClause}`).get(params);
-    const total = totalResult.total;
+    let total = 0;
+    let autos = [];
 
-    const autos = await db.prepare(`
-      SELECT a.*, 
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
-      FROM autos a
-      WHERE ${whereClause}
-      ORDER BY ${orderClause}
-      LIMIT ? OFFSET ?
-    `).all([...params, perPage, offset]);
+    if (isPostgres) {
+      const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM public.vehiculos WHERE ${whereClause}`).get(params);
+      total = totalResult ? totalResult.total : 0;
+      autos = await db.prepare(`
+        SELECT v.*, 
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_principal,
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
+        FROM public.vehiculos v
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ? OFFSET ?
+      `).all([...params, perPage, offset]);
+    } else {
+      const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos WHERE ${whereClause}`).get(params);
+      total = totalResult ? totalResult.total : 0;
+      autos = await db.prepare(`
+        SELECT a.*, 
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
+        FROM autos a
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ? OFFSET ?
+      `).all([...params, perPage, offset]);
+    }
 
     res.json({
       autos,
@@ -84,7 +105,7 @@ router.get('/buscar', async (req, res) => {
     });
   } catch (error) {
     console.error('Error en /buscar:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 

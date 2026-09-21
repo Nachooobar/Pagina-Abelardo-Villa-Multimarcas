@@ -37,17 +37,42 @@ app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, 'public'), { 
   maxAge: NODE_ENV === 'production' ? '1d' : 0 
 }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
+
+// ── Headers de seguridad HTTP ──
+app.use((req, res, next) => {
+  // Prevenir clickjacking
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  // Prevenir sniffing de MIME type
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  // Protección XSS del navegador (legado, pero útil para IE/Edge antiguos)
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Controlar información del referer
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Evitar que se almacenen páginas admin en caché del navegador
+  if (req.path.startsWith('/admin')) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+  }
+  next();
+});
 
 // ── Sesiones ──
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const HARDCODED_FALLBACK = 'abelardo-villa-multimarcas-secret-2024';
+if (!SESSION_SECRET || SESSION_SECRET === HARDCODED_FALLBACK) {
+  console.warn('⚠ ADVERTENCIA: SESSION_SECRET no configurado o usa el valor por defecto inseguro.');
+  console.warn('   Configurá SESSION_SECRET en el archivo .env con una cadena aleatoria larga.');
+}
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'abelardo-villa-multimarcas-secret-2024',
+  secret: SESSION_SECRET || HARDCODED_FALLBACK,
   resave: false,
   saveUninitialized: false,
   cookie: { 
     maxAge: 1000 * 60 * 60 * 12,
-    secure: false,
+    secure: NODE_ENV === 'production', // HTTPS obligatorio en producción
     httpOnly: true,
     sameSite: 'lax'
   }
@@ -86,10 +111,14 @@ app.use((req, res, next) => {
 // ── Middleware: Verificar estado del inventario ──
 app.use(async (req, res, next) => {
   try {
-    const inventoryCount = await db.get('SELECT COUNT(*) as count FROM autos WHERE activo = 1');
-    res.locals.inventoryStatus = inventoryCount.count === 0 ? 'coming_soon' : 'available';
-    res.locals.hasInventory = inventoryCount.count > 0;
-    res.locals.totalInventoryCount = inventoryCount.count;
+    const sqlCount = (db.isPg && db.isPg())
+      ? "SELECT COUNT(*) as count FROM public.vehiculos WHERE estado = 'disponible'"
+      : "SELECT COUNT(*) as count FROM autos WHERE (activo = 1 OR estado = 'disponible')";
+    const inventoryCount = await db.get(sqlCount);
+    const count = inventoryCount ? (inventoryCount.count || 0) : 0;
+    res.locals.inventoryStatus = count === 0 ? 'coming_soon' : 'available';
+    res.locals.hasInventory = count > 0;
+    res.locals.totalInventoryCount = count;
   } catch (error) {
     console.error('Error verificando inventario:', error);
     res.locals.inventoryStatus = 'available';

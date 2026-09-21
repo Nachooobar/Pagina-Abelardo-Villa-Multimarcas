@@ -23,41 +23,69 @@ function generateSlug(marca, modelo) {
 // ── HOME ──
 router.get('/', async (req, res) => {
   try {
-    // Get featured vehicles
-    const destacados = await db.prepare(`
-      SELECT a.*, 
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
-      FROM autos a
-      WHERE a.activo = 1 AND a.destacado = 1
-      ORDER BY a.created_at DESC
-      LIMIT 8
-    `).all([]);
+    let destacados = [];
+    let ultimos = [];
+    let marcas = [];
+    let anios = [];
+    let totalAutos = { total: 0 };
 
-    // Get latest vehicles
-    const ultimos = await db.prepare(`
-      SELECT a.*, 
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
-      FROM autos a
-      WHERE a.activo = 1
-      ORDER BY a.created_at DESC
-      LIMIT 12
-    `).all([]);
+    if (db.isPg()) {
+      destacados = await db.prepare(`
+        SELECT v.*, 
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_principal,
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
+        FROM public.vehiculos v
+        WHERE v.estado = 'disponible' AND v.destacado = true
+        ORDER BY v.created_at DESC
+        LIMIT 8
+      `).all([]);
 
-    // Get distinct brands, models, years for filters
-    const marcas = await db.prepare('SELECT DISTINCT marca FROM autos WHERE activo = 1 ORDER BY marca ASC').all([]);
-    const anios = await db.prepare('SELECT DISTINCT anio FROM autos WHERE activo = 1 ORDER BY anio DESC').all([]);
+      ultimos = await db.prepare(`
+        SELECT v.*, 
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_principal,
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
+        FROM public.vehiculos v
+        WHERE v.estado = 'disponible'
+        ORDER BY v.created_at DESC
+        LIMIT 12
+      `).all([]);
 
-    const totalAutos = await db.prepare('SELECT COUNT(*) as total FROM autos WHERE activo = 1').get([]);
+      marcas = await db.prepare("SELECT DISTINCT marca FROM public.vehiculos WHERE estado = 'disponible' ORDER BY marca ASC").all([]);
+      anios = await db.prepare("SELECT DISTINCT anio FROM public.vehiculos WHERE estado = 'disponible' ORDER BY anio DESC").all([]);
+      totalAutos = await db.prepare("SELECT COUNT(*) as total FROM public.vehiculos WHERE estado = 'disponible'").get([]);
+    } else {
+      destacados = await db.prepare(`
+        SELECT a.*, 
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
+        FROM autos a
+        WHERE (a.activo = 1 OR a.estado = 'disponible') AND a.destacado = 1
+        ORDER BY a.created_at DESC
+        LIMIT 8
+      `).all([]);
+
+      ultimos = await db.prepare(`
+        SELECT a.*, 
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
+        FROM autos a
+        WHERE (a.activo = 1 OR a.estado = 'disponible')
+        ORDER BY a.created_at DESC
+        LIMIT 12
+      `).all([]);
+
+      marcas = await db.prepare("SELECT DISTINCT marca FROM autos WHERE (activo = 1 OR estado = 'disponible') ORDER BY marca ASC").all([]);
+      anios = await db.prepare("SELECT DISTINCT anio FROM autos WHERE (activo = 1 OR estado = 'disponible') ORDER BY anio DESC").all([]);
+      totalAutos = await db.prepare("SELECT COUNT(*) as total FROM autos WHERE (activo = 1 OR estado = 'disponible')").get([]);
+    }
 
     res.render('index', {
-      title: 'Abelardo Villa Multimarcas - Concesionaria',
+      title: 'Abelardo Villa Multimarcas - Concesionaria Oficial',
       destacados,
       ultimos,
       marcas,
       anios,
-      totalAutos: totalAutos.total,
+      totalAutos: totalAutos ? totalAutos.total : 0,
       generateSlug
     });
   } catch (error) {
@@ -74,40 +102,61 @@ router.get('/catalogo', async (req, res) => {
     const perPage = 12;
     const offset = (currentPage - 1) * perPage;
 
-    let whereConditions = ['a.activo = 1'];
+    let whereConditions = [db.isPg() ? "estado = 'disponible'" : "(activo = 1 OR estado = 'disponible')"];
     let params = [];
 
-    if (marca) { whereConditions.push('a.marca = ?'); params.push(marca); }
-    if (modelo) { whereConditions.push('a.modelo LIKE ?'); params.push(`%${modelo}%`); }
-    if (anio) { whereConditions.push('a.anio = ?'); params.push(parseInt(anio)); }
-    if (combustible) { whereConditions.push('a.combustible = ?'); params.push(combustible); }
-    if (precio_min) { whereConditions.push('a.precio >= ?'); params.push(parseFloat(precio_min)); }
-    if (precio_max) { whereConditions.push('a.precio <= ?'); params.push(parseFloat(precio_max)); }
+    if (marca) { whereConditions.push('marca = ?'); params.push(marca); }
+    if (modelo) { whereConditions.push('modelo LIKE ?'); params.push(`%${modelo}%`); }
+    if (anio) { whereConditions.push('anio = ?'); params.push(parseInt(anio)); }
+    if (combustible) { whereConditions.push('combustible = ?'); params.push(combustible); }
+    if (precio_min) { whereConditions.push('precio >= ?'); params.push(parseFloat(precio_min)); }
+    if (precio_max) { whereConditions.push('precio <= ?'); params.push(parseFloat(precio_max)); }
 
     const whereClause = whereConditions.join(' AND ');
 
-    let orderClause = 'a.created_at DESC';
-    if (orden === 'precio_asc') orderClause = 'a.precio ASC';
-    if (orden === 'precio_desc') orderClause = 'a.precio DESC';
-    if (orden === 'anio_desc') orderClause = 'a.anio DESC';
-    if (orden === 'anio_asc') orderClause = 'a.anio ASC';
-    if (orden === 'km_asc') orderClause = 'a.kilometraje ASC';
+    let orderClause = 'created_at DESC';
+    if (orden === 'precio_asc') orderClause = 'precio ASC';
+    if (orden === 'precio_desc') orderClause = 'precio DESC';
+    if (orden === 'anio_desc') orderClause = 'anio DESC';
+    if (orden === 'anio_asc') orderClause = 'anio ASC';
+    if (orden === 'km_asc') orderClause = 'kilometraje ASC';
 
-    const totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos a WHERE ${whereClause}`).get(params);
-    const totalPages = Math.ceil(totalResult.total / perPage);
+    let totalResult;
+    let autos = [];
+    let marcas = [];
+    let anios = [];
 
-    const autos = await db.prepare(`
-      SELECT a.*, 
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
-      FROM autos a
-      WHERE ${whereClause}
-      ORDER BY ${orderClause}
-      LIMIT ? OFFSET ?
-    `).all([...params, perPage, offset]);
+    if (db.isPg()) {
+      totalResult = await db.prepare(`SELECT COUNT(*) as total FROM public.vehiculos WHERE ${whereClause}`).get(params);
+      autos = await db.prepare(`
+        SELECT v.*, 
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_principal,
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
+        FROM public.vehiculos v
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ? OFFSET ?
+      `).all([...params, perPage, offset]);
 
-    const marcas = await db.prepare('SELECT DISTINCT marca FROM autos WHERE activo = 1 ORDER BY marca ASC').all();
-    const anios = await db.prepare('SELECT DISTINCT anio FROM autos WHERE activo = 1 ORDER BY anio DESC').all();
+      marcas = await db.prepare("SELECT DISTINCT marca FROM public.vehiculos WHERE estado = 'disponible' ORDER BY marca ASC").all();
+      anios = await db.prepare("SELECT DISTINCT anio FROM public.vehiculos WHERE estado = 'disponible' ORDER BY anio DESC").all();
+    } else {
+      totalResult = await db.prepare(`SELECT COUNT(*) as total FROM autos WHERE ${whereClause}`).get(params);
+      autos = await db.prepare(`
+        SELECT a.*, 
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
+        FROM autos a
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ? OFFSET ?
+      `).all([...params, perPage, offset]);
+
+      marcas = await db.prepare("SELECT DISTINCT marca FROM autos WHERE (activo = 1 OR estado = 'disponible') ORDER BY marca ASC").all();
+      anios = await db.prepare("SELECT DISTINCT anio FROM autos WHERE (activo = 1 OR estado = 'disponible') ORDER BY anio DESC").all();
+    }
+
+    const totalPages = Math.ceil((totalResult ? totalResult.total : 0) / perPage);
 
     res.render('catalogo', {
       title: 'Catálogo de Vehículos - Abelardo Villa Multimarcas',
@@ -117,7 +166,7 @@ router.get('/catalogo', async (req, res) => {
       filtros: req.query,
       currentPage,
       totalPages,
-      totalAutos: totalResult.total,
+      totalAutos: totalResult ? totalResult.total : 0,
       generateSlug
     });
   } catch (error) {
@@ -130,29 +179,56 @@ router.get('/catalogo', async (req, res) => {
 router.get('/auto/:slug-:id', async (req, res) => {
   try {
     const { id } = req.params;
+    let auto = null;
+    let imagenes = [];
+    let relacionados = [];
 
-    const auto = await db.prepare(`
-      SELECT * FROM autos WHERE id = ? AND activo = 1
-    `).get([id]);
+    if (db.isPg()) {
+      auto = await db.prepare("SELECT * FROM public.vehiculos WHERE id = ?").get([id]);
+      if (!auto) {
+        return res.status(404).render('404', { title: 'Vehículo no encontrado' });
+      }
 
-    if (!auto) {
-      return res.status(404).render('404', { title: 'Vehículo no encontrado' });
+      if (Array.isArray(auto.imagenes)) {
+        imagenes = auto.imagenes.map((url, i) => ({
+          id: i + 1,
+          auto_id: auto.id,
+          filename: url.replace('/uploads/autos/', ''),
+          url,
+          es_principal: i === 0 ? 1 : 0,
+          orden: i
+        }));
+      }
+
+      relacionados = await db.prepare(`
+        SELECT v.*, 
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_principal,
+          CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
+        FROM public.vehiculos v
+        WHERE v.estado = 'disponible' AND v.id != ? AND v.marca = ?
+        ORDER BY RANDOM()
+        LIMIT 4
+      `).all([id, auto.marca]);
+    } else {
+      auto = await db.prepare('SELECT * FROM autos WHERE id = ?').get([id]);
+      if (!auto) {
+        return res.status(404).render('404', { title: 'Vehículo no encontrado' });
+      }
+
+      imagenes = await db.prepare(`
+        SELECT * FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC
+      `).all([id]);
+
+      relacionados = await db.prepare(`
+        SELECT a.*, 
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
+          (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
+        FROM autos a
+        WHERE (a.activo = 1 OR a.estado = 'disponible') AND a.id != ? AND a.marca = ?
+        ORDER BY RANDOM()
+        LIMIT 4
+      `).all([id, auto.marca]);
     }
-
-    const imagenes = await db.prepare(`
-      SELECT * FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC
-    `).all([id]);
-
-    // Related vehicles (same brand or type)
-    const relacionados = await db.prepare(`
-      SELECT a.*, 
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id AND es_principal = 1 LIMIT 1) as imagen_principal,
-        (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
-      FROM autos a
-      WHERE a.activo = 1 AND a.id != ? AND a.marca = ?
-      ORDER BY RANDOM()
-      LIMIT 4
-    `).all([id, auto.marca]);
 
     res.render('detalle', {
       title: `${auto.marca} ${auto.modelo} ${auto.anio} - Abelardo Villa Multimarcas`,

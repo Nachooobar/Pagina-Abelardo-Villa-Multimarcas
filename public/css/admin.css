@@ -1,55 +1,62 @@
 /* ============================================================
    ADMIN PANEL - Abelardo Villa Multimarcas
-   Paleta inspirada en el logo: Azul marino, Rojo, Blanco
-   Interfaz ultra intuitiva
+   Sistema de Diseño Unificado (Tokens Centralizados)
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('./tokens.css');
 
 :root {
-  --av-navy: #1B3A5C;
-  --av-navy-light: #234B73;
-  --av-navy-dark: #0F2640;
-  --av-blue: #2E6EB5;
-  --av-blue-light: #3A85D6;
-  --av-red: #C41E2A;
+  /* Tokens de Marca Unificados */
+  --av-navy: var(--color-neutral-850);
+  --av-navy-light: var(--color-neutral-800);
+  --av-navy-dark: var(--color-neutral-900);
+  --av-blue: var(--color-secondary);           /* #1479BE */
+  --av-blue-light: #2A92DC;
+  --av-red: var(--color-primary);              /* #E11D2A */
   --av-white: #FFFFFF;
-  --av-gray: #6B6B6B;
+  --av-gray: var(--color-neutral-500);
 
-  --admin-bg: #F0F4F8;
+  --admin-bg: var(--color-bg-light);           /* #F6F7F9 */
   --admin-card: #FFFFFF;
-  --admin-text: #1E293B;
-  --admin-text-secondary: #64748B;
-  --admin-text-muted: #94A3B8;
-  --admin-border: #E2E8F0;
+  --admin-text: var(--color-neutral-900);      /* #0E1116 */
+  --admin-text-secondary: var(--color-neutral-500);
+  --admin-text-muted: var(--color-neutral-400);
+  --admin-border: var(--color-border);         /* #E3E7EC */
 
-  --admin-success: #10B981;
-  --admin-success-bg: rgba(16, 185, 129, 0.1);
-  --admin-danger: #EF4444;
-  --admin-danger-bg: rgba(239, 68, 68, 0.1);
-  --admin-warning: #F59E0B;
-  --admin-warning-bg: rgba(245, 158, 11, 0.1);
+  --admin-success: var(--color-success);
+  --admin-success-bg: var(--color-success-bg);
+  --admin-danger: var(--color-danger);
+  --admin-danger-bg: var(--color-danger-bg);
+  --admin-warning: var(--color-warning);
+  --admin-warning-bg: var(--color-warning-bg);
 
-  --shadow-card: 0 2px 8px rgba(27, 58, 92, 0.06);
-  --shadow-md: 0 4px 12px rgba(27, 58, 92, 0.1);
-  --shadow-lg: 0 8px 30px rgba(27, 58, 92, 0.12);
+  --shadow-card: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
 
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius: var(--radius-md);
+  --radius-sm: var(--radius-sm);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --transition: var(--transition-fast);
 
-  --sidebar-width: 250px;
+  --sidebar-width: 260px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   background: var(--admin-bg);
   color: var(--admin-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6,
+.stat-number,
+.admin-header h1 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
 }
 
 /* ══════════════════════════════

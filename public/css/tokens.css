@@ -1,0 +1,204 @@
+/* ============================================================
+   ABELARDO VILLA MULTIMARCA - SISTEMA DE DISEÑO UNIFICADO
+   Tokens Centralizados (Web Pública y Panel /admin)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap');
+
+:root {
+  /* ── 1. PALETA DE COLORES DE MARCA ── */
+  --color-primary: #E11D2A;         /* Acción principal, llamados a la acción, acentos de poder */
+  --color-primary-hover: #C5131F;   /* Hover para elementos primarios */
+  --color-primary-active: #A80E18;  /* Active / Click */
+  --color-primary-subtle: rgba(225, 29, 42, 0.12); /* Fondo suave con tinte de marca */
+
+  /* Tono bordó elegante para pie de página */
+  --color-bordo: #360B10;
+  --color-bordo-dark: #1A0406;
+  --color-bordo-light: #4D1016;
+  --color-bordo-border: rgba(255, 255, 255, 0.14);
+
+  --color-secondary: #1479BE;       /* Secundario, foco interactivo, enlaces destacados */
+  --color-secondary-hover: #0E629D;
+  --color-secondary-subtle: rgba(20, 121, 190, 0.12);
+
+  /* ── 2. NEUTROS Y FONDOS ── */
+  --color-neutral-900: #0E1116;     /* Neutro más oscuro (fondos profundos, texto en modo claro) */
+  --color-neutral-850: #12161D;     /* Superficies intermedias */
+  --color-neutral-800: #151A21;     /* Superficie oscura principal (tarjetas, panels, sidebars) */
+  --color-neutral-700: #222933;     /* Bordes y divisores en modo oscuro */
+  --color-neutral-600: #384252;     /* Bordes activos en modo oscuro */
+  --color-neutral-500: #64748B;     /* Texto terciario / muted */
+  --color-neutral-400: #94A3B8;     /* Texto secundario en modo oscuro */
+  --color-neutral-300: #CBD5E1;     /* Texto suave */
+  --color-neutral-200: #E3E7EC;     /* Bordes estándar de marca */
+  --color-neutral-100: #F1F4F8;     /* Superficies claras secundarias */
+  --color-bg-light: #F6F7F9;        /* Fondo claro general de la marca */
+  --color-white: #FFFFFF;
+
+  /* ── 3. SEMÁFORO / ESTADOS DE NEGOCIO ── */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-info: #1479BE;
+  --color-info-bg: rgba(20, 121, 190, 0.12);
+
+  /* ── 4. TIPOGRAFÍAS ── */
+  --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Escala tipográfica fluida y legible */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* ── 5. ESPACIADOS Y ZONAS TÁCTILES ── */
+  --touch-target-min: 44px; /* Regla 4: Zonas táctiles mínimas de 44px */
+  --space-1: 0.25rem;       /* 4px */
+  --space-2: 0.5rem;        /* 8px */
+  --space-3: 0.75rem;       /* 12px */
+  --space-4: 1rem;          /* 16px */
+  --space-5: 1.25rem;       /* 20px */
+  --space-6: 1.5rem;        /* 24px */
+  --space-8: 2rem;          /* 32px */
+  --space-10: 2.5rem;       /* 40px */
+  --space-12: 3rem;         /* 48px */
+  --space-16: 4rem;         /* 64px */
+
+  /* ── 6. RADIOS DE BORDE ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── 7. SOMBRAS Y ELEVACIÓN ── */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 12px 32px rgba(14, 17, 22, 0.2);
+
+  /* ── 8. ACCESIBILIDAD Y FOCO (Regla 5) ── */
+  --focus-ring-color: #1479BE;
+  --focus-ring: 0 0 0 3px rgba(20, 121, 190, 0.45);
+  --focus-ring-offset: 2px;
+
+  /* ── 9. MICROINTERACCIONES (Regla 7: 150–250ms, ease-out) ── */
+  --duration-fast: 160ms;
+  --duration-base: 220ms;
+  --ease-standard: cubic-bezier(0, 0, 0.2, 1);
+  --transition-fast: all var(--duration-fast) var(--ease-standard);
+  --transition-base: all var(--duration-base) var(--ease-standard);
+
+  /* Layout */
+  --max-width-site: 1320px;
+}
+
+/* ── ACCESIBILIDAD: PREFERS-REDUCED-MOTION (Regla 5) ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── REGLA 5 & 12: ESTADOS Y FOCO ACCESIBLE UNIFICADO ── */
+:focus-visible {
+  outline: 2px solid var(--color-secondary) !important;
+  outline-offset: var(--focus-ring-offset) !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+/* Clases utilitarias de texto e interactividad */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Botones Base del Sistema */
+.btn-primary-brand {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.625rem 1.25rem;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-primary-brand:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 29, 42, 0.35);
+}
+
+.btn-primary-brand:active {
+  background-color: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.btn-primary-brand:disabled,
+.btn-primary-brand[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.btn-secondary-brand {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.625rem 1.25rem;
+  background-color: transparent;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-secondary-brand:hover {
+  background-color: var(--color-secondary-subtle);
+  color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+}
+
+.btn-secondary-brand:active {
+  background-color: rgba(20, 121, 190, 0.2);
+}

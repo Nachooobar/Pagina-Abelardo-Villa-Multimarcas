@@ -1,48 +1,110 @@
 <%
   function getImageSrc(auto) {
-    if (auto.imagen_principal) return '/uploads/autos/' + auto.imagen_principal;
-    if (auto.imagen_fallback) return '/uploads/autos/' + auto.imagen_fallback;
-    if (auto.imagen) return '/uploads/autos/' + auto.imagen;
+    if (Array.isArray(auto.imagenes) && auto.imagenes.length > 0) {
+      return auto.imagenes[0];
+    }
+    if (typeof auto.imagenes === 'string' && auto.imagenes.startsWith('{')) {
+      const parsed = auto.imagenes.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+      if (parsed.length > 0) return parsed[0];
+    }
+    if (auto.imagen_principal) {
+      return auto.imagen_principal.startsWith('http') ? auto.imagen_principal : '/uploads/autos/' + auto.imagen_principal;
+    }
+    if (auto.imagen_fallback) {
+      return auto.imagen_fallback.startsWith('http') ? auto.imagen_fallback : '/uploads/autos/' + auto.imagen_fallback;
+    }
+    if (auto.imagen) {
+      return auto.imagen.startsWith('http') ? auto.imagen : '/uploads/autos/' + auto.imagen;
+    }
     return null;
   }
+
   const imgSrc = getImageSrc(auto);
   const slug = generateSlug(auto.marca, auto.modelo);
+  const estado = (auto.estado || (auto.activo === 0 ? 'vendido' : 'disponible')).toLowerCase();
+  const estadoLabel = estado === 'reservado' ? 'Reservado' : (estado === 'vendido' ? 'Vendido' : (auto.condicion || 'Disponible'));
 %>
-<a href="/auto/<%= slug %>-<%= auto.id %>" class="vehicle-card fade-in" id="vehicle-<%= auto.id %>">
-  <div class="card-image">
-    <% if (imgSrc) { %>
-      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="<%= imgSrc %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy" class="lazy-img">
-    <% } else { %>
-      <div class="no-image">📷 Sin imagen</div>
-    <% } %>
-    <span class="card-badge <%= auto.condicion === 'Usado' ? 'usado' : '' %>"><%= auto.condicion %></span>
-  </div>
-  <div class="card-body">
-    <div class="card-brand"><%= auto.marca %></div>
-    <div class="card-title"><%= auto.modelo %> <%= auto.version %></div>
-    <div class="card-specs">
-      <span class="card-spec">
-        <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" fill="none" stroke-width="2"/></svg>
-        <%= auto.anio %>
-      </span>
-      <span class="card-spec">
-        <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" fill="none" stroke-width="2"/></svg>
-        <%= auto.combustible %>
-      </span>
-      <% if (auto.kilometraje > 0) { %>
-      <span class="card-spec">
-        <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
-        <%= new Intl.NumberFormat('es-AR').format(auto.kilometraje) %> km
-      </span>
-      <% } %>
-    </div>
-    <div class="card-footer">
-      <% if (auto.precio > 0) { %>
-        <div class="card-price"><span class="currency"><%= auto.moneda === 'ARS' ? '$' : 'U$S' %></span> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></div>
+<article class="vehicle-card-wrapper" id="vehicle-<%= auto.id %>">
+  <a href="/auto/<%= slug %>-<%= auto.id %>" class="vehicle-card" aria-label="Ver detalles de <%= auto.marca %> <%= auto.modelo %> <%= auto.anio %>">
+    <div class="card-image">
+      <% if (imgSrc) { %>
+        <img 
+          src="<%= imgSrc %>" 
+          alt="<%= auto.marca %> <%= auto.modelo %> <%= auto.version || '' %> <%= auto.anio %> - Abelardo Villa Multimarca" 
+          loading="lazy" 
+          width="400" 
+          height="250" 
+          class="vehicle-img"
+        >
       <% } else { %>
-        <div class="card-price" style="font-size:0.9rem;">Consultar</div>
+        <div class="no-image" role="img" aria-label="Sin imagen disponible">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span>Foto disponible pronto</span>
+        </div>
       <% } %>
-      <span class="card-link">Ver más →</span>
+
+      <span class="card-badge badge-<%= estado %>">
+        <%= estadoLabel %>
+      </span>
+
+      <% if (auto.destacado) { %>
+        <span class="card-badge-destacado" title="Vehículo Destacado">★ Destacado</span>
+      <% } %>
     </div>
-  </div>
-</a>
+
+    <div class="card-body">
+      <div class="card-brand"><%= auto.marca %></div>
+      <h3 class="card-title"><%= auto.modelo %> <%= auto.version ? auto.version : '' %></h3>
+
+      <div class="card-specs" aria-label="Características del vehículo">
+        <span class="card-spec">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+          <%= auto.anio %>
+        </span>
+
+        <% if (auto.combustible) { %>
+        <span class="card-spec">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <%= auto.combustible %>
+        </span>
+        <% } %>
+
+        <% if (auto.kilometraje > 0) { %>
+        <span class="card-spec">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+          <%= new Intl.NumberFormat('es-AR').format(auto.kilometraje) %> km
+        </span>
+        <% } else if (auto.condicion === 'Nuevo' || auto.kilometraje === 0) { %>
+        <span class="card-spec">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+          0 km
+        </span>
+        <% } %>
+      </div>
+
+      <div class="card-footer">
+        <div class="card-price-container">
+          <span class="card-price-label">Precio</span>
+          <% if (auto.precio > 0) { %>
+            <div class="card-price">
+              <span class="currency"><%= (auto.moneda === 'USD' || auto.moneda === 'U$S') ? 'U$S' : '$' %></span>
+              <%= new Intl.NumberFormat('es-AR').format(auto.precio) %>
+            </div>
+          <% } else { %>
+            <div class="card-price consult">Consultar</div>
+          <% } %>
+        </div>
+
+        <span class="card-cta-btn">
+          Ver detalles
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </a>
+</article>

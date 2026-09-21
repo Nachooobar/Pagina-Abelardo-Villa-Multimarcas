@@ -7,12 +7,20 @@
       <a href="/">Inicio</a> / <a href="/catalogo">Catálogo</a> / <a href="/catalogo?marca=<%= auto.marca %>"><%= auto.marca %></a> / <span><%= auto.modelo %></span>
     </div>
 
+<%
+  function getImgUrl(img) {
+    if (!img) return '';
+    const src = img.url || img.filename || '';
+    if (src.startsWith('http') || src.startsWith('/uploads/')) return src;
+    return '/uploads/autos/' + src;
+  }
+%>
     <div class="detail-grid">
       <!-- Gallery -->
       <div class="gallery">
         <div class="gallery-main" id="galleryMain">
           <% if (imagenes.length > 0) { %>
-            <img src="/uploads/autos/<%= imagenes[0].filename %>" alt="<%= auto.marca %> <%= auto.modelo %>" id="mainImage" onclick="openLightbox(this.src)">
+            <img src="<%= getImgUrl(imagenes[0]) %>" alt="<%= auto.marca %> <%= auto.modelo %>" id="mainImage" onclick="openLightbox(this.src)">
           <% } else { %>
             <div class="no-image" style="height:100%;">📷 Sin imágenes disponibles</div>
           <% } %>
@@ -20,8 +28,8 @@
         <% if (imagenes.length > 1) { %>
         <div class="gallery-thumbs">
           <% imagenes.forEach((img, i) => { %>
-            <div class="gallery-thumb <%= i === 0 ? 'active' : '' %>" onclick="changeImage('/uploads/autos/<%= img.filename %>', this)">
-              <img src="/uploads/autos/<%= img.filename %>" alt="Foto <%= i + 1 %>" loading="lazy">
+            <div class="gallery-thumb <%= i === 0 ? 'active' : '' %>" onclick="changeImage('<%= getImgUrl(img) %>', this)">
+              <img src="<%= getImgUrl(img) %>" alt="Foto <%= i + 1 %>" loading="lazy">
             </div>
           <% }) %>
         </div>

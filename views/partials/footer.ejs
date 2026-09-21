@@ -47,13 +47,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; <%= currentYear %>
-          <%= brand.name %>. Todos los derechos reservados.</p>
-      <div
-        style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;gap:0.75rem;">
-        <span style="font-size:0.72rem;color:var(--text-secondary);letter-spacing:0.5px;">Desarrollado por</span>
-        <img src="/images/astroweb-logo.png" alt="Astro Web"
-          style="height:40px;width:auto;object-fit:contain;background:#fff;border-radius:8px;padding:4px 10px;">
+      <p class="footer-copyright">&copy; <%= currentYear %> <%= brand.name %>. Todos los derechos reservados.</p>
+      <div class="footer-developer">
+        <span>Desarrollado por</span>
+        <img src="/images/astroweb-logo.png" alt="Astro Web" class="footer-dev-logo">
       </div>
     </div>
   </div>
