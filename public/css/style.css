@@ -856,37 +856,54 @@ body.drawer-locked {
   }
 }
 
-/* ==================== 2. FRANJA DE CONFIANZA ==================== */
+/* ==================== 2. FRANJA DE CONFIANZA (Estilo Vision Motors) ==================== */
 .trust-bar {
-  background: var(--neutral-900, #0E1116);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--neutral-950, #090B0F);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 2.25rem 0;
+  position: relative;
+  z-index: 10;
 }
 
 .trust-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.75rem;
+  gap: 2rem;
+  align-items: center;
 }
 
 .trust-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.15rem;
+}
+
+@media (min-width: 1025px) {
+  .trust-item:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding-right: 1.5rem;
+  }
 }
 
 .trust-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md, 8px);
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 12px;
   background: rgba(225, 29, 42, 0.08);
-  border: 1px solid rgba(225, 29, 42, 0.2);
+  border: 1px solid rgba(225, 29, 42, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-primary, #E11D2A);
   flex-shrink: 0;
+  transition: transform var(--transition-fast, 0.15s ease), background var(--transition-fast, 0.15s ease);
+}
+
+.trust-item:hover .trust-icon-box {
+  transform: scale(1.05);
+  background: rgba(225, 29, 42, 0.16);
 }
 
 .trust-title {
@@ -894,13 +911,14 @@ body.drawer-locked {
   font-size: 0.95rem;
   font-weight: 700;
   color: #FFFFFF;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.25;
 }
 
 .trust-desc {
   font-size: 0.8rem;
   color: var(--neutral-400, #8A94A6);
-  line-height: 1.4;
+  line-height: 1.45;
   margin: 0;
 }
 
@@ -918,7 +936,7 @@ body.drawer-locked {
   }
 }
 
-/* ==================== 4. EXPLORAR POR TIPO ==================== */
+/* ==================== 4. EXPLORAR POR TIPO (Estilo Vision Motors) ==================== */
 .type-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -926,23 +944,24 @@ body.drawer-locked {
 }
 
 .type-card {
-  background: var(--neutral-900, #0E1116);
-  border: 1px solid var(--border-medium, #283241);
-  border-radius: var(--radius-lg, 12px);
-  padding: 2rem 1rem;
+  background: var(--neutral-850, #151A21);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg, 14px);
+  padding: 2rem 1.25rem;
   text-align: center;
   text-decoration: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   transition: transform var(--transition-fast, 0.15s ease), border-color var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease);
 }
 
 .type-card:hover {
   transform: translateY(-4px);
   border-color: var(--color-primary, #E11D2A);
-  box-shadow: 0 10px 24px rgba(225, 29, 42, 0.2);
+  box-shadow: 0 12px 28px rgba(225, 29, 42, 0.22);
 }
 
 .type-card__icon {
@@ -952,28 +971,30 @@ body.drawer-locked {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   margin-bottom: 1rem;
   color: var(--neutral-200, #E3E7EC);
-  transition: background var(--transition-fast, 0.15s ease), color var(--transition-fast, 0.15s ease);
+  transition: background var(--transition-fast, 0.15s ease), color var(--transition-fast, 0.15s ease), transform var(--transition-fast, 0.15s ease);
 }
 
 .type-card:hover .type-card__icon {
   background: var(--color-primary, #E11D2A);
   color: #FFFFFF;
+  transform: scale(1.08);
 }
 
 .type-card__name {
   font-family: var(--font-heading, 'Sora', sans-serif);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #FFFFFF;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .type-card__count {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: var(--neutral-400, #8A94A6);
+  line-height: 1.3;
 }
 
 @media (max-width: 1024px) {
@@ -1161,60 +1182,112 @@ body.drawer-locked {
   }
 }
 
-/* ==================== 8. INSTAGRAM GRID ==================== */
-.instagram-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-.instagram-item {
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-md, 8px);
-  overflow: hidden;
+/* ==================== 8. BANDA DE ACCIÓN / CTA (Estilo Vision Motors) ==================== */
+.cta-banner-red {
+  background: linear-gradient(135deg, #E11D2A 0%, #A80E18 100%);
+  padding: 3.5rem 0;
   position: relative;
-  background: var(--neutral-900, #0E1116);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  display: block;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(225, 29, 42, 0.25);
 }
 
-.instagram-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.instagram-item:hover img {
-  transform: scale(1.08);
-}
-
-.instagram-overlay {
+.cta-banner-red::before {
+  content: '';
   position: absolute;
   inset: 0;
-  background: rgba(14, 17, 22, 0.75);
+  background: radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.cta-banner-content {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  justify-content: space-between;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-banner-text {
+  max-width: 680px;
+}
+
+.cta-banner-badge {
+  display: inline-block;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: rgba(0, 0, 0, 0.25);
   color: #FFFFFF;
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-bottom: 0.75rem;
 }
 
-.instagram-item:hover .instagram-overlay {
-  opacity: 1;
+.cta-banner-title {
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin-bottom: 0.65rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 1024px) {
-  .instagram-grid {
-    grid-template-columns: repeat(3, 1fr);
+.cta-banner-subtitle {
+  font-size: clamp(0.925rem, 1.5vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.cta-banner-action {
+  flex-shrink: 0;
+}
+
+.cta-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: #FFFFFF;
+  color: #0E1116;
+  font-family: var(--font-heading, 'Sora', sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-full, 9999px);
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: transform var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease), background var(--transition-fast, 0.15s ease);
+  white-space: nowrap;
+}
+
+.cta-banner-btn svg {
+  color: #25D366;
+  flex-shrink: 0;
+}
+
+.cta-banner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  background: #F8FAFC;
+}
+
+@media (max-width: 900px) {
+  .cta-banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.75rem;
   }
-}
-
-@media (max-width: 600px) {
-  .instagram-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .cta-banner-text {
+    max-width: 100%;
+  }
+  .cta-banner-btn {
+    width: 100%;
+    max-width: 380px;
   }
 }
 
@@ -1455,11 +1528,36 @@ body.drawer-locked {
   margin: 0 auto;
 }
 
-/* ── VEHICLE CARDS (Reglas 1, 2, 3, 4, 5, 7, 12) ── */
+/* ── VEHICLE CARDS (Reglas 1, 2, 3, 4, 5, 7, 12 - Inspiración Vision Motors) ── */
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .vehicles-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .vehicles-grid:has(> :only-child) {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .vehicles-grid:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .vehicles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
