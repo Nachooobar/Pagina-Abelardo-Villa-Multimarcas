@@ -71,9 +71,9 @@
 
               <select name="estado" class="filter-select">
                 <option value="">Estado comercial</option>
-                <option value="disponible" <%= filtros.estado === 'disponible' ? 'selected' : '' %>>🟢 Disponible</option>
-                <option value="reservado" <%= filtros.estado === 'reservado' ? 'selected' : '' %>>🟡 Reservado</option>
-                <option value="vendido" <%= filtros.estado === 'vendido' ? 'selected' : '' %>>🔴 Vendido</option>
+                <option value="disponible" <%= filtros.estado === 'disponible' ? 'selected' : '' %>>Disponible</option>
+                <option value="reservado" <%= filtros.estado === 'reservado' ? 'selected' : '' %>>Reservado</option>
+                <option value="vendido" <%= filtros.estado === 'vendido' ? 'selected' : '' %>>Vendido</option>
               </select>
 
               <button type="submit" class="btn btn-secondary btn-sm">
@@ -81,7 +81,7 @@
               </button>
               <% if (filtros.buscar || filtros.marca || filtros.condicion || filtros.estado) { %>
                 <a href="/admin/autos" class="btn btn-ghost btn-sm" title="Restablecer filtros">
-                  ✕ Limpiar
+                  Limpiar
                 </a>
               <% } %>
             </div>
@@ -135,7 +135,7 @@
                           <div class="table-thumbnail-placeholder">Sin foto</div>
                         <% } %>
                         <% if (auto.total_imagenes > 1) { %>
-                          <span class="thumbnail-count-badge">📷 <%= auto.total_imagenes %></span>
+                          <span class="thumbnail-count-badge"><%= auto.total_imagenes %></span>
                         <% } %>
                       </div>
                     </td>
@@ -152,7 +152,7 @@
                             <%= auto.condicion === '0km' ? '0km' : 'Usado' %>
                           </span>
                           <% if (auto.destacado) { %>
-                            <span class="chip-mini chip-destacado" title="Destacado en la Home">⭐ Destacado</span>
+                            <span class="chip-mini chip-destacado" title="Destacado en la Home">Destacado</span>
                           <% } %>
                         </div>
                       </div>
@@ -186,9 +186,9 @@
                       <div class="table-status-dropdown-wrap">
                         <form method="POST" action="/admin/autos/estado/<%= auto.id %>" class="quick-status-form">
                           <select name="estado" class="table-status-select <%= estadoSlug %>" onchange="this.form.submit()" title="Cambiar estado comercial">
-                            <option value="disponible" <%= estadoSlug === 'disponible' ? 'selected' : '' %>>🟢 Disponible</option>
-                            <option value="reservado" <%= estadoSlug === 'reservado' ? 'selected' : '' %>>🟡 Reservado</option>
-                            <option value="vendido" <%= estadoSlug === 'vendido' ? 'selected' : '' %>>🔴 Vendido</option>
+                            <option value="disponible" <%= estadoSlug === 'disponible' ? 'selected' : '' %>>Disponible</option>
+                            <option value="reservado" <%= estadoSlug === 'reservado' ? 'selected' : '' %>>Reservado</option>
+                            <option value="vendido" <%= estadoSlug === 'vendido' ? 'selected' : '' %>>Vendido</option>
                           </select>
                         </form>
                       </div>
@@ -235,7 +235,11 @@
                   <tr>
                     <td colspan="8" class="table-empty-row">
                       <div class="table-empty-state">
-                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-icon">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--neutral-500);">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                          </svg>
+                        </div>
                         <h3>No encontramos vehículos</h3>
                         <p>Probá modificando los filtros de búsqueda o cargá un nuevo auto en el inventario.</p>
                         <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:0.75rem;">
@@ -269,19 +273,19 @@
           <input type="hidden" name="accion" id="massAccionInput">
 
           <button type="button" class="btn-mass mass-btn-available" onclick="submitMassAction('disponible')">
-            🟢 Disponible
+            Disponible
           </button>
           <button type="button" class="btn-mass mass-btn-reserve" onclick="submitMassAction('reservado')">
-            🟡 Reservar
+            Reservar
           </button>
           <button type="button" class="btn-mass mass-btn-sold" onclick="submitMassAction('vendido')">
-            🔴 Vendido
+            Vendido
           </button>
           <button type="button" class="btn-mass mass-btn-delete" onclick="submitMassAction('eliminar')">
-            🗑️ Eliminar
+            Eliminar
           </button>
         </form>
-        <button type="button" class="btn-mass-cancel" id="cancelMassBtn" title="Cancelar selección">✕</button>
+        <button type="button" class="btn-mass-cancel" id="cancelMassBtn" title="Cancelar seleccion">X</button>
       </div>
     </div>
   </div>

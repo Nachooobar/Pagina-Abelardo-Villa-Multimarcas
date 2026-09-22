@@ -138,8 +138,8 @@ router.get('/catalogo', async (req, res) => {
 
     // Filtro Tipo de Carrocería
     if (tipo && tipo !== 'Todos' && tipo !== '') {
-      whereConditions.push('(modelo LIKE ? OR descripcion LIKE ?)');
-      params.push(`%${tipo}%`, `%${tipo}%`);
+      whereConditions.push('tipo = ?');
+      params.push(tipo);
     }
 
     // Filtro Marca

@@ -80,6 +80,7 @@ async function initSchema() {
         descripcion TEXT,
         estado TEXT DEFAULT 'disponible',
         destacado BOOLEAN DEFAULT false,
+        tipo TEXT DEFAULT '',
         imagenes TEXT[],
         created_at TIMESTAMPTZ DEFAULT now(),
         updated_at TIMESTAMPTZ DEFAULT now()
@@ -113,6 +114,7 @@ async function initSchema() {
         motor VARCHAR(255) DEFAULT '',
         descripcion TEXT,
         condicion VARCHAR(50) DEFAULT 'Usado',
+        tipo VARCHAR(50) DEFAULT '',
         estado VARCHAR(50) DEFAULT 'disponible',
         destacado INTEGER DEFAULT 0,
         activo INTEGER DEFAULT 1,
@@ -141,6 +143,7 @@ async function initSchema() {
     // Intentar agregar columnas si la tabla ya existía previamente
     try { await activeDb.run("ALTER TABLE autos ADD COLUMN estado VARCHAR(50) DEFAULT 'disponible'"); } catch (e) {}
     try { await activeDb.run("ALTER TABLE autos ADD COLUMN imagenes TEXT DEFAULT '[]'"); } catch (e) {}
+    try { await activeDb.run("ALTER TABLE autos ADD COLUMN tipo VARCHAR(50) DEFAULT ''"); } catch (e) {}
   }
 
   // ── Usuario Admin: crear o sincronizar con credenciales oficiales ──

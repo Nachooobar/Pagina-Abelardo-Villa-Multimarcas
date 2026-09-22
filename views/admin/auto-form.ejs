@@ -26,7 +26,7 @@
             <div class="admin-breadcrumb">
               <a href="/admin/autos" style="color:var(--color-secondary);text-decoration:none;">Vehículos</a> / <%= auto ? 'Editar' : 'Nuevo' %>
             </div>
-            <h2 class="admin-page-title"><%= auto ? '✏️ Editar Vehículo' : '➕ Cargar Nuevo Vehículo' %></h2>
+            <h2 class="admin-page-title"><%= auto ? 'Editar Vehiculo' : 'Cargar Nuevo Vehiculo' %></h2>
             <p class="admin-page-desc">Completá los datos técnicos, fotos y precio para la publicación en el sitio web.</p>
           </div>
           <div class="admin-page-actions">
@@ -35,8 +35,9 @@
         </div>
 
         <% if (error) { %>
-          <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
-            ⚠️ <%= error %>
+            <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+              <%= error %>
+            </div>
           </div>
         <% } %>
 
@@ -121,8 +122,8 @@
                     <div class="form-group">
                       <label for="condicion">Condición</label>
                       <select id="condicion" name="condicion" class="form-select">
-                        <option value="Usado" <%= auto && auto.condicion === 'Usado' ? 'selected' : '' %>>🔄 Usado</option>
-                        <option value="0km" <%= auto && auto.condicion === '0km' ? 'selected' : '' %>>✨ 0km (Nuevo)</option>
+                        <option value="Usado" <%= auto && auto.condicion === 'Usado' ? 'selected' : '' %>>Usado</option>
+                        <option value="0km" <%= auto && auto.condicion === '0km' ? 'selected' : '' %>>0km (Nuevo)</option>
                       </select>
                     </div>
                   </div>
@@ -149,6 +150,18 @@
                         placeholder="Ej: 1.8 16v 140cv, 2.0 TDI..."
                         class="form-input"
                       >
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label for="tipo">Tipo de Vehiculo</label>
+                      <select id="tipo" name="tipo" class="form-select">
+                        <option value="" <%= !auto || !auto.tipo ? 'selected' : '' %>>-- Seleccionar tipo --</option>
+                        <% ['SUV', 'Pick-up', 'Sedan', 'Hatchback', 'Utilitario', 'Coupe', 'Convertible', 'Minivan', 'Camioneta'].forEach(t => { %>
+                          <option value="<%= t %>" <%= auto && auto.tipo === t ? 'selected' : '' %>><%= t %></option>
+                        <% }) %>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -216,10 +229,10 @@
                     <label>Moneda de Publicación</label>
                     <div class="currency-toggle-cluster" id="currencyToggle">
                       <button type="button" class="currency-chip <%= (!auto || auto.moneda === 'ARS') ? 'active' : '' %>" data-currency="ARS">
-                        🇦🇷 Pesos Argentinos ($ ARS)
+                        Pesos Argentinos ($ ARS)
                       </button>
                       <button type="button" class="currency-chip <%= auto && (auto.moneda === 'USD' || auto.moneda === 'U$S') ? 'active' : '' %>" data-currency="USD">
-                        🇺🇸 Dólares (U$S)
+                        Dolares (U$S)
                       </button>
                     </div>
                     <input type="hidden" id="moneda" name="moneda" value="<%= auto && auto.moneda ? auto.moneda : 'ARS' %>">
@@ -264,9 +277,9 @@
                       <label for="estado">Estado comercial</label>
                       <% const currentEst = auto ? (auto.estado || (auto.activo === 0 ? 'vendido' : 'disponible')) : 'disponible'; %>
                       <select id="estado" name="estado" class="form-select">
-                        <option value="disponible" <%= currentEst === 'disponible' ? 'selected' : '' %>>🟢 Disponible para la venta</option>
-                        <option value="reservado" <%= currentEst === 'reservado' ? 'selected' : '' %>>🟡 Reservado / Señado</option>
-                        <option value="vendido" <%= currentEst === 'vendido' ? 'selected' : '' %>>🔴 Vendido</option>
+                        <option value="disponible" <%= currentEst === 'disponible' ? 'selected' : '' %>>Disponible para la venta</option>
+                        <option value="reservado" <%= currentEst === 'reservado' ? 'selected' : '' %>>Reservado / Senado</option>
+                        <option value="vendido" <%= currentEst === 'vendido' ? 'selected' : '' %>>Vendido</option>
                       </select>
                     </div>
 
@@ -274,7 +287,7 @@
                       <label class="checkbox-label-card" for="destacado">
                         <input type="checkbox" id="destacado" name="destacado" value="1" <%= auto && auto.destacado ? 'checked' : '' %>>
                         <div class="checkbox-card-content">
-                          <span class="checkbox-card-title">⭐ Destacar en la Home</span>
+                          <span class="checkbox-card-title">Destacar en la Home</span>
                           <span class="checkbox-card-desc">Mostrará badge especial y prioridad visual</span>
                         </div>
                       </label>
@@ -300,8 +313,8 @@
                   <% if (imagenes && imagenes.length > 0) { %>
                     <div class="existing-photos-section">
                       <div class="existing-photos-header">
-                        <span class="existing-photos-count">📷 <%= imagenes.length %> foto<%= imagenes.length !== 1 ? 's' : '' %> guardada<%= imagenes.length !== 1 ? 's' : '' %></span>
-                        <span class="existing-photos-tip">Hacé clic en ⭐ para elegir la foto de portada</span>
+                        <span class="existing-photos-count"><%= imagenes.length %> foto<%= imagenes.length !== 1 ? 's' : '' %> guardada<%= imagenes.length !== 1 ? 's' : '' %></span>
+                        <span class="existing-photos-tip">Haga clic en "Portada" para elegir la foto de portada</span>
                       </div>
                       <div class="existing-photos-grid">
                         <% imagenes.forEach(img => { %>
@@ -315,11 +328,11 @@
                             <div class="photo-thumb-actions">
                               <% if (!img.es_principal) { %>
                                 <button type="button" class="photo-action-btn btn-star" onclick="setMainImage('<%= img.id %>')" title="Hacer foto principal">
-                                  ⭐ Portada
+                                  Portada
                                 </button>
                               <% } %>
                               <button type="button" class="photo-action-btn btn-delete" onclick="deleteExistingImage('<%= img.id %>')" title="Eliminar foto">
-                                ✕ Eliminar
+                                Eliminar
                               </button>
                             </div>
                           </div>
@@ -391,9 +404,9 @@
               <!-- BOTONES FIJOS INFERIORES -->
               <div class="form-sticky-submit-bar">
                 <div class="sticky-bar-left">
-                  <span class="draft-auto-save-indicator" id="draftStatus">
-                    💾 Borrador local activo
-                  </span>
+                    <span class="draft-auto-save-indicator" id="draftStatus">
+                      Borrador local activo
+                    </span>
                 </div>
                 <div class="sticky-bar-right">
                   <button type="button" class="btn btn-outline btn-md" onclick="saveAsInactive()">
@@ -401,7 +414,7 @@
                   </button>
                   <button type="submit" class="btn btn-primary btn-md" id="submitBtn">
                     <span class="btn-text">
-                      <%= auto && auto.id ? '💾 Guardar Cambios' : '🚗 Publicar Vehículo' %>
+                      <%= auto && auto.id ? 'Guardar Cambios' : 'Publicar Vehiculo' %>
                     </span>
                     <span class="btn-loading" style="display:none;">
                       <span class="spinner-inline"></span> Guardando...
@@ -461,7 +474,7 @@
               </div>
 
               <div class="live-preview-card-notes">
-                <small>💡 Los cambios que escribas en el formulario se reflejan instantáneamente en esta tarjeta.</small>
+                <small>Los cambios que escribas en el formulario se reflejan instantaneamente en esta tarjeta.</small>
               </div>
             </div>
           </div>

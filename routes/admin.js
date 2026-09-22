@@ -33,14 +33,14 @@ function gitSync(action, details = '') {
     const safeAction = sanitizeForShell(action);
     const safeDetails = sanitizeForShell(details);
     const message = `[AUTO] ${safeAction} - ${safeDetails} (${timestamp})`;
-    
+
     // Usar array de argumentos en lugar de string interpolado para evitar inyección
     execSync('git add -A', { cwd: projectRoot, stdio: 'pipe', timeout: 10000 });
     execSync('git', { cwd: projectRoot, stdio: 'pipe' });
-    
+
     // Hacer commit con el mensaje ya sanitizado
     execSync(`git commit -m "${message}" --allow-empty`, { cwd: projectRoot, stdio: 'pipe', timeout: 10000 });
-    
+
     // Intentar push al repositorio remoto con timeout reducido
     try {
       execSync('git push', { cwd: projectRoot, stdio: 'pipe', timeout: 15000 });
@@ -61,20 +61,20 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 minutos
 function checkRateLimit(ip) {
   const now = Date.now();
   const record = loginAttempts.get(ip);
-  
+
   if (!record || now - record.firstAttempt > LOGIN_WINDOW_MS) {
     // Ventana expirada o primer intento: resetear
     loginAttempts.set(ip, { count: 1, firstAttempt: now });
     return { blocked: false, remaining: MAX_LOGIN_ATTEMPTS - 1 };
   }
-  
+
   record.count++;
   if (record.count > MAX_LOGIN_ATTEMPTS) {
     const waitMs = LOGIN_WINDOW_MS - (now - record.firstAttempt);
     const waitMin = Math.ceil(waitMs / 60000);
     return { blocked: true, waitMin };
   }
-  
+
   return { blocked: false, remaining: MAX_LOGIN_ATTEMPTS - record.count };
 }
 
@@ -101,7 +101,7 @@ router.get('/login', (req, res) => {
 // ── LOGIN POST ──
 router.post('/login', async (req, res) => {
   const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-  
+
   // Verificar rate limit
   const rateCheck = checkRateLimit(clientIp);
   if (rateCheck.blocked) {
@@ -113,12 +113,12 @@ router.post('/login', async (req, res) => {
 
   try {
     const { username, password } = req.body;
-    
+
     // Validar que username y password sean strings no vacíos
     if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
       return res.render('admin/login', { title: 'Admin Login', error: 'Usuario o contraseña incorrectos' });
     }
-    
+
     const user = await db.prepare('SELECT * FROM admin_users WHERE username = ?').get([username.trim().substring(0, 100)]);
 
     if (user && bcrypt.compareSync(password, user.password)) {
@@ -169,7 +169,7 @@ router.get('/', requireAuth, async (req, res) => {
       totalPublicados = (await db.prepare("SELECT COUNT(*) as count FROM public.vehiculos WHERE estado = 'disponible'").get()).count || 0;
       nuevosMes = (await db.prepare("SELECT COUNT(*) as count FROM public.vehiculos WHERE to_char(created_at, 'YYYY-MM') = ?").get([currentYearMonth])).count || 0;
       totalReservados = (await db.prepare("SELECT COUNT(*) as count FROM public.vehiculos WHERE estado = 'reservado'").get()).count || 0;
-      
+
       ultimosAutos = await db.prepare(`
         SELECT v.*,
           CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen,
@@ -182,7 +182,7 @@ router.get('/', requireAuth, async (req, res) => {
       totalPublicados = (await db.prepare("SELECT COUNT(*) as count FROM autos WHERE (activo = 1 OR estado = 'disponible') AND estado != 'reservado' AND estado != 'vendido'").get()).count || 0;
       nuevosMes = (await db.prepare("SELECT COUNT(*) as count FROM autos WHERE strftime('%Y-%m', created_at) = ?").get([currentYearMonth])).count || 0;
       totalReservados = (await db.prepare("SELECT COUNT(*) as count FROM autos WHERE estado = 'reservado' OR activo = 0").get()).count || 0;
-      
+
       ultimosAutos = await db.prepare(`
         SELECT a.*, 
           (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen,
@@ -291,7 +291,7 @@ router.get('/autos/nuevo', requireAuth, (req, res) => {
 router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (req, res) => {
   try {
     const { marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
-      transmision, color, puertas, motor, descripcion, condicion, destacado, activo, estado } = req.body;
+      transmision, color, puertas, motor, descripcion, condicion, destacado, activo, estado, tipo } = req.body;
 
     const finalEstado = estado || (activo === '0' || activo === 0 ? 'vendido' : 'disponible');
     const isDestacado = Boolean(destacado && destacado !== '0');
@@ -307,24 +307,24 @@ router.post('/autos/nuevo', requireAuth, upload.array('imagenes', 50), async (re
       // ── Supabase PostgreSQL: tabla public.vehiculos (Regla 13) ──
       await db.prepare(`
         INSERT INTO public.vehiculos (marca, modelo, version, anio, kilometraje, combustible,
-          transmision, precio, moneda, descripcion, estado, destacado, imagenes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          transmision, precio, moneda, descripcion, estado, destacado, tipo, imagenes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run([
         marca.trim(), modelo.trim(), version ? version.trim() : '', numAnio, numKm,
         combustible || 'Nafta', transmision || 'Manual', numPrecio, finalMoneda,
-        descripcion || '', finalEstado, isDestacado, uploadedUrls
+        descripcion || '', finalEstado, isDestacado, tipo || '', uploadedUrls
       ]);
     } else {
       // ── Modo local SQLite ──
       const result = await db.prepare(`
         INSERT INTO autos (marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
-          transmision, color, puertas, motor, descripcion, condicion, estado, destacado, activo, imagenes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          transmision, color, puertas, motor, descripcion, condicion, tipo, estado, destacado, activo, imagenes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run([
         marca.trim(), modelo.trim(), version ? version.trim() : '', numAnio, numPrecio, finalMoneda,
         numKm, combustible || 'Nafta', transmision || 'Manual',
         color || '', parseInt(puertas) || 4, motor || '', descripcion || '',
-        condicion || 'Usado', finalEstado, isDestacado ? 1 : 0, finalEstado === 'disponible' ? 1 : 0,
+        condicion || 'Usado', tipo || '', finalEstado, isDestacado ? 1 : 0, finalEstado === 'disponible' ? 1 : 0,
         JSON.stringify(uploadedUrls)
       ]);
 
@@ -393,7 +393,7 @@ router.get('/autos/editar/:id', requireAuth, async (req, res) => {
 router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), async (req, res) => {
   try {
     const { marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
-      transmision, color, puertas, motor, descripcion, condicion, destacado, activo, estado } = req.body;
+      transmision, color, puertas, motor, descripcion, condicion, destacado, activo, estado, tipo } = req.body;
 
     const finalEstado = estado || (activo === '0' || activo === 0 ? 'vendido' : 'disponible');
     const isDestacado = Boolean(destacado && destacado !== '0');
@@ -412,12 +412,12 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
         UPDATE public.vehiculos SET
           marca = ?, modelo = ?, version = ?, anio = ?, kilometraje = ?, combustible = ?,
           transmision = ?, precio = ?, moneda = ?, descripcion = ?, estado = ?, destacado = ?,
-          imagenes = ?, updated_at = now()
+          tipo = ?, imagenes = ?, updated_at = now()
         WHERE id = ?
       `).run([
         marca.trim(), modelo.trim(), version ? version.trim() : '', numAnio, numKm,
         combustible || 'Nafta', transmision || 'Manual', numPrecio, finalMoneda,
-        descripcion || '', finalEstado, isDestacado, updatedImgs,
+        descripcion || '', finalEstado, isDestacado, tipo || '', updatedImgs,
         req.params.id
       ]);
     } else {
@@ -425,14 +425,14 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
         UPDATE autos SET
           marca = ?, modelo = ?, version = ?, anio = ?, precio = ?, moneda = ?,
           kilometraje = ?, combustible = ?, transmision = ?, color = ?, puertas = ?,
-          motor = ?, descripcion = ?, condicion = ?, estado = ?, destacado = ?, activo = ?,
+          motor = ?, descripcion = ?, condicion = ?, tipo = ?, estado = ?, destacado = ?, activo = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `).run([
         marca.trim(), modelo.trim(), version ? version.trim() : '', numAnio, numPrecio, finalMoneda,
         numKm, combustible || 'Nafta', transmision || 'Manual',
         color || '', parseInt(puertas) || 4, motor || '', descripcion || '',
-        condicion || 'Usado', finalEstado, isDestacado ? 1 : 0, finalEstado === 'disponible' ? 1 : 0,
+        condicion || 'Usado', tipo || '', finalEstado, isDestacado ? 1 : 0, finalEstado === 'disponible' ? 1 : 0,
         req.params.id
       ]);
 
@@ -497,12 +497,12 @@ router.post('/autos/duplicar/:id', requireAuth, async (req, res) => {
       if (auto) {
         await db.prepare(`
           INSERT INTO public.vehiculos (marca, modelo, version, anio, kilometraje, combustible,
-            transmision, precio, moneda, descripcion, estado, destacado, imagenes)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'disponible', false, ?)
+            transmision, precio, moneda, descripcion, estado, destacado, tipo, imagenes)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'disponible', false, ?, ?)
         `).run([
           auto.marca, auto.modelo, (auto.version ? auto.version + ' (Copia)' : '(Copia)'),
           auto.anio, auto.kilometraje, auto.combustible, auto.transmision,
-          auto.precio, auto.moneda, auto.descripcion, auto.imagenes || []
+          auto.precio, auto.moneda, auto.descripcion, auto.tipo || '', auto.imagenes || []
         ]);
         gitSync('DUPLICAR AUTO', `${auto.marca} ${auto.modelo}`);
       }
@@ -511,13 +511,13 @@ router.post('/autos/duplicar/:id', requireAuth, async (req, res) => {
       if (auto) {
         const result = await db.prepare(`
           INSERT INTO autos (marca, modelo, version, anio, precio, moneda, kilometraje, combustible,
-            transmision, color, puertas, motor, descripcion, condicion, estado, destacado, activo, imagenes)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'disponible', 0, 1, ?)
+            transmision, color, puertas, motor, descripcion, condicion, tipo, estado, destacado, activo, imagenes)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'disponible', 0, 1, ?)
         `).run([
           auto.marca, auto.modelo, (auto.version ? auto.version + ' (Copia)' : '(Copia)'),
           auto.anio, auto.precio, auto.moneda, auto.kilometraje, auto.combustible,
           auto.transmision, auto.color, auto.puertas, auto.motor, auto.descripcion,
-          auto.condicion, auto.imagenes || '[]'
+          auto.condicion, auto.tipo || '', auto.imagenes || '[]'
         ]);
 
         const newId = result.id;
