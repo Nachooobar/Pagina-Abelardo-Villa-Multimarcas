@@ -61,14 +61,15 @@
       <% if (activeChips && activeChips.length> 0) { %>
         <div class="active-chips-bar fade-up">
           <span class="active-chips-label">Filtros activos:</span>
-          <div class="active-chips-list">
-            <% activeChips.forEach(chip=> { %>
-              <% // Construir URL removiendo este filtro const newParams={ ...filtros }; delete newParams[chip.key];
-                delete newParams.page; const removeUrl='/catalogo?' + Object.entries(newParams) .filter(([k, v])=> v !==
-                undefined && v !== '')
-                .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
-                .join('&');
-                %>
+            <% activeChips.forEach(chip => { 
+                const newParams = { ...filtros };
+                delete newParams[chip.key];
+                delete newParams.page;
+                const removeUrl = '/catalogo?' + Object.entries(newParams)
+                  .filter(([k, v]) => v !== undefined && v !== '')
+                  .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+                  .join('&');
+            %>
                 <a href="<%= removeUrl || '/catalogo' %>" class="filter-chip"
                   title="Quitar filtro <%= chip.label %>: <%= chip.value %>">
                   <span class="chip-label">

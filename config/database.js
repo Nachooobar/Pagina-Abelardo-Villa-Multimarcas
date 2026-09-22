@@ -70,23 +70,37 @@ async function initSchema() {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         marca TEXT NOT NULL,
         modelo TEXT NOT NULL,
-        version TEXT,
+        version TEXT DEFAULT '',
         anio INTEGER NOT NULL,
-        kilometraje INTEGER,
-        combustible TEXT,
-        transmision TEXT,
-        precio NUMERIC(12, 2),
+        kilometraje INTEGER DEFAULT 0,
+        combustible TEXT DEFAULT 'Nafta',
+        transmision TEXT DEFAULT 'Manual',
+        color TEXT DEFAULT '',
+        puertas INTEGER DEFAULT 4,
+        motor TEXT DEFAULT '',
+        precio NUMERIC(15, 2) DEFAULT 0,
         moneda TEXT DEFAULT 'ARS',
-        descripcion TEXT,
+        descripcion TEXT DEFAULT '',
+        condicion TEXT DEFAULT 'Usado',
         estado TEXT DEFAULT 'disponible',
         destacado BOOLEAN DEFAULT false,
+        activo INTEGER DEFAULT 1,
         tipo TEXT DEFAULT '',
-        imagenes TEXT[],
+        imagenes TEXT[] DEFAULT '{}',
         created_at TIMESTAMPTZ DEFAULT now(),
         updated_at TIMESTAMPTZ DEFAULT now()
       );
 
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS condicion TEXT DEFAULT 'Usado';
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS color TEXT DEFAULT '';
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS puertas INTEGER DEFAULT 4;
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS motor TEXT DEFAULT '';
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS activo INTEGER DEFAULT 1;
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS tipo TEXT DEFAULT '';
+      ALTER TABLE public.vehiculos ADD COLUMN IF NOT EXISTS imagenes TEXT[] DEFAULT '{}';
+
       CREATE INDEX IF NOT EXISTS idx_vehiculos_marca_modelo ON public.vehiculos (marca, modelo);
+      CREATE INDEX IF NOT EXISTS idx_vehiculos_estado ON public.vehiculos (estado);
 
       CREATE TABLE IF NOT EXISTS admin_users (
         id SERIAL PRIMARY KEY,

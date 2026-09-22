@@ -210,10 +210,10 @@
       <% } %>
 
         <!-- ==================== 4. NUEVOS INGRESOS (CarCards 4:3) ==================== -->
-        <% // Filtrar nuevos ingresos para no repetir vehículos destacados const destacadoIds=(destacados || []).map(d=>
-          d.id);
-          const nuevosIngresosUnicos = (nuevosIngresos || []).filter(a => !destacadoIds.includes(a.id));
-          %>
+        <%
+          const destacadoIds = (destacados || []).map(function(d) { return d.id; });
+          const nuevosIngresosUnicos = (nuevosIngresos || []).filter(function(a) { return !destacadoIds.includes(a.id); });
+        %>
           <% if (nuevosIngresosUnicos && nuevosIngresosUnicos.length> 0) { %>
             <section class="home-section section-surface" id="nuevosIngresos"
               style="background-color: #0E1116; color: #FFFFFF;">
