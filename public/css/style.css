@@ -137,6 +137,14 @@ textarea {
   padding: 0 1.5rem;
 }
 
+/* ==================== 0. SITE HEADER ==================== */
+.site-header {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: var(--z-sticky, 1020);
+}
+
 /* ==================== 1. TOPBAR (Barra Superior Fina y Oscura) ==================== */
 .topbar {
   background: var(--neutral-950, #090B0F);
@@ -371,6 +379,7 @@ textarea {
 
 /* ==================== 3. MOBILE DRAWER (Pantalla Completa) ==================== */
 .mobile-drawer {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: var(--z-max, 9999);
@@ -379,9 +388,18 @@ textarea {
   transition: visibility 0.3s ease, opacity 0.3s ease;
 }
 
-.mobile-drawer.is-open {
-  visibility: visible;
-  opacity: 1;
+@media (max-width: 1024px) {
+  .mobile-drawer.is-open {
+    display: block !important;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-drawer {
+    display: none !important;
+  }
 }
 
 .mobile-drawer__backdrop {
@@ -619,7 +637,8 @@ body.drawer-locked {
   will-change: opacity, transform;
 }
 
-.fade-up.visible {
+.fade-up.visible,
+.hero-v2 .fade-up {
   opacity: 1;
   transform: translateY(0);
 }

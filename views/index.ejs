@@ -201,6 +201,7 @@
   const destacadoIds = (destacados || []).map(d => d.id);
   const nuevosIngresosUnicos = (nuevosIngresos || []).filter(a => !destacadoIds.includes(a.id));
 %>
+<% if (nuevosIngresosUnicos && nuevosIngresosUnicos.length > 0) { %>
 <section class="home-section section-surface" id="nuevosIngresos" style="background-color: #0E1116; color: #FFFFFF;">
   <div class="container">
     <div class="section-header-wrap fade-up">
@@ -211,32 +212,42 @@
       </p>
     </div>
 
-    <% if (nuevosIngresosUnicos && nuevosIngresosUnicos.length > 0) { %>
-      <div class="vehicles-grid fade-up">
-        <% nuevosIngresosUnicos.forEach(auto => { %>
-          <%- include('partials/vehicle-card', { auto, generateSlug, badge: 'Nuevo ingreso' }) %>
-        <% }) %>
-      </div>
+    <div class="vehicles-grid fade-up">
+      <% nuevosIngresosUnicos.forEach(auto => { %>
+        <%- include('partials/vehicle-card', { auto, generateSlug, badge: 'Nuevo ingreso' }) %>
+      <% }) %>
+    </div>
 
-      <div style="text-align: center; margin-top: 3.5rem;" class="fade-up">
-        <a href="/catalogo" class="ds-btn ds-btn--outline ds-btn--lg" style="border-radius: var(--radius-full);">
-          Ver todos los vehículos en stock →
-        </a>
-      </div>
-    <% } else if (!destacados || destacados.length === 0) { %>
-      <div class="ds-card text-center fade-up" style="padding: 3rem; max-width: 600px; margin: 0 auto;">
-        <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🚗</span>
-        <h3 style="font-family: var(--font-heading); font-size: var(--text-xl); color: #fff; margin-bottom: 0.5rem;">Stock en Preparación</h3>
-        <p style="color: var(--neutral-400); font-size: var(--text-sm); line-height: 1.6; margin-bottom: 1.5rem;">
-          Estamos incorporando nuevas unidades exclusivas a nuestro salón. Escribinos para conocer los ingresos antes de su publicación.
-        </p>
-        <a href="<%= getWhatsAppLink() %>" target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--primary">
-          Consultar próximos ingresos por WhatsApp
-        </a>
-      </div>
-    <% } %>
+    <div style="text-align: center; margin-top: 3.5rem;" class="fade-up">
+      <a href="/catalogo" class="ds-btn ds-btn--outline ds-btn--lg" style="border-radius: var(--radius-full);">
+        Ver todos los vehículos en stock →
+      </a>
+    </div>
   </div>
 </section>
+<% } else if (!destacados || destacados.length === 0) { %>
+<section class="home-section section-surface" id="nuevosIngresos" style="background-color: #0E1116; color: #FFFFFF;">
+  <div class="container">
+    <div class="section-header-wrap fade-up">
+      <span class="section-tag-v2" style="color: var(--color-primary, #E11D2A);">★ Recién Llegados</span>
+      <h2 class="section-title-v2" style="color: #FFFFFF; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Nuevos Ingresos</h2>
+      <p class="section-subtitle-v2" style="color: #C2C9D6;">
+        Los vehículos más recientes incorporados a nuestro stock cuidadosamente seleccionado.
+      </p>
+    </div>
+    <div class="ds-card text-center fade-up" style="padding: 3rem; max-width: 600px; margin: 0 auto;">
+      <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🚗</span>
+      <h3 style="font-family: var(--font-heading); font-size: var(--text-xl); color: #fff; margin-bottom: 0.5rem;">Stock en Preparación</h3>
+      <p style="color: var(--neutral-400); font-size: var(--text-sm); line-height: 1.6; margin-bottom: 1.5rem;">
+        Estamos incorporando nuevas unidades exclusivas a nuestro salón. Escribinos para conocer los ingresos antes de su publicación.
+      </p>
+      <a href="<%= getWhatsAppLink() %>" target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--primary">
+        Consultar próximos ingresos por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+<% } %>
 
 <!-- ==================== 4. EXPLORAR POR TIPO ==================== -->
 <section class="home-section section-dark" id="explorarPorTipo">
