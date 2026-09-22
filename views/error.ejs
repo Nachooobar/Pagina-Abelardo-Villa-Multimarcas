@@ -1,10 +1,26 @@
-<%- include('partials/header') %>
-<div class="page-404">
-  <div>
-    <h1 style="font-size:3rem;">⚠️</h1>
-    <h2 style="color:var(--text-primary); margin:1rem 0;">Error del Servidor</h2>
-    <p><%= typeof error !== 'undefined' ? error : 'Ocurrió un error inesperado.' %></p>
-    <a href="/" class="btn btn-primary" style="margin-top:1.5rem;">Volver al Inicio</a>
+<%- include('partials/header', { 
+  title: 'Error del Servidor - Abelardo Villa Multimarcas', 
+  seoDescription: 'Ocurrió un error inesperado al procesar tu solicitud.' 
+}) %>
+
+<div class="page-error" style="padding: 6rem 1rem; text-align: center; min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+  <div class="ds-card" style="padding: 3.5rem 2rem; max-width: 540px; margin: 0 auto; text-align: center;">
+    <span style="font-size: 3.5rem; display: block; margin-bottom: 1rem;">⚠️</span>
+    <h1 style="font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 700; color: #fff; margin-bottom: 1rem;">
+      Error del Servidor
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--text-base); line-height: var(--leading-relaxed); margin-bottom: 2rem;">
+      <%= typeof error !== 'undefined' ? error : 'Ocurrió un error temporal al procesar tu solicitud. Por favor intenta nuevamente más tarde.' %>
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/" class="ds-btn ds-btn--primary">
+        Volver al Inicio
+      </a>
+      <a href="/contacto" class="ds-btn ds-btn--outline">
+        Contactar Soporte
+      </a>
+    </div>
   </div>
 </div>
+
 <%- include('partials/footer') %>

@@ -3,79 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title><%= title %> | Abelardo Villa Multimarcas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" type="image/png" href="/images/logo.png">
 </head>
 <body>
   <div class="admin-layout">
     <%- include('sidebar') %>
+
     <main class="admin-main">
-      <div class="admin-header">
-        <h1>📊 Dashboard</h1>
-        <span style="color:var(--admin-text-secondary); font-size:0.88rem;">👋 ¡Bienvenido, Admin!</span>
-      </div>
+      <%- include('topbar') %>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon blue">🚗</div>
-          <div>
-            <div class="stat-number"><%= stats.totalAutos %></div>
-            <div class="stat-label">Vehículos Total</div>
+      <div class="admin-content">
+        <!-- Dashboard Welcome & Quick Actions -->
+        <div class="dashboard-hero-banner">
+          <div class="dashboard-hero-content">
+            <span class="dashboard-eyebrow">RESUMEN GENERAL</span>
+            <h2 class="dashboard-title">Panel de Control Multimarca</h2>
+            <p class="dashboard-desc">Monitoreá en tiempo real tu stock de autos publicados, reservas del mes y consultas comerciales.</p>
+          </div>
+          <div class="dashboard-quick-actions">
+            <a href="/admin/autos/nuevo" class="btn btn-primary btn-md">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Cargar auto</span>
+            </a>
+            <a href="/" target="_blank" class="btn btn-outline btn-md dashboard-btn-site">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span>Ver sitio</span>
+            </a>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon green">✅</div>
-          <div>
-            <div class="stat-number"><%= stats.totalActivos %></div>
-            <div class="stat-label">Publicados</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon gold">⭐</div>
-          <div>
-            <div class="stat-number"><%= stats.totalDestacados %></div>
-            <div class="stat-label">Destacados</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon purple">📷</div>
-          <div>
-            <div class="stat-number"><%= stats.totalImagenes %></div>
-            <div class="stat-label">Fotos Cargadas</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="admin-table-wrap">
-        <div class="admin-table-header">
-          <h2>Últimos Vehículos Cargados</h2>
-          <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm">+ Agregar Vehículo</a>
+        <!-- 4 Metric Cards Requeridas -->
+        <div class="stats-grid">
+          <!-- 1. Autos publicados -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                <circle cx="7" cy="17" r="2"></circle>
+                <path d="M9 17h6"></path>
+                <circle cx="17" cy="17" r="2"></circle>
+              </svg>
+            </div>
+            <div class="stat-details">
+              <div class="stat-number"><%= stats.totalPublicados %></div>
+              <div class="stat-label">Autos publicados</div>
+              <div class="stat-meta">Visibles activamente en la web</div>
+            </div>
+          </div>
+
+          <!-- 2. Nuevos ingresos del mes -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <line x1="12" y1="14" x2="12" y2="18"></line>
+                <line x1="10" y1="16" x2="14" y2="16"></line>
+              </svg>
+            </div>
+            <div class="stat-details">
+              <div class="stat-number"><%= stats.nuevosMes %></div>
+              <div class="stat-label">Nuevos ingresos del mes</div>
+              <div class="stat-meta">Cargados durante este mes</div>
+            </div>
+          </div>
+
+          <!-- 3. Reservados -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="stat-details">
+              <div class="stat-number"><%= stats.totalReservados %></div>
+              <div class="stat-label">Reservados / Señados</div>
+              <div class="stat-meta">En proceso de cierre comercial</div>
+            </div>
+          </div>
+
+          <!-- 4. Consultas -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-red">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+            </div>
+            <div class="stat-details">
+              <div class="stat-number"><%= stats.totalConsultas %></div>
+              <div class="stat-label">Consultas</div>
+              <div class="stat-meta">Interacciones vía WhatsApp y llamadas</div>
+            </div>
+          </div>
         </div>
-        <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr><th>Imagen</th><th>Vehículo</th><th>Año</th><th>Precio</th><th>Estado</th></tr>
-          </thead>
-          <tbody>
-            <% ultimosAutos.forEach(auto => { %>
-            <tr>
-              <td><% if(auto.imagen){ %><img src="/uploads/autos/<%= auto.imagen %>" class="table-img" loading="lazy"><% } else { %><div class="table-img" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--admin-text-muted);">Sin foto</div><% } %></td>
-              <td><strong><%= auto.marca %> <%= auto.modelo %></strong></td>
-              <td><%= auto.anio %></td>
-              <td><% if(auto.precio > 0){ %><%= auto.moneda === 'ARS' ? '$' : 'U$S' %> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %><% } else { %>Consultar<% } %></td>
-              <td><span class="badge <%= auto.activo ? 'badge-success' : 'badge-danger' %>"><%= auto.activo ? '✅ Activo' : '⏸️ Inactivo' %></span></td>
-            </tr>
-            <% }) %>
-            <% if(ultimosAutos.length === 0) { %>
-            <tr><td colspan="5" style="text-align:center; padding:2.5rem; color:var(--admin-text-muted);">
-              No hay vehículos cargados aún.<br>
-              <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">+ Cargar el primero</a>
-            </td></tr>
-            <% } %>
-          </tbody>
-        </table>
+
+        <!-- Tabla de Últimos Vehículos Cargados -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <div class="table-header-title-wrap">
+              <h2>Últimos Vehículos en Inventario</h2>
+              <span class="table-header-sub">Visualizá las unidades agregadas recientemente</span>
+            </div>
+            <div class="table-header-actions">
+              <a href="/admin/autos" class="btn btn-outline btn-sm">Ver todos (<%= stats.totalAutos %>)</a>
+              <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm">+ Cargar auto</a>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Foto</th>
+                  <th>Vehículo</th>
+                  <th>Año</th>
+                  <th>Precio</th>
+                  <th>Estado</th>
+                  <th style="text-align: right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% ultimosAutos.forEach(auto => { %>
+                  <% 
+                    let estadoSlug = (auto.estado || '').toLowerCase();
+                    if (!estadoSlug) {
+                      estadoSlug = (auto.activo === 0) ? 'vendido' : 'disponible';
+                    }
+                  %>
+                  <tr>
+                    <td>
+                      <div class="table-thumbnail-4-3">
+                        <% if (auto.imagen) { %>
+                          <img src="/uploads/autos/<%= auto.imagen %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy">
+                        <% } else { %>
+                          <div class="table-thumbnail-placeholder">Sin foto</div>
+                        <% } %>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="table-vehicle-name">
+                        <strong><%= auto.marca %> <%= auto.modelo %></strong>
+                        <% if (auto.version) { %>
+                          <span class="table-vehicle-version"><%= auto.version %></span>
+                        <% } %>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="table-year-badge"><%= auto.anio %></span>
+                    </td>
+                    <td>
+                      <% if (auto.precio > 0) { %>
+                        <strong class="table-price"><%= auto.moneda === 'ARS' ? '$' : 'U$S' %> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></strong>
+                      <% } else { %>
+                        <span class="table-price-consultar">Consultar</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (estadoSlug === 'disponible') { %>
+                        <span class="badge badge-success">● Disponible</span>
+                      <% } else if (estadoSlug === 'reservado') { %>
+                        <span class="badge badge-warning">● Reservado</span>
+                      <% } else if (estadoSlug === 'vendido') { %>
+                        <span class="badge badge-danger">● Vendido</span>
+                      <% } else { %>
+                        <span class="badge badge-neutral">● Próximamente</span>
+                      <% } %>
+                    </td>
+                    <td style="text-align: right;">
+                      <div class="table-actions-inline">
+                        <a href="/admin/autos/editar/<%= auto.id %>" class="btn btn-outline btn-xs" title="Editar vehículo">
+                          ✏️ Editar
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+
+                <% if (ultimosAutos.length === 0) { %>
+                  <tr>
+                    <td colspan="6" class="table-empty-row">
+                      <div class="table-empty-state">
+                        <div class="empty-state-icon">🚗</div>
+                        <h3>No hay vehículos cargados todavía</h3>
+                        <p>Comenzá publicando tu primer vehículo en la web oficial.</p>
+                        <a href="/admin/autos/nuevo" class="btn btn-primary btn-sm">+ Cargar el primer vehículo</a>
+                      </div>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
         </div>
+
       </div>
     </main>
   </div>

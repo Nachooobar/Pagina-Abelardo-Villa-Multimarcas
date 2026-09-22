@@ -1,111 +1,312 @@
-/* ============================================================
-   ABELARDO VILLA MULTIMARCA - SISTEMA DE DISEÑO UNIFICADO
-   Tokens Centralizados (Web Pública y Panel /admin)
-   ============================================================ */
+/* ================================================================
+   ABELARDO VILLA MULTIMARCA — DESIGN SYSTEM TOKENS v2.0
+   ────────────────────────────────────────────────────────────────
+   Fuente única de verdad para la web pública y el panel /admin.
+   Modo claro por defecto; tokens de superficies oscuras listos
+   para hero, footer y sidebar admin.
+   ================================================================ */
 
+/* ── FUENTES — font-display: swap + fallback del sistema ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap');
 
+/* ================================================================
+   1. CUSTOM PROPERTIES — :root  (modo claro por defecto)
+   ================================================================ */
 :root {
-  /* ── 1. PALETA DE COLORES DE MARCA ── */
-  --color-primary: #E11D2A;         /* Acción principal, llamados a la acción, acentos de poder */
-  --color-primary-hover: #C5131F;   /* Hover para elementos primarios */
-  --color-primary-active: #A80E18;  /* Active / Click */
-  --color-primary-subtle: rgba(225, 29, 42, 0.12); /* Fondo suave con tinte de marca */
 
-  /* Tono bordó elegante para pie de página */
-  --color-bordo: #360B10;
-  --color-bordo-dark: #1A0406;
-  --color-bordo-light: #4D1016;
-  --color-bordo-border: rgba(255, 255, 255, 0.14);
+  /* ─── 1.1  PALETA PRIMITIVA ─── */
 
-  --color-secondary: #1479BE;       /* Secundario, foco interactivo, enlaces destacados */
-  --color-secondary-hover: #0E629D;
-  --color-secondary-subtle: rgba(20, 121, 190, 0.12);
+  /* Rojo marca — CTA / acción */
+  --red-50:   #FEF2F2;
+  --red-100:  #FEE2E2;
+  --red-200:  #FECACA;
+  --red-300:  #FCA5A5;
+  --red-400:  #F87171;
+  --red-500:  #E11D2A;     /* ★ Brand Primary */
+  --red-600:  #C5131F;
+  --red-700:  #A80E18;
+  --red-800:  #7F0D14;
+  --red-900:  #5C0A0F;
 
-  /* ── 2. NEUTROS Y FONDOS ── */
-  --color-neutral-900: #0E1116;     /* Neutro más oscuro (fondos profundos, texto en modo claro) */
-  --color-neutral-850: #12161D;     /* Superficies intermedias */
-  --color-neutral-800: #151A21;     /* Superficie oscura principal (tarjetas, panels, sidebars) */
-  --color-neutral-700: #222933;     /* Bordes y divisores en modo oscuro */
-  --color-neutral-600: #384252;     /* Bordes activos en modo oscuro */
-  --color-neutral-500: #64748B;     /* Texto terciario / muted */
-  --color-neutral-400: #94A3B8;     /* Texto secundario en modo oscuro */
-  --color-neutral-300: #CBD5E1;     /* Texto suave */
-  --color-neutral-200: #E3E7EC;     /* Bordes estándar de marca */
-  --color-neutral-100: #F1F4F8;     /* Superficies claras secundarias */
-  --color-bg-light: #F6F7F9;        /* Fondo claro general de la marca */
-  --color-white: #FFFFFF;
+  /* Azul confianza — secundario / foco */
+  --blue-50:  #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-300: #93C5FD;
+  --blue-400: #60A5FA;
+  --blue-500: #1479BE;     /* ★ Brand Secondary */
+  --blue-600: #0E629D;
+  --blue-700: #0B4E7E;
+  --blue-800: #093E65;
+  --blue-900: #062E4C;
 
-  /* ── 3. SEMÁFORO / ESTADOS DE NEGOCIO ── */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.12);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.12);
-  --color-danger: #EF4444;
-  --color-danger-bg: rgba(239, 68, 68, 0.12);
-  --color-info: #1479BE;
-  --color-info-bg: rgba(20, 121, 190, 0.12);
+  /* Neutros */
+  --neutral-0:   #FFFFFF;
+  --neutral-25:  #FCFCFD;
+  --neutral-50:  #F6F7F9;  /* ★ Brand bg-light */
+  --neutral-100: #F1F4F8;
+  --neutral-150: #E8ECF1;
+  --neutral-200: #E3E7EC;  /* ★ Brand border */
+  --neutral-300: #CBD5E1;
+  --neutral-400: #94A3B8;
+  --neutral-500: #64748B;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1E293B;
+  --neutral-850: #151A21;  /* ★ Brand card-dark */
+  --neutral-900: #0E1116;  /* ★ Brand bg-dark */
+  --neutral-950: #090B0F;
 
-  /* ── 4. TIPOGRAFÍAS ── */
-  --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Bordó — footer */
+  --bordo-light: #4D1016;
+  --bordo-500:   #360B10;  /* ★ Footer background */
+  --bordo-dark:  #1A0406;
+  --bordo-border: rgba(255, 255, 255, 0.14);
 
-  /* Escala tipográfica fluida y legible */
-  --text-xs: 0.75rem;     /* 12px */
-  --text-sm: 0.875rem;    /* 14px */
-  --text-base: 1rem;      /* 16px */
-  --text-lg: 1.125rem;    /* 18px */
-  --text-xl: 1.25rem;     /* 20px */
-  --text-2xl: 1.5rem;     /* 24px */
-  --text-3xl: 1.875rem;   /* 30px */
-  --text-4xl: 2.25rem;    /* 36px */
-  --text-5xl: 3rem;       /* 48px */
+  /* Semáforo / estados de negocio */
+  --green-500:  #10B981;
+  --green-bg:   rgba(16, 185, 129, 0.12);
+  --yellow-500: #F59E0B;
+  --yellow-bg:  rgba(245, 158, 11, 0.12);
+  --red-error:  #EF4444;
+  --red-error-bg: rgba(239, 68, 68, 0.12);
+  --info-bg:    rgba(20, 121, 190, 0.12);
 
-  /* ── 5. ESPACIADOS Y ZONAS TÁCTILES ── */
-  --touch-target-min: 44px; /* Regla 4: Zonas táctiles mínimas de 44px */
-  --space-1: 0.25rem;       /* 4px */
-  --space-2: 0.5rem;        /* 8px */
-  --space-3: 0.75rem;       /* 12px */
-  --space-4: 1rem;          /* 16px */
-  --space-5: 1.25rem;       /* 20px */
-  --space-6: 1.5rem;        /* 24px */
-  --space-8: 2rem;          /* 32px */
-  --space-10: 2.5rem;       /* 40px */
-  --space-12: 3rem;         /* 48px */
-  --space-16: 4rem;         /* 64px */
+  /* ─── 1.2  ALIASES SEMÁNTICOS ─── */
 
-  /* ── 6. RADIOS DE BORDE ── */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Marca */
+  --color-primary:         var(--red-500);
+  --color-primary-hover:   var(--red-600);
+  --color-primary-active:  var(--red-700);
+  --color-primary-subtle:  rgba(225, 29, 42, 0.10);
+
+  --color-secondary:       var(--blue-500);
+  --color-secondary-hover: var(--blue-600);
+  --color-secondary-subtle: rgba(20, 121, 190, 0.10);
+
+  /* Fondos y superficies — modo claro */
+  --surface-page:     var(--neutral-50);
+  --surface-card:     var(--neutral-0);
+  --surface-raised:   var(--neutral-0);
+  --surface-sunken:   var(--neutral-100);
+  --surface-overlay:  rgba(0, 0, 0, 0.45);
+
+  /* Texto — modo claro */
+  --text-primary:     var(--neutral-900);
+  --text-secondary:   var(--neutral-500);
+  --text-tertiary:    var(--neutral-400);
+  --text-inverse:     var(--neutral-0);
+  --text-on-primary:  var(--neutral-0);
+  --text-on-secondary: var(--neutral-0);
+  --text-link:        var(--blue-500);
+
+  /* Bordes */
+  --border-default:   var(--neutral-200);
+  --border-strong:    var(--neutral-300);
+  --border-subtle:    var(--neutral-150);
+  --border-focus:     var(--blue-500);
+
+  /* Estados funcionales */
+  --color-success:    var(--green-500);
+  --color-success-bg: var(--green-bg);
+  --color-warning:    var(--yellow-500);
+  --color-warning-bg: var(--yellow-bg);
+  --color-danger:     var(--red-error);
+  --color-danger-bg:  var(--red-error-bg);
+  --color-info:       var(--blue-500);
+  --color-info-bg:    var(--info-bg);
+
+  /* ─── 1.3  TIPOGRAFÍA ─── */
+
+  --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Escala tipográfica — módulo 1.250 (Major Third) */
+  --text-2xs:  0.625rem;   /* 10px */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.25rem;    /* 36px */
+  --text-5xl:  3rem;       /* 48px */
+  --text-6xl:  3.75rem;    /* 60px */
+
+  /* Alturas de línea */
+  --leading-none:    1;
+  --leading-tight:   1.15;
+  --leading-snug:    1.3;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose:   1.8;
+
+  /* Tracking / letter-spacing */
+  --tracking-tighter: -0.04em;
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.025em;
+  --tracking-wider:    0.05em;
+  --tracking-widest:   0.1em;
+
+  /* ─── 1.4  ESPACIADO — base 8px ─── */
+
+  --space-0:   0;
+  --space-0-5: 0.125rem;  /*  2px */
+  --space-1:   0.25rem;   /*  4px */
+  --space-1-5: 0.375rem;  /*  6px */
+  --space-2:   0.5rem;    /*  8px  ← unidad base */
+  --space-3:   0.75rem;   /* 12px */
+  --space-4:   1rem;      /* 16px */
+  --space-5:   1.25rem;   /* 20px */
+  --space-6:   1.5rem;    /* 24px */
+  --space-7:   1.75rem;   /* 28px */
+  --space-8:   2rem;      /* 32px */
+  --space-10:  2.5rem;    /* 40px */
+  --space-12:  3rem;      /* 48px */
+  --space-14:  3.5rem;    /* 56px */
+  --space-16:  4rem;      /* 64px */
+  --space-20:  5rem;      /* 80px */
+  --space-24:  6rem;      /* 96px */
+  --space-32:  8rem;      /* 128px */
+
+  /* Zona táctil mínima (WCAG / Regla 4) */
+  --touch-target-min: 44px;
+
+  /* ─── 1.5  RADIOS DE BORDE ─── */
+
+  --radius-none: 0;
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
   --radius-full: 9999px;
 
-  /* ── 7. SOMBRAS Y ELEVACIÓN ── */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-card-hover: 0 12px 32px rgba(14, 17, 22, 0.2);
+  /* ─── 1.6  SOMBRAS Y ELEVACIÓN ─── */
 
-  /* ── 8. ACCESIBILIDAD Y FOCO (Regla 5) ── */
-  --focus-ring-color: #1479BE;
-  --focus-ring: 0 0 0 3px rgba(20, 121, 190, 0.45);
-  --focus-ring-offset: 2px;
+  --shadow-xs:   0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm:   0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md:   0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --shadow-lg:   0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+  --shadow-xl:   0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+  --shadow-2xl:  0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+  --shadow-none: 0 0 #0000;
 
-  /* ── 9. MICROINTERACCIONES (Regla 7: 150–250ms, ease-out) ── */
-  --duration-fast: 160ms;
-  --duration-base: 220ms;
-  --ease-standard: cubic-bezier(0, 0, 0.2, 1);
-  --transition-fast: all var(--duration-fast) var(--ease-standard);
-  --transition-base: all var(--duration-base) var(--ease-standard);
+  /* Sombras con tinte de marca */
+  --shadow-primary: 0 4px 14px rgba(225, 29, 42, 0.30);
+  --shadow-secondary: 0 4px 14px rgba(20, 121, 190, 0.30);
+  --shadow-card:       0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 12px 32px rgba(14, 17, 22, 0.14);
 
-  /* Layout */
+  /* ─── 1.7  Z-INDEX ─── */
+
+  --z-hide:      -1;
+  --z-base:       0;
+  --z-raised:     1;
+  --z-dropdown:  10;
+  --z-sticky:    20;
+  --z-banner:    30;
+  --z-overlay:   40;
+  --z-modal:     50;
+  --z-popover:   60;
+  --z-toast:     70;
+  --z-tooltip:   80;
+  --z-navbar:   100;
+  --z-max:     9999;
+
+  /* ─── 1.8  BREAKPOINTS (referencia, se usan en @media) ─── */
+  /* No son custom-properties en media queries, solo documentación:
+     --bp-xs:   390px    — iPhone 12/13/14 base
+     --bp-sm:   640px    — Phones landscape
+     --bp-md:   768px    — Tablets portrait
+     --bp-lg:  1024px    — Tablets landscape / small laptops
+     --bp-xl:  1280px    — Desktops
+     --bp-2xl: 1440px    — Large desktops
+  */
+
+  /* ─── 1.9  TRANSICIONES Y ANIMACIONES ─── */
+
+  --duration-instant: 100ms;
+  --duration-fast:    160ms;
+  --duration-base:    220ms;
+  --duration-slow:    350ms;
+  --duration-slower:  500ms;
+
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --transition-fast:    all var(--duration-fast) var(--ease-standard);
+  --transition-base:    all var(--duration-base) var(--ease-standard);
+  --transition-slow:    all var(--duration-slow) var(--ease-standard);
+  --transition-colors:  color var(--duration-fast) var(--ease-standard),
+                        background-color var(--duration-fast) var(--ease-standard),
+                        border-color var(--duration-fast) var(--ease-standard);
+
+  /* ─── 1.10  LAYOUT ─── */
+
   --max-width-site: 1320px;
+  --max-width-content: 768px;
+  --sidebar-width: 260px;
+  --navbar-height: 72px;
 }
 
-/* ── ACCESIBILIDAD: PREFERS-REDUCED-MOTION (Regla 5) ── */
+
+/* ================================================================
+   2. SUPERFICIES OSCURAS — para hero, footer, sidebar, cartas web
+   ================================================================ */
+
+.surface-dark,
+[data-surface="dark"] {
+  --surface-page:    var(--neutral-900);
+  --surface-card:    var(--neutral-850);
+  --surface-raised:  var(--neutral-800);
+  --surface-sunken:  var(--neutral-950);
+
+  --text-primary:    var(--neutral-0);
+  --text-secondary:  var(--neutral-400);
+  --text-tertiary:   var(--neutral-500);
+  --text-inverse:    var(--neutral-900);
+
+  --border-default:  var(--neutral-700);
+  --border-strong:   var(--neutral-600);
+  --border-subtle:   rgba(255, 255, 255, 0.08);
+
+  --shadow-card:       0 4px 20px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.40);
+}
+
+/* Footer surface (bordó) */
+.surface-bordo,
+[data-surface="bordo"] {
+  --surface-page:  var(--bordo-500);
+  --surface-card:  var(--bordo-light);
+  --text-primary:  var(--neutral-0);
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --border-default: var(--bordo-border);
+}
+
+/* Sidebar admin surface */
+.surface-sidebar,
+[data-surface="sidebar"] {
+  --surface-page:  #1B3A5C;
+  --surface-card:  #0F2640;
+  --text-primary:  var(--neutral-0);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-default: rgba(255, 255, 255, 0.08);
+}
+
+
+/* ================================================================
+   3. ACCESIBILIDAD — prefers-reduced-motion & focus visible
+   ================================================================ */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -117,88 +318,30 @@
   }
 }
 
-/* ── REGLA 5 & 12: ESTADOS Y FOCO ACCESIBLE UNIFICADO ── */
+/* Anillo de foco unificado — azul secundario */
 :focus-visible {
-  outline: 2px solid var(--color-secondary) !important;
-  outline-offset: var(--focus-ring-offset) !important;
-  box-shadow: var(--focus-ring) !important;
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(20, 121, 190, 0.25);
 }
 
-/* Clases utilitarias de texto e interactividad */
-.font-heading {
-  font-family: var(--font-heading);
-}
+/* ================================================================
+   4. CLASES UTILITARIAS DE TIPOGRAFÍA
+   ================================================================ */
 
-.font-body {
-  font-family: var(--font-body);
-}
+.font-heading { font-family: var(--font-heading); }
+.font-body    { font-family: var(--font-body); }
+.font-mono    { font-family: var(--font-mono); }
 
-/* Botones Base del Sistema */
-.btn-primary-brand {
-  min-height: var(--touch-target-min);
-  min-width: var(--touch-target-min);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 0.625rem 1.25rem;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  text-decoration: none;
-}
-
-.btn-primary-brand:hover {
-  background-color: var(--color-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(225, 29, 42, 0.35);
-}
-
-.btn-primary-brand:active {
-  background-color: var(--color-primary-active);
-  transform: translateY(0);
-}
-
-.btn-primary-brand:disabled,
-.btn-primary-brand[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: not-allowed;
-  pointer-events: none;
-  box-shadow: none;
-}
-
-.btn-secondary-brand {
-  min-height: var(--touch-target-min);
-  min-width: var(--touch-target-min);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 0.625rem 1.25rem;
-  background-color: transparent;
-  color: var(--color-secondary);
-  border: 1px solid var(--color-secondary);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: var(--transition-fast);
-  text-decoration: none;
-}
-
-.btn-secondary-brand:hover {
-  background-color: var(--color-secondary-subtle);
-  color: var(--color-secondary-hover);
-  border-color: var(--color-secondary-hover);
-}
-
-.btn-secondary-brand:active {
-  background-color: rgba(20, 121, 190, 0.2);
+/* Screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

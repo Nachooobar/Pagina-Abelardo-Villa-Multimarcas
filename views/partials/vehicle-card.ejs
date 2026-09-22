@@ -32,23 +32,34 @@
           src="<%= imgSrc %>" 
           alt="<%= auto.marca %> <%= auto.modelo %> <%= auto.version || '' %> <%= auto.anio %> - Abelardo Villa Multimarca" 
           loading="lazy" 
+          decoding="async"
           width="400" 
-          height="250" 
+          height="300" 
           class="vehicle-img"
+          style="aspect-ratio: 4 / 3; object-fit: cover;"
         >
       <% } else { %>
-        <div class="no-image" role="img" aria-label="Sin imagen disponible">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-          <span>Foto disponible pronto</span>
-        </div>
+        <img 
+          src="/images/car-placeholder-4x3.svg" 
+          alt="<%= auto.marca %> <%= auto.modelo %> <%= auto.anio %> - Foto en preparación" 
+          loading="lazy" 
+          decoding="async"
+          width="400" 
+          height="300" 
+          class="vehicle-img vehicle-img--placeholder"
+          style="aspect-ratio: 4 / 3; object-fit: cover;"
+        >
       <% } %>
 
-      <span class="card-badge badge-<%= estado %>">
-        <%= estadoLabel %>
-      </span>
+      <% if (typeof badge !== 'undefined' && badge) { %>
+        <span class="card-badge badge-nuevo-ingreso">
+          <span class="card-badge-dot"></span><%= badge %>
+        </span>
+      <% } else { %>
+        <span class="card-badge badge-<%= estado %>">
+          <%= estadoLabel %>
+        </span>
+      <% } %>
 
       <% if (auto.destacado) { %>
         <span class="card-badge-destacado" title="Vehículo Destacado">★ Destacado</span>

@@ -1,0 +1,82 @@
+<%- include('partials/header') %>
+
+<main id="mainContent">
+<section class="page-hero" style="padding: 4rem 0 3rem; background: linear-gradient(180deg, var(--neutral-900) 0%, var(--neutral-950) 100%); border-bottom: 1px solid var(--border-subtle);">
+  <div class="container text-center">
+    <span class="ds-chip ds-chip--usado" style="margin-bottom: 1rem;">
+      <span class="ds-chip__dot"></span>Tasación en el Acto
+    </span>
+    <h1 style="font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: #fff; margin-bottom: 1rem; letter-spacing: -0.02em;">
+      Vendé o Permutá tu <span style="color: var(--color-primary);">Vehículo Usado</span>
+    </h1>
+    <p style="max-width: 680px; margin: 0 auto; color: var(--neutral-300); font-size: var(--text-lg); line-height: var(--leading-relaxed);">
+      En Abelardo Villa Multimarcas te ofrecemos la mejor cotización del mercado con seriedad, transparencia y respaldo de más de 40 años de trayectoria.
+    </p>
+  </div>
+</section>
+
+<section style="padding: 4rem 0; background: var(--surface-page);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
+      <div class="ds-card" style="padding: 2rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🤝</div>
+        <h3 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Tomamos tu Usado</h3>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed); margin-bottom: 1.5rem;">
+          Dejá tu vehículo como parte de pago para llevarte otro usado seleccionado o un 0km. Tasación inmediata sin vueltas.
+        </p>
+        <ul style="color: var(--text-secondary); font-size: var(--text-sm); line-height: 2; padding-left: 1.25rem;">
+          <li>Cotización rápida y transparente</li>
+          <li>Sin trámites engorrosos</li>
+          <li>Aceptamos todas las marcas y modelos</li>
+        </ul>
+      </div>
+
+      <div class="ds-card" style="padding: 2rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">💵</div>
+        <h3 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Compra Directa</h3>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed); margin-bottom: 1.5rem;">
+          ¿Querés vender tu auto sin comprar otro? Te lo tomamos y te damos lo que usted pide por su vehiculo, teniendolo con nosotros hasta culminar la venta.
+        </p>
+        <ul style="color: var(--text-secondary); font-size: var(--text-sm); line-height: 2; padding-left: 1.25rem;">
+          <li>Pago de contado o transferencia</li>
+          <li>Gestión integral de documentación</li>
+        </ul>
+      </div>
+
+      <div class="ds-card" style="padding: 2rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔑</div>
+        <h3 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Consignación</h3>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed); margin-bottom: 1.5rem;">
+          Dejanos tu vehículo en nuestro salón de ventas en Ruta 1 o gestionamos la venta con nuestra amplia cartera de clientes.
+        </p>
+        <ul style="color: var(--text-secondary); font-size: var(--text-sm); line-height: 2; padding-left: 1.25rem;">
+          <li>Exhibición en local de alta visibilidad</li>
+          <li>Publicación en portales y redes</li>
+          <li>Trato directo y seguro</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CTA Box -->
+    <div class="ds-card" style="padding: 3rem; text-align: center; max-width: 800px; margin: 0 auto; background: linear-gradient(135deg, var(--neutral-900) 0%, rgba(225, 29, 42, 0.08) 100%); border: 1px solid var(--border-medium);">
+      <h2 style="font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 700; color: #fff; margin-bottom: 1rem;">
+        ¿Querés cotizar tu auto hoy mismo?
+      </h2>
+      <p style="color: var(--neutral-300); font-size: var(--text-base); margin-bottom: 2rem; max-width: 550px; margin-left: auto; margin-right: auto;">
+        Envianos fotos, marca, modelo, año y kilometraje por WhatsApp. Te respondemos a la brevedad con una cotización estimada.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+        <a href="https://wa.me/<%= brand.contact.whatsapp.number %>?text=Hola!%20Quiero%20cotizar%20mi%20auto%20para%20vender%20o%20permutar." target="_blank" rel="noopener" class="ds-btn ds-btn--primary ds-btn--lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378l-.361.214-3.741-.982.998 3.645-.235.364a9.964 9.964 0 001.523 5.074c.711 1.103 1.632 2.053 2.692 2.792 1.393.953 3.042 1.464 4.782 1.464 1.487 0 2.926-.358 4.206-1.031l.364-.214 3.758.981-.997-3.648.236-.363a9.968 9.968 0 00-1.522-5.037c-.71-1.097-1.628-2.043-2.687-2.787-.695-.477-1.477-.885-2.313-1.107-.338-.089-.681-.135-1.025-.127z"/></svg>
+          Tasá tu auto por WhatsApp
+        </a>
+        <a href="/contacto" class="ds-btn ds-btn--outline ds-btn--lg" style="color: #fff; border-color: rgba(255,255,255,0.3);">
+          Formulario de contacto
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<%- include('partials/footer') %>

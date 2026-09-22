@@ -1,12 +1,5 @@
 <%- include('partials/header') %>
 
-<section class="detail-page">
-  <div class="container">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-      <a href="/">Inicio</a> / <a href="/catalogo">Catálogo</a> / <a href="/catalogo?marca=<%= auto.marca %>"><%= auto.marca %></a> / <span><%= auto.modelo %></span>
-    </div>
-
 <%
   function getImgUrl(img) {
     if (!img) return '';
@@ -14,101 +7,632 @@
     if (src.startsWith('http') || src.startsWith('/uploads/')) return src;
     return '/uploads/autos/' + src;
   }
+
+  const allImages = (Array.isArray(imagenes) && imagenes.length > 0) 
+    ? imagenes.map(img => getImgUrl(img)).filter(Boolean)
+    : [];
+
+  const mainPhoto = allImages.length > 0 ? allImages[0] : null;
+  const versionText = auto.version ? ` ${auto.version}` : '';
+  const vehicleTitle = `${auto.marca} ${auto.modelo}${versionText}`;
+  const estado = (auto.estado || (auto.activo === 0 ? 'vendido' : 'disponible')).toLowerCase();
+  const estadoLabel = estado === 'reservado' ? 'Reservado' : (estado === 'vendido' ? 'Vendido' : (auto.condicion || 'Disponible'));
+  
+  // Mensaje prellenado para WhatsApp
+  const waCarMessage = `¡Hola! Me contacto desde la web de Abelardo Villa Multimarcas. Estoy interesado en el ${vehicleTitle} (${auto.anio}) - ${fullUrl}`;
+  const waUrl = `https://wa.me/5493425352093?text=${encodeURIComponent(waCarMessage)}`;
 %>
-    <div class="detail-grid">
-      <!-- Gallery -->
-      <div class="gallery">
-        <div class="gallery-main" id="galleryMain">
-          <% if (imagenes.length > 0) { %>
-            <img src="<%= getImgUrl(imagenes[0]) %>" alt="<%= auto.marca %> <%= auto.modelo %>" id="mainImage" onclick="openLightbox(this.src)">
-          <% } else { %>
-            <div class="no-image" style="height:100%;">📷 Sin imágenes disponibles</div>
-          <% } %>
-        </div>
-        <% if (imagenes.length > 1) { %>
-        <div class="gallery-thumbs">
-          <% imagenes.forEach((img, i) => { %>
-            <div class="gallery-thumb <%= i === 0 ? 'active' : '' %>" onclick="changeImage('<%= getImgUrl(img) %>', this)">
-              <img src="<%= getImgUrl(img) %>" alt="Foto <%= i + 1 %>" loading="lazy">
+
+<!-- Datos estructurados SEO Schema.org -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Car",
+  "name": "<%= vehicleTitle %> <%= auto.anio %>",
+  "image": "<%= mainPhoto || '' %>",
+  "description": "<%= (auto.descripcion || '').replace(/[\r\n]+/g, ' ').replace(/"/g, "'").slice(0, 200) %>",
+  "brand": {
+    "@type": "Brand",
+    "name": "<%= auto.marca %>"
+  },
+  "model": "<%= auto.modelo %>",
+  "vehicleModelDate": "<%= auto.anio %>",
+  "mileageFromOdometer": {
+    "@type": "QuantitativeValue",
+    "value": <%= auto.kilometraje || 0 %>,
+    "unitCode": "KMT"
+  },
+  "fuelType": "<%= auto.combustible || 'Nafta' %>",
+  "vehicleTransmission": "<%= auto.transmision || 'Manual' %>",
+  "color": "<%= auto.color || '' %>",
+  "numberOfDoors": <%= auto.puertas || 4 %>,
+  "offers": {
+    "@type": "Offer",
+    "url": "<%= fullUrl %>",
+    "priceCurrency": "<%= auto.moneda === 'USD' ? 'USD' : 'ARS' %>",
+    "price": "<%= auto.precio || 0 %>",
+    "itemCondition": "<%= auto.condicion === '0km' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition' %>",
+    "availability": "<%= estado === 'reservado' ? 'https://schema.org/PreOrder' : (estado === 'vendido' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock') %>",
+    "seller": {
+      "@type": "AutoDealer",
+      "name": "Abelardo Villa Multimarcas",
+      "telephone": "+54 9 342 535-2093",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Ruta 1 KM 5.5",
+        "addressLocality": "Rincón",
+        "addressRegion": "Santa Fe",
+        "addressCountry": "AR"
+      }
+    }
+  }
+}
+</script>
+
+<main class="detail-page-v2" id="mainContent">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <nav class="catalog-breadcrumb fade-up" aria-label="Navegación secundaria">
+      <a href="/">Inicio</a>
+      <span class="sep">/</span>
+      <a href="/catalogo">Catálogo</a>
+      <span class="sep">/</span>
+      <a href="/catalogo?marca=<%= encodeURIComponent(auto.marca) %>"><%= auto.marca %></a>
+      <span class="sep">/</span>
+      <span class="current"><%= auto.modelo %></span>
+    </nav>
+
+    <!-- Main Detail Grid: Galería e Info + Sticky Actions Column -->
+    <div class="detail-main-layout">
+      
+      <!-- COLUMNA IZQUIERDA: Galería, Especificaciones, Descripción -->
+      <div class="detail-left-col">
+        
+        <!-- Galería de Fotos -->
+        <section class="detail-gallery-card fade-up" aria-label="Galería de fotos del vehículo">
+          <div class="gallery-main-wrapper" id="galleryMainWrapper">
+            <% if (mainPhoto) { %>
+              <img 
+                src="<%= mainPhoto %>" 
+                alt="<%= vehicleTitle %> <%= auto.anio %> - Abelardo Villa Multimarcas" 
+                id="mainImage" 
+                class="gallery-main-img" 
+                width="800"
+                height="600"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                style="aspect-ratio: 4 / 3; object-fit: cover;"
+                onclick="openLightbox(currentPhotoIndex)"
+              >
+              
+              <!-- Badges Superpuestos -->
+              <div class="gallery-badges-overlay">
+                <span class="card-badge badge-<%= estado %>">
+                  <span class="card-badge-dot"></span><%= estadoLabel %>
+                </span>
+                <% if (auto.destacado) { %>
+                  <span class="card-badge-destacado">★ Destacado</span>
+                <% } %>
+              </div>
+
+              <!-- Flechas de navegación rápida en la imagen principal -->
+              <% if (allImages.length > 1) { %>
+                <button type="button" class="gallery-arrow arrow-prev" onclick="prevImage(event)" aria-label="Foto anterior">
+                  ‹
+                </button>
+                <button type="button" class="gallery-arrow arrow-next" onclick="nextImage(event)" aria-label="Foto siguiente">
+                  ›
+                </button>
+                <div class="gallery-photo-counter" id="photoCounter">
+                  1 / <%= allImages.length %>
+                </div>
+              <% } %>
+            <% } else { %>
+              <img 
+                src="/images/car-placeholder-4x3.svg" 
+                alt="<%= vehicleTitle %> <%= auto.anio %> - Foto en preparación" 
+                id="mainImage" 
+                class="gallery-main-img" 
+                width="800"
+                height="600"
+                loading="eager"
+                fetchpriority="high"
+                style="aspect-ratio: 4 / 3; object-fit: cover;"
+              >
+            <% } %>
+          </div>
+
+          <!-- Miniaturas (Thumbnails) -->
+          <% if (allImages.length > 1) { %>
+            <div class="gallery-thumbs-row" id="thumbsRow" role="tablist" aria-label="Miniaturas de fotos">
+              <% allImages.forEach((imgUrl, idx) => { %>
+                <button 
+                  type="button" 
+                  class="thumb-btn <%= idx === 0 ? 'active' : '' %>" 
+                  onclick="selectImage(<%= idx %>)" 
+                  role="tab" 
+                  aria-selected="<%= idx === 0 ? 'true' : 'false' %>"
+                  aria-label="Ver foto <%= idx + 1 %> de <%= allImages.length %>"
+                >
+                  <img src="<%= imgUrl %>" alt="Miniatura <%= idx + 1 %>" width="120" height="90" loading="lazy" decoding="async" style="aspect-ratio: 4 / 3; object-fit: cover;">
+                </button>
+              <% }) %>
             </div>
+          <% } %>
+        </section>
+
+        <!-- Encabezado de Especificaciones (Mobile-First y Desktop) -->
+        <section class="detail-specs-card fade-up">
+          <h2 class="specs-section-title">Ficha Técnica</h2>
+          <div class="specs-modern-grid">
+            
+            <!-- Año -->
+            <div class="spec-tile">
+              <div class="spec-tile-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div class="spec-tile-content">
+                <span class="spec-tile-label">Año</span>
+                <strong class="spec-tile-value"><%= auto.anio %></strong>
+              </div>
+            </div>
+
+            <!-- Kilometraje -->
+            <div class="spec-tile">
+              <div class="spec-tile-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="spec-tile-content">
+                <span class="spec-tile-label">Kilómetros</span>
+                <strong class="spec-tile-value">
+                  <%= auto.kilometraje > 0 ? auto.kilometraje.toLocaleString('es-AR') + ' km' : '0 km (A estrenar)' %>
+                </strong>
+              </div>
+            </div>
+
+            <!-- Combustible -->
+            <div class="spec-tile">
+              <div class="spec-tile-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <div class="spec-tile-content">
+                <span class="spec-tile-label">Combustible</span>
+                <strong class="spec-tile-value"><%= auto.combustible || 'Nafta' %></strong>
+              </div>
+            </div>
+
+            <!-- Transmisión -->
+            <div class="spec-tile">
+              <div class="spec-tile-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </div>
+              <div class="spec-tile-content">
+                <span class="spec-tile-label">Transmisión</span>
+                <strong class="spec-tile-value"><%= auto.transmision || 'Manual' %></strong>
+              </div>
+            </div>
+
+            <!-- Color -->
+            <% if (auto.color) { %>
+              <div class="spec-tile">
+                <div class="spec-tile-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a10 10 0 0 1 10 10H12V2z"></path>
+                  </svg>
+                </div>
+                <div class="spec-tile-content">
+                  <span class="spec-tile-label">Color</span>
+                  <strong class="spec-tile-value"><%= auto.color %></strong>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Puertas -->
+            <% if (auto.puertas) { %>
+              <div class="spec-tile">
+                <div class="spec-tile-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+                    <circle cx="14" cy="12" r="1"></circle>
+                  </svg>
+                </div>
+                <div class="spec-tile-content">
+                  <span class="spec-tile-label">Puertas</span>
+                  <strong class="spec-tile-value"><%= auto.puertas %></strong>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Motor -->
+            <% if (auto.motor) { %>
+              <div class="spec-tile" style="grid-column: span 2;">
+                <div class="spec-tile-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="13" rx="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                </div>
+                <div class="spec-tile-content">
+                  <span class="spec-tile-label">Motorización</span>
+                  <strong class="spec-tile-value"><%= auto.motor %></strong>
+                </div>
+              </div>
+            <% } %>
+
+          </div>
+        </section>
+
+        <!-- Descripción detallada -->
+        <% if (auto.descripcion) { %>
+          <section class="detail-desc-card fade-up">
+            <h2 class="specs-section-title">Detalles y Equipamiento</h2>
+            <div class="desc-text-content">
+              <%= auto.descripcion %>
+            </div>
+          </section>
+        <% } %>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: Resumen Sticky, Precio, CTAs, Formulario y Calculadora -->
+      <aside class="detail-right-col">
+        <div class="detail-sticky-action-card fade-up">
+          
+          <!-- Marca y Título -->
+          <div class="detail-header-info">
+            <span class="card-brand"><%= auto.marca %></span>
+            <h1 class="detail-vehicle-title"><%= vehicleTitle %></h1>
+            <p class="detail-vehicle-meta">Modelo <%= auto.anio %> · <%= auto.condicion || 'Usado' %></p>
+          </div>
+
+          <!-- Precio Destacado -->
+          <div class="detail-price-box">
+            <span class="price-box-label">Precio Contado</span>
+            <% if (auto.precio > 0) { %>
+              <div class="price-box-amount">
+                <span class="price-currency"><%= auto.moneda === 'USD' ? 'U$S' : '$' %></span>
+                <span class="price-number"><%= new Intl.NumberFormat('es-AR').format(auto.precio) %></span>
+              </div>
+            <% } else { %>
+              <div class="price-box-amount price-consult">
+                Consultar Precio
+              </div>
+            <% } %>
+            <span class="price-box-note">Aceptamos permutas · Financiación prendaria disponible</span>
+          </div>
+
+          <!-- Acciones Principales -->
+          <div class="detail-actions-stack">
+            <!-- Botón WhatsApp Principal -->
+            <a 
+              href="<%= waUrl %>" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="ds-btn ds-btn--primary ds-btn--block detail-wa-btn"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-2.001-.475-1.579-.652-2.584-2.274-2.664-2.381-.078-.107-.638-.851-.638-1.624 0-.773.406-1.153.55-1.309.144-.156.315-.195.42-.195.106 0 .211.002.303.007.098.005.228-.037.357.273.131.313.447 1.089.486 1.168.039.078.065.17.013.273-.052.103-.078.167-.156.257-.078.091-.164.202-.234.272-.078.077-.16.16-.068.318.091.157.406.67 87 1.085.597.533 1.1.698 1.256.776.157.078.248.065.34-.039.091-.104.392-.456.496-.612.105-.156.21-.13.353-.078.144.052.913.43 1.07.508.157.078.261.117.3.182.039.065.039.378-.105.783z"/>
+              </svg>
+              <span>Consultar por WhatsApp</span>
+            </a>
+
+            <!-- Botón Llamar -->
+            <a href="tel:+5493425352093" class="ds-btn ds-btn--outline ds-btn--block detail-call-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <span>Llamar: (342) 535-2093</span>
+            </a>
+          </div>
+
+          <!-- Calculadora Simple de Financiación (Si tiene precio publicado) -->
+          <% if (auto.precio > 0) { %>
+            <% 
+              const anticipoEstimado = Math.round(auto.precio * 0.5);
+              const saldoEstimado = auto.precio - anticipoEstimado;
+              const cuota12 = Math.round((saldoEstimado * 1.35) / 12);
+              const cuota24 = Math.round((saldoEstimado * 1.65) / 24);
+              const cuota36 = Math.round((saldoEstimado * 1.95) / 36);
+              const cuota48 = Math.round((saldoEstimado * 2.25) / 48);
+            %>
+            <div class="finance-calc-box">
+              <h3 class="calc-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                Simulador de Financiación
+              </h3>
+              <p class="calc-subtitle">Ejemplo estimativo con 50% de anticipo (o tu usado):</p>
+              
+              <div class="calc-anticipo-row">
+                <span>Anticipo sugerido (50%):</span>
+                <strong><%= auto.moneda === 'USD' ? 'U$S' : '$' %> <%= anticipoEstimado.toLocaleString('es-AR') %></strong>
+              </div>
+
+              <div class="calc-installments-grid">
+                <div class="calc-installment-item">
+                  <span class="inst-months">12 cuotas</span>
+                  <span class="inst-value">$<%= cuota12.toLocaleString('es-AR') %></span>
+                </div>
+                <div class="calc-installment-item active-plan">
+                  <span class="inst-months">24 cuotas</span>
+                  <span class="inst-value">$<%= cuota24.toLocaleString('es-AR') %></span>
+                </div>
+                <div class="calc-installment-item">
+                  <span class="inst-months">36 cuotas</span>
+                  <span class="inst-value">$<%= cuota36.toLocaleString('es-AR') %></span>
+                </div>
+                <div class="calc-installment-item">
+                  <span class="inst-months">48 cuotas</span>
+                  <span class="inst-value">$<%= cuota48.toLocaleString('es-AR') %></span>
+                </div>
+              </div>
+
+              <p class="calc-disclaimer">
+                * Cuotas fijas estimadas. Tasas y condiciones sujetas a evaluación crediticia.
+              </p>
+
+              <a 
+                href="https://wa.me/5493425352093?text=<%= encodeURIComponent('Hola! Me interesa financiar el ' + vehicleTitle + ' con anticipo aproximado de $' + anticipoEstimado.toLocaleString('es-AR') + '. ¿Podrían asesorarme?') %>" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="calc-plan-btn"
+              >
+                Consultar este plan por WhatsApp →
+              </a>
+            </div>
+          <% } %>
+
+          <!-- Formulario Corto de Consulta Rápida -->
+          <div class="quick-inquiry-box">
+            <h3 class="inquiry-title">Consultar por este vehículo</h3>
+            <form action="/contacto" method="POST" id="quickInquiryForm" onsubmit="handleInquirySubmit(event)">
+              <input type="hidden" name="vehiculo_interes" value="<%= vehicleTitle %> (<%= auto.anio %>)">
+              <div class="inquiry-field">
+                <input type="text" name="nombre" id="inqNombre" class="sidebar-input" placeholder="Tu nombre completo" required>
+              </div>
+              <div class="inquiry-field">
+                <input type="tel" name="telefono" id="inqTelefono" class="sidebar-input" placeholder="Teléfono / WhatsApp" required>
+              </div>
+              <div class="inquiry-field">
+                <textarea name="mensaje" id="inqMensaje" class="sidebar-input" rows="3" placeholder="Tu consulta (disponibilidad, permuta, etc.)">Hola, me interesa el <%= vehicleTitle %> (<%= auto.anio %>) publicado en la web. ¿Sigue disponible?</textarea>
+              </div>
+              <button type="submit" class="ds-btn ds-btn--outline ds-btn--block" style="font-size: 0.9rem;">
+                Enviar Consulta Rápida
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Sección "También te puede interesar" (4 Autos Similares) -->
+    <% if (Array.isArray(relacionados) && relacionados.length > 0) { %>
+      <section class="detail-related-section fade-up">
+        <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
+          <span class="hero-eyebrow">OPCIONES RECOMENDADAS</span>
+          <h2 class="section-title" style="font-size: 1.8rem;">También te puede interesar</h2>
+        </div>
+        <div class="vehicles-grid">
+          <% relacionados.forEach(relAuto => { %>
+            <%- include('partials/vehicle-card', { auto: relAuto, generateSlug }) %>
           <% }) %>
         </div>
-        <% } %>
-      </div>
+      </section>
+    <% } %>
 
-      <!-- Vehicle Info -->
-      <div class="detail-info">
-        <span class="detail-condition"><%= auto.condicion %></span>
-        <div class="detail-brand"><%= auto.marca %></div>
-        <h1 class="detail-title"><%= auto.modelo %> <%= auto.version %></h1>
-        <% if (auto.precio > 0) { %>
-          <div class="detail-price"><span class="currency"><%= auto.moneda === 'ARS' ? '$' : 'U$S' %></span> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></div>
-        <% } else { %>
-          <div class="detail-price" style="font-size:1.5rem;">Consultar precio</div>
-        <% } %>
+  </div>
+</main>
 
-        <div class="specs-grid">
-          <div class="spec-item"><span class="spec-label">Año</span><span class="spec-value"><%= auto.anio %></span></div>
-          <div class="spec-item"><span class="spec-label">Kilómetros</span><span class="spec-value"><%= auto.kilometraje > 0 ? new Intl.NumberFormat('es-AR').format(auto.kilometraje) + ' km' : '0 km' %></span></div>
-          <div class="spec-item"><span class="spec-label">Combustible</span><span class="spec-value"><%= auto.combustible %></span></div>
-          <div class="spec-item"><span class="spec-label">Transmisión</span><span class="spec-value"><%= auto.transmision %></span></div>
-          <div class="spec-item"><span class="spec-label">Color</span><span class="spec-value"><%= auto.color || 'Consultar' %></span></div>
-          <div class="spec-item"><span class="spec-label">Puertas</span><span class="spec-value"><%= auto.puertas %></span></div>
-          <% if (auto.motor) { %>
-          <div class="spec-item" style="grid-column:span 2;"><span class="spec-label">Motor</span><span class="spec-value"><%= auto.motor %></span></div>
-          <% } %>
-        </div>
-
-        <% if (auto.descripcion) { %>
-        <div class="detail-description">
-          <h3>Descripción</h3>
-          <p><%= auto.descripcion %></p>
-        </div>
-        <% } %>
-
-        <div class="detail-actions">
-          <a href="https://wa.me/5493425352093?text=Hola! Estoy interesado en el <%= auto.marca %> <%= auto.modelo %> <%= auto.anio %>. ¿Está disponible?" target="_blank" class="btn-whatsapp">
-            💬 Consultar por WhatsApp
-          </a>
-          <a href="/contacto" class="btn-contact">📧 Enviar consulta</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Related -->
-    <% if (relacionados.length > 0) { %>
-    <div class="related-section">
-      <div class="section-header"><h2 class="section-title">Vehículos Similares</h2></div>
-      <div class="vehicles-grid">
-        <% relacionados.forEach(auto => { %>
-          <%- include('partials/vehicle-card', { auto, generateSlug }) %>
-        <% }) %>
-      </div>
-    </div>
+<!-- ── BARRA DE ACCIÓN FIJA INFERIOR EN MÓVIL ── -->
+<div class="mobile-fixed-bottom-bar" id="mobileBottomBar">
+  <div class="mobile-bar-price">
+    <span class="bar-label">Precio</span>
+    <% if (auto.precio > 0) { %>
+      <strong class="bar-amount"><%= auto.moneda === 'USD' ? 'U$S' : '$' %> <%= new Intl.NumberFormat('es-AR').format(auto.precio) %></strong>
+    <% } else { %>
+      <strong class="bar-amount" style="font-size: 0.95rem;">Consultar</strong>
     <% } %>
   </div>
-</section>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img src="" alt="Imagen ampliada" id="lightboxImg">
+  <div class="mobile-bar-actions">
+    <a href="tel:+5493425352093" class="mobile-bar-btn btn-call" aria-label="Llamar a Abelardo Villa">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+      </svg>
+      <span>Llamar</span>
+    </a>
+    <a href="<%= waUrl %>" target="_blank" rel="noopener noreferrer" class="mobile-bar-btn btn-wa" aria-label="Consultar por WhatsApp">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-2.001-.475-1.579-.652-2.584-2.274-2.664-2.381-.078-.107-.638-.851-.638-1.624 0-.773.406-1.153.55-1.309.144-.156.315-.195.42-.195.106 0 .211.002.303.007.098.005.228-.037.357.273.131.313.447 1.089.486 1.168.039.078.065.17.013.273-.052.103-.078.167-.156.257-.078.091-.164.202-.234.272-.078.077-.16.16-.068.318.091.157.406.67 87 1.085.597.533 1.1.698 1.256.776.157.078.248.065.34-.039.091-.104.392-.456.496-.612.105-.156.21-.13.353-.078.144.052.913.43 1.07.508.157.078.261.117.3.182.039.065.039.378-.105.783z"/>
+      </svg>
+      <span>WhatsApp</span>
+    </a>
+  </div>
 </div>
 
+<!-- ── LIGHTBOX MODAL CON FLECHAS, TECLADO Y GESTOS TÁCTILES ── -->
+<div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-label="Visualizador de imágenes en alta resolución">
+  <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
+  
+  <div class="lightbox-container">
+    <button type="button" class="lightbox-close-btn" onclick="closeLightbox()" aria-label="Cerrar imagen ampliada">✕</button>
+    
+    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+
+    <button type="button" class="lightbox-arrow arrow-left" onclick="lightboxPrev(event)" aria-label="Foto anterior">‹</button>
+    
+    <div class="lightbox-image-stage" id="lightboxStage">
+      <img src="" alt="Vehículo ampliado" id="lightboxActiveImg" class="lightbox-img">
+    </div>
+
+    <button type="button" class="lightbox-arrow arrow-right" onclick="lightboxNext(event)" aria-label="Foto siguiente">›</button>
+  </div>
+</div>
+
+<!-- Scripts interactivos de la Ficha -->
 <script>
-  function changeImage(src, thumb) {
-    document.getElementById('mainImage').src = src;
-    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
+  const galleryImages = <%- JSON.stringify(allImages) %>;
+  let currentPhotoIndex = 0;
+
+  function updateGalleryDisplay(idx) {
+    if (!galleryImages || galleryImages.length === 0) return;
+    if (idx < 0) idx = galleryImages.length - 1;
+    if (idx >= galleryImages.length) idx = 0;
+    currentPhotoIndex = idx;
+
+    const mainImg = document.getElementById('mainImage');
+    if (mainImg) mainImg.src = galleryImages[currentPhotoIndex];
+
+    const counter = document.getElementById('photoCounter');
+    if (counter) counter.textContent = `${currentPhotoIndex + 1} / ${galleryImages.length}`;
+
+    // Actualizar thumbnails
+    const thumbBtns = document.querySelectorAll('.thumb-btn');
+    thumbBtns.forEach((btn, i) => {
+      if (i === currentPhotoIndex) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      }
+    });
   }
-  function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('active'); }
-  function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
-  document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
-  // Lazy load related
-  document.querySelectorAll('.lazy-img').forEach(img => {
-    const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.src=e.target.dataset.src; obs.unobserve(e.target); }}); }, {rootMargin:'200px'});
-    obs.observe(img);
+
+  function selectImage(idx) {
+    updateGalleryDisplay(idx);
+  }
+
+  function prevImage(e) {
+    if (e) e.stopPropagation();
+    updateGalleryDisplay(currentPhotoIndex - 1);
+  }
+
+  function nextImage(e) {
+    if (e) e.stopPropagation();
+    updateGalleryDisplay(currentPhotoIndex + 1);
+  }
+
+  // Lightbox
+  function openLightbox(idx) {
+    if (!galleryImages || galleryImages.length === 0) return;
+    currentPhotoIndex = idx >= 0 ? idx : 0;
+    const modal = document.getElementById('lightboxModal');
+    const img = document.getElementById('lightboxActiveImg');
+    const counter = document.getElementById('lightboxCounter');
+
+    img.src = galleryImages[currentPhotoIndex];
+    counter.textContent = `${currentPhotoIndex + 1} / ${galleryImages.length}`;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function lightboxPrev(e) {
+    if (e) e.stopPropagation();
+    currentPhotoIndex = (currentPhotoIndex - 1 + galleryImages.length) % galleryImages.length;
+    document.getElementById('lightboxActiveImg').src = galleryImages[currentPhotoIndex];
+    document.getElementById('lightboxCounter').textContent = `${currentPhotoIndex + 1} / ${galleryImages.length}`;
+    updateGalleryDisplay(currentPhotoIndex);
+  }
+
+  function lightboxNext(e) {
+    if (e) e.stopPropagation();
+    currentPhotoIndex = (currentPhotoIndex + 1) % galleryImages.length;
+    document.getElementById('lightboxActiveImg').src = galleryImages[currentPhotoIndex];
+    document.getElementById('lightboxCounter').textContent = `${currentPhotoIndex + 1} / ${galleryImages.length}`;
+    updateGalleryDisplay(currentPhotoIndex);
+  }
+
+  // Control por Teclado
+  document.addEventListener('keydown', (e) => {
+    const isLightboxOpen = document.getElementById('lightboxModal').classList.contains('open');
+    if (isLightboxOpen) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') lightboxPrev();
+      if (e.key === 'ArrowRight') lightboxNext();
+    } else {
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'ArrowRight') nextImage();
+    }
   });
+
+  // Gestos táctiles Swipe en Galería Principal y Lightbox
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  function handleGesture(isLightbox) {
+    const swipeThreshold = 50;
+    if (touchEndX < touchStartX - swipeThreshold) {
+      // Swipe izquierda -> Siguiente foto
+      if (isLightbox) lightboxNext();
+      else nextImage();
+    }
+    if (touchEndX > touchStartX + swipeThreshold) {
+      // Swipe derecha -> Foto anterior
+      if (isLightbox) lightboxPrev();
+      else prevImage();
+    }
+  }
+
+  const galleryWrapper = document.getElementById('galleryMainWrapper');
+  if (galleryWrapper) {
+    galleryWrapper.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    galleryWrapper.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleGesture(false);
+    }, { passive: true });
+  }
+
+  const lightboxStage = document.getElementById('lightboxStage');
+  if (lightboxStage) {
+    lightboxStage.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    lightboxStage.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleGesture(true);
+    }, { passive: true });
+  }
+
+  // Formulario rápido
+  function handleInquirySubmit(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('inqNombre').value.trim();
+    const telefono = document.getElementById('inqTelefono').value.trim();
+    const mensaje = document.getElementById('inqMensaje').value.trim();
+
+    const textToSend = `¡Hola! Soy ${nombre} (Tel: ${telefono}). ${mensaje} - ${window.location.href}`;
+    const directWaUrl = `https://wa.me/5493425352093?text=${encodeURIComponent(textToSend)}`;
+    window.open(directWaUrl, '_blank');
+  }
 </script>
 
 <%- include('partials/footer') %>

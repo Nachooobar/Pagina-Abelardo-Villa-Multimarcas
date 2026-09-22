@@ -1,0 +1,65 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="800" y2="600" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#090B0F"/>
+      <stop offset="50%" stop-color="#13171F"/>
+      <stop offset="100%" stop-color="#090B0F"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="200" y1="300" x2="600" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1479BE"/>
+      <stop offset="100%" stop-color="#E11D2A"/>
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="400" cy="270" r="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1479BE" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1479BE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background 4:3 -->
+  <rect width="800" height="600" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Glow -->
+  <circle cx="400" cy="270" r="280" fill="url(#glowGrad)"/>
+
+  <!-- Decorative Border Grid -->
+  <rect x="24" y="24" width="752" height="552" rx="16" stroke="rgba(255, 255, 255, 0.06)" stroke-width="2"/>
+
+  <!-- Car Silhouette Icon -->
+  <g transform="translate(280, 160)">
+    <!-- Car body outline -->
+    <path d="M20 110 L45 55 C52 40 68 30 85 30 L155 30 C172 30 188 40 195 55 L220 110 C232 110 240 118 240 130 L240 160 C240 168 234 175 225 175 L215 175 C215 160 200 145 185 145 C170 145 155 160 155 175 L85 175 C85 160 70 145 55 145 C40 145 25 160 25 175 L15 175 C6 175 0 168 0 160 L0 130 C0 118 8 110 20 110 Z" fill="rgba(255, 255, 255, 0.05)" stroke="url(#accentGrad)" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Windshield -->
+    <path d="M50 55 L80 38 L160 38 L190 55 L50 55 Z" fill="none" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2"/>
+    <!-- Headlights -->
+    <circle cx="35" cy="125" r="8" fill="#1479BE"/>
+    <circle cx="205" cy="125" r="8" fill="#1479BE"/>
+    <!-- Wheels -->
+    <circle cx="55" cy="175" r="20" fill="#090B0F" stroke="url(#accentGrad)" stroke-width="3"/>
+    <circle cx="55" cy="175" r="8" fill="#1479BE"/>
+    <circle cx="185" cy="175" r="20" fill="#090B0F" stroke="url(#accentGrad)" stroke-width="3"/>
+    <circle cx="185" cy="175" r="8" fill="#1479BE"/>
+  </g>
+
+  <!-- Brand Typography -->
+  <text x="400" y="385" font-family="'Sora', 'Inter', -apple-system, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+    ABELARDO VILLA
+  </text>
+  
+  <text x="400" y="415" font-family="'Inter', -apple-system, sans-serif" font-size="13" font-weight="700" fill="#1479BE" text-anchor="middle" letter-spacing="6">
+    M U L T I M A R C A
+  </text>
+
+  <!-- Status Pill -->
+  <g transform="translate(295, 450)">
+    <rect width="210" height="34" rx="17" fill="rgba(255, 255, 255, 0.06)" stroke="rgba(255, 255, 255, 0.12)"/>
+    <circle cx="22" cy="17" r="4" fill="#E11D2A"/>
+    <text x="36" y="22" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="600" fill="rgba(255, 255, 255, 0.7)">
+      FOTO EN PREPARACIÓN
+    </text>
+  </g>
+
+  <!-- Watermark Trayectoria -->
+  <text x="400" y="525" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="500" fill="rgba(255, 255, 255, 0.3)" text-anchor="middle" letter-spacing="1.5">
+    +40 AÑOS DE TRAYECTORIA · RINCÓN, SANTA FE
+  </text>
+</svg>

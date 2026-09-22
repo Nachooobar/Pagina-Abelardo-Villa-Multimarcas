@@ -1,24 +1,114 @@
-<!-- Admin Sidebar -->
+<!-- Admin Sidebar (ink-950) -->
 <aside class="admin-sidebar" id="adminSidebar">
-  <div class="admin-sidebar-brand">
-    <img src="/images/logo.png" alt="Logo" style="width:100%;max-width:200px;margin:0 auto 0.5rem;display:block;border-radius:8px;">
+  <div class="admin-sidebar-header">
+    <a href="/admin" class="admin-sidebar-logo-link" title="Ir al Dashboard">
+      <img src="/images/logo-light.svg" alt="Abelardo Villa Multimarcas" width="180" height="48" class="admin-sidebar-logo">
+    </a>
+    <div class="admin-sidebar-badge">
+      <span class="sidebar-badge-dot"></span>
+      <span>PANEL DE CONTROL</span>
+    </div>
   </div>
-  <div class="admin-sidebar-sub">Panel de Control</div>
+
+  <div class="admin-sidebar-cta">
+    <a href="/admin/autos/nuevo" class="sidebar-btn-add">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>Cargar Auto</span>
+    </a>
+  </div>
+
   <nav class="admin-nav">
-    <a href="/admin" class="<%= typeof title !== 'undefined' && title.includes('Panel') ? 'active' : '' %>">📊 Dashboard</a>
-    <a href="/admin/autos" class="<%= typeof title !== 'undefined' && (title.includes('Gestión') || title.includes('Editar')) ? 'active' : '' %>">🚗 Vehículos</a>
-    <a href="/admin/autos/nuevo" class="<%= typeof title !== 'undefined' && title.includes('Agregar') ? 'active' : '' %>">➕ Agregar Auto</a>
+    <div class="admin-nav-section-title">GESTIÓN PRINCIPAL</div>
+
+    <a href="/admin" class="admin-nav-link <%= typeof title !== 'undefined' && (title.includes('Dashboard') || title.includes('Panel')) ? 'active' : '' %>">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="/admin/autos" class="admin-nav-link <%= typeof title !== 'undefined' && (title.includes('Gestión') || title.includes('Vehículos') || title.includes('Editar') || title.includes('Agregar')) ? 'active' : '' %>">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+        <circle cx="7" cy="17" r="2"></circle>
+        <path d="M9 17h6"></path>
+        <circle cx="17" cy="17" r="2"></circle>
+      </svg>
+      <span>Vehículos</span>
+    </a>
+
+    <a href="/admin/consultas" class="admin-nav-link <%= typeof title !== 'undefined' && title.includes('Consultas') ? 'active' : '' %>">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+      </svg>
+      <span>Consultas</span>
+    </a>
+
+    <div class="admin-nav-section-title" style="margin-top: 1rem;">SISTEMA</div>
+
+    <a href="/admin/config" class="admin-nav-link <%= typeof title !== 'undefined' && (title.includes('Configuración') || title.includes('Ajustes')) ? 'active' : '' %>">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      <span>Ajustes</span>
+    </a>
+
+    <a href="/" target="_blank" class="admin-nav-link" title="Abrir sitio público">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span>Ver Sitio Web</span>
+      <span class="nav-ext-icon">↗</span>
+    </a>
+
     <div class="admin-nav-divider"></div>
-    <a href="/admin/config" class="<%= typeof title !== 'undefined' && title.includes('Configuración') ? 'active' : '' %>">⚙️ Configuración</a>
-    <a href="/" target="_blank">🌐 Ver Sitio Web</a>
-    <div class="admin-nav-divider"></div>
-    <a href="/admin/logout" style="color:#EF4444;">🚪 Cerrar Sesión</a>
+
+    <a href="/admin/logout" class="admin-nav-link admin-nav-logout">
+      <svg class="admin-nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Cerrar Sesión</span>
+    </a>
   </nav>
-  <div style="padding:0.75rem 1.25rem;margin-top:auto;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-    <span style="font-size:0.6rem;color:rgba(255,255,255,0.5);letter-spacing:0.3px;">by</span>
-    <img src="/images/astroweb-logo.png" alt="Astro Web" style="height:30px;width:auto;object-fit:contain;background:#fff;border-radius:6px;padding:3px 8px;">
+
+  <div class="admin-sidebar-footer">
+    <div class="sidebar-credits">
+      <span class="sidebar-credits-by">by</span>
+      <img src="/images/astroweb-logo.png" alt="Astro Web" class="sidebar-credits-logo">
+    </div>
   </div>
 </aside>
-<!-- Mobile menu button -->
-<button class="mobile-menu-toggle" id="mobileMenuBtn" onclick="document.getElementById('adminSidebar').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('active');">☰</button>
-<div class="mobile-overlay" id="mobileOverlay" onclick="document.getElementById('adminSidebar').classList.remove('open');this.classList.remove('active');"></div>
+
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<script>
+  // Mobile drawer toggle
+  (function() {
+    var mobileBtn = document.getElementById('mobileMenuBtn');
+    var sidebar = document.getElementById('adminSidebar');
+    var overlay = document.getElementById('mobileOverlay');
+
+    if (mobileBtn && sidebar && overlay) {
+      mobileBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+      });
+      overlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+    }
+  })();
+</script>

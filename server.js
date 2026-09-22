@@ -34,6 +34,8 @@ app.set('env', NODE_ENV);
 app.set('trust proxy', 1);
 
 // ── Middlewares globales ──
+const compression = require('compression');
+app.use(compression());
 app.use(express.static(path.join(__dirname, 'public'), { 
   maxAge: NODE_ENV === 'production' ? '1d' : 0 
 }));
@@ -83,6 +85,7 @@ app.use((req, res, next) => {
   res.locals.currentYear = new Date().getFullYear();
   res.locals.isAdmin = req.session && req.session.isAdmin;
   res.locals.NODE_ENV = NODE_ENV;
+  res.locals.currentPath = req.path;
   
   // ── Inyectar configuración de marca ──
   res.locals.brand = brand;

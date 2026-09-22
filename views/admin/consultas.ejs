@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Abelardo Villa Multimarcas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" type="image/png" href="/images/logo.png">
+</head>
+<body>
+  <div class="admin-layout">
+    <%- include('sidebar') %>
+
+    <main class="admin-main">
+      <%- include('topbar') %>
+
+      <div class="admin-content">
+        <div class="admin-page-header">
+          <div>
+            <div class="admin-breadcrumb">Gestión / Consultas</div>
+            <h2 class="admin-page-title">Canal Comercial y Consultas</h2>
+            <p class="admin-page-desc">Todas las consultas de la web pública ingresan directamente al WhatsApp comercial y teléfonos de la concesionaria.</p>
+          </div>
+          <div class="admin-page-actions">
+            <a href="https://wa.me/5493425488000" target="_blank" class="btn btn-primary btn-md">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              <span>Abrir WhatsApp Business</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">💬</div>
+            <div class="stat-details">
+              <div class="stat-number"><%= totalConsultas %></div>
+              <div class="stat-label">Consultas estimadas del mes</div>
+              <div class="stat-meta">Iniciadas vía botón de WhatsApp</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">⚡</div>
+            <div class="stat-details">
+              <div class="stat-number">&lt; 15 min</div>
+              <div class="stat-label">Tiempo de respuesta óptimo</div>
+              <div class="stat-meta">Tasa de conversión 3x superior</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card-lead-info">
+          <div class="lead-info-header">
+            <h3>📱 Canales de Atención Configurados</h3>
+          </div>
+          <div class="lead-channels-grid">
+            <div class="lead-channel-box">
+              <div class="channel-icon">🟢</div>
+              <div class="channel-text">
+                <strong>WhatsApp Comercial</strong>
+                <p>+54 9 342 548-8000</p>
+                <small>Recibe mensajes con auto prellenado desde cada ficha técnica pública.</small>
+              </div>
+            </div>
+            <div class="lead-channel-box">
+              <div class="channel-icon">📞</div>
+              <div class="channel-text">
+                <strong>Teléfono Fijo / Salón</strong>
+                <p>(0342) 496-2244</p>
+                <small>Ruta 1 Km 5.5, San José del Rincón, Santa Fe.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

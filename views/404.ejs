@@ -1,9 +1,27 @@
-<%- include('partials/header') %>
-<div class="page-404">
-  <div>
-    <h1>404</h1>
-    <p>La página que buscás no existe o fue movida.</p>
-    <a href="/" class="btn btn-primary">Volver al Inicio</a>
+<%- include('partials/header', { 
+  title: 'Página no encontrada (404) - Abelardo Villa Multimarcas', 
+  seoDescription: 'La página que buscás no existe o fue movida. Volvé a nuestro catálogo de autos usados y 0km.' 
+}) %>
+
+<div class="page-404" style="padding: 6rem 1rem; text-align: center; min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+  <div class="ds-card" style="padding: 3.5rem 2rem; max-width: 540px; margin: 0 auto; text-align: center;">
+    <span style="font-size: 3.5rem; display: block; margin-bottom: 1rem;">🚗</span>
+    <h1 style="font-family: var(--font-heading); font-size: 3.5rem; font-weight: 800; color: var(--color-primary); margin-bottom: 0.5rem; line-height: 1;">404</h1>
+    <h2 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: #fff; margin-bottom: 1rem;">
+      Página no encontrada
+    </h2>
+    <p style="color: var(--text-secondary); font-size: var(--text-base); line-height: var(--leading-relaxed); margin-bottom: 2rem;">
+      La dirección que ingresaste no existe o el vehículo ya no se encuentra disponible.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/" class="ds-btn ds-btn--primary">
+        Volver al Inicio
+      </a>
+      <a href="/catalogo" class="ds-btn ds-btn--outline">
+        Ver Catálogo
+      </a>
+    </div>
   </div>
 </div>
+
 <%- include('partials/footer') %>

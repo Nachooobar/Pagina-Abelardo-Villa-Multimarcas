@@ -1,0 +1,23 @@
+<%
+  let waFloatHref = getWhatsAppLink();
+  let waFloatTooltip = '¡Consultanos por WhatsApp!';
+  if (typeof auto !== 'undefined' && auto && auto.marca && auto.modelo) {
+    const autoName = `${auto.marca} ${auto.modelo}${auto.anio ? ' ' + auto.anio : ''}`;
+    waFloatHref = getWhatsAppLink(autoName);
+    waFloatTooltip = `Consultar por ${auto.marca} ${auto.modelo}`;
+  }
+%>
+
+<!-- Botón Flotante de WhatsApp -->
+<div class="whatsapp-float-container" id="whatsappFloatContainer">
+  <a href="<%= waFloatHref %>" 
+     target="_blank" 
+     rel="noopener noreferrer" 
+     class="whatsapp-float-btn" 
+     id="whatsappFloatBtn"
+     aria-label="<%= waFloatTooltip %>">
+    <span class="whatsapp-float-pulse"></span>
+    <span class="whatsapp-float-tooltip"><%= waFloatTooltip %></span>
+    <img src="/images/whatsapp-icon.png" alt="WhatsApp" class="whatsapp-float-img" width="60" height="60">
+  </a>
+</div>

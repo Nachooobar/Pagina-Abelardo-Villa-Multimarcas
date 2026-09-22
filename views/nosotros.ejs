@@ -1,41 +1,109 @@
 <%- include('partials/header') %>
-<section class="contact-page">
+
+<main id="mainContent">
+<section class="about-page" style="padding: 3rem 0 5rem;">
   <div class="container">
-    <div class="section-header fade-in" style="margin-top:1rem;">
-      <div class="section-tag">🏢 Nosotros</div>
-      <h1 class="section-title">Abelardo Villa Multimarcas</h1>
-      <p class="section-subtitle">40 Años de experiencia en el mercado automotor</p>
+    <div class="section-header fade-in text-center" style="margin-bottom: 2.5rem;">
+      <span class="ds-chip ds-chip--usado" style="margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem;">
+        <span class="ds-chip__dot"></span>Sobre Nosotros
+      </span>
+      <h1 class="section-title" style="font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: var(--color-text-light); margin-bottom: 0.75rem; letter-spacing: -0.02em;">
+        Abelardo Villa Multimarcas
+      </h1>
+      <p class="section-subtitle" style="color: var(--neutral-300); font-size: var(--text-lg); max-width: 600px; margin: 0 auto;">
+        Más de 40 años de trayectoria en el mercado automotor
+      </p>
     </div>
-    <div class="contact-grid">
-      <div class="fade-in">
-        <div class="contact-info-card">
+
+    <!-- Cuadrícula pareja adaptada a lista en móvil -->
+    <div class="about-grid">
+      <!-- Card 1: Nuestra Historia -->
+      <div class="about-card fade-in">
+        <div>
           <h3>Nuestra Historia</h3>
-          <p>Abelardo Villa Multimarcas es una concesionaria con amplia trayectoria en el rubro automotor. Nos especializamos en la compra-venta de vehículos usados seleccionados y 0km de todas las marcas.</p>
-          <p style="margin-top:1rem;">Nuestro compromiso es brindar transparencia, confianza y el mejor servicio a cada cliente que nos elige.</p>
-        </div>
-        <div class="contact-info-card">
-          <h3>¿Por qué elegirnos?</h3>
-          <p>✅ Vehículos verificados y con garantía<br>
-             ✅ Financiación para que adquieras tu 0KM<br>
-             ✅ Tasamos tu usado<br>
-             ✅ Amplio stock de todas las marcas<br>
-             ✅ Documentación al día y transparente</p>
+          <p class="about-card__text">
+            Abelardo Villa Multimarcas es una concesionaria familiar con amplia trayectoria en el rubro automotor. Nos especializamos en la compra, venta y permuta de vehículos usados seleccionados y 0km de todas las marcas.
+          </p>
+          <p class="about-card__text" style="margin-top: 1rem;">
+            Nuestro compromiso constante es brindar transparencia, confianza y asesoramiento personalizado a cada cliente que nos elige en Santa Fe y la región.
+          </p>
         </div>
       </div>
-      <div class="fade-in">
-        <div class="contact-info-card">
-          <h3>Nuestros Valores</h3>
-          <p><strong style="color:var(--accent);">Transparencia</strong><br>Cada vehículo cuenta con información completa y verificada.</p>
-          <p style="margin-top:1rem;"><strong style="color:var(--accent);">Confianza</strong><br>Construimos relaciones duraderas con nuestros clientes.</p>
-          <p style="margin-top:1rem;"><strong style="color:var(--accent);">Calidad</strong><br>Solo ofrecemos vehículos que cumplen nuestros estándares.</p>
+
+      <!-- Card 2: ¿Por qué elegirnos? -->
+      <div class="about-card fade-in">
+        <div>
+          <h3>¿Por qué elegirnos?</h3>
+          <ul class="about-features-list">
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="about-check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Financiación a tu medida para adquirir tu usado o 0KM</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="about-check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Tasamos tu usado a la mejor cotización del mercado</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="about-check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Amplio stock multimarca garantizado</span>
+            </li>
+            <li>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="about-check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Documentación al día, transferencias rápidas y seguras</span>
+            </li>
+          </ul>
         </div>
-        <div class="contact-info-card">
+      </div>
+
+      <!-- Card 3: Nuestros Valores -->
+      <div class="about-card fade-in">
+        <div>
+          <h3>Nuestros Valores</h3>
+          <div class="about-value-item">
+            <strong>Transparencia</strong>
+            <p>Cada vehículo cuenta con información completa, historial y verificación mecánica.</p>
+          </div>
+          <div class="about-value-item">
+            <strong>Confianza</strong>
+            <p>Construimos relaciones duraderas respaldadas por cuatro décadas de seriedad.</p>
+          </div>
+          <div class="about-value-item">
+            <strong>Calidad</strong>
+            <p>Solo seleccionamos unidades que superan nuestros estándares de calidad.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Horarios de Atención y Contacto -->
+      <div class="about-card fade-in">
+        <div>
           <h3>Horarios de Atención</h3>
-          <p>📅 Lunes a Viernes: 10:00 - 19:00<br>📅 Sabados y Domingos: Cerrado</p>
-          <a href="/contacto" class="btn btn-primary" style="margin-top:1.5rem;">Contactanos →</a>
+          <div class="about-schedule-box">
+            <div class="schedule-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <div>
+                <span class="schedule-days">Lunes a Viernes</span>
+                <span class="schedule-hours">10:00 a 19:00 hs</span>
+              </div>
+            </div>
+            <div class="schedule-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <div>
+                <span class="schedule-days">Sábados y Domingos</span>
+                <span class="schedule-hours">Cerrado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 1.5rem;">
+          <a href="/contacto" class="ds-btn ds-btn--primary ds-btn--block">
+            Contactanos →
+          </a>
         </div>
       </div>
     </div>
   </div>
 </section>
+</main>
+
 <%- include('partials/footer') %>

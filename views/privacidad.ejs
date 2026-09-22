@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<main id="mainContent">
+<section class="page-hero" style="padding: 4rem 0 3rem; background: linear-gradient(180deg, var(--neutral-900) 0%, var(--neutral-950) 100%); border-bottom: 1px solid var(--border-subtle);">
+  <div class="container text-center">
+    <h1 style="font-family: var(--font-heading); font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 700; color: #fff; margin-bottom: 1rem; letter-spacing: -0.02em;">
+      Política de <span style="color: var(--color-primary);">Privacidad</span>
+    </h1>
+    <p style="max-width: 650px; margin: 0 auto; color: var(--neutral-300); font-size: var(--text-base); line-height: var(--leading-relaxed);">
+      Última actualización: <%= new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+    </p>
+  </div>
+</section>
+
+<section style="padding: 4rem 0; background: var(--surface-page);">
+  <div class="container" style="max-width: 860px;">
+    <div class="ds-card" style="padding: 3rem;">
+      <div style="color: var(--text-secondary); font-size: var(--text-base); line-height: 1.8;">
+        <h2 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: #fff; margin-bottom: 1rem;">
+          1. Compromiso de Privacidad
+        </h2>
+        <p style="margin-bottom: 2rem;">
+          En <strong><%= brand.name %></strong>, respetamos y protegemos la privacidad de nuestros clientes y visitantes. Esta política detalla el tratamiento de la información que podamos recopilar a través de nuestro sitio web o canales directos de contacto (WhatsApp, llamadas y formularios).
+        </p>
+
+        <h2 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: #fff; margin-bottom: 1rem;">
+          2. Datos que Recopilamos
+        </h2>
+        <p style="margin-bottom: 1rem;">
+          Únicamente recopilamos los datos estrictamente necesarios para responder consultas, coordinar visitas y cotizaciones comerciales:
+        </p>
+        <ul style="padding-left: 1.5rem; margin-bottom: 2rem;">
+          <li>Nombre y apellido.</li>
+          <li>Teléfono de contacto o número de WhatsApp.</li>
+          <li>Dirección de correo electrónico.</li>
+          <li>Información sobre el vehículo que se desea comprar, vender o permutar.</li>
+        </ul>
+
+        <h2 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: #fff; margin-bottom: 1rem;">
+          3. Uso de la Información
+        </h2>
+        <p style="margin-bottom: 2rem;">
+          Los datos proporcionados son utilizados exclusivamente con fines de atención al cliente, asesoramiento comercial y gestión de las operaciones de compra-venta de vehículos. No compartimos, vendemos ni cedemos sus datos personales a terceros sin su previo consentimiento.
+        </p>
+
+        <h2 style="font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; color: #fff; margin-bottom: 1rem;">
+          4. Contacto y Consultas
+        </h2>
+        <p style="margin-bottom: 0;">
+          Para cualquier duda o solicitud respecto a sus datos personales, puede comunicarse directamente con nosotros en <strong><%= brand.contact.maps.address %></strong>, vía email a <a href="mailto:<%= brand.contact.email %>" style="color: var(--color-primary);"><%= brand.contact.email %></a> o al teléfono <strong><%= brand.contact.phone %></strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<%- include('partials/footer') %>

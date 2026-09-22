@@ -3,37 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title><%= title %> | Abelardo Villa Multimarcas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" type="image/png" href="/images/logo.png">
 </head>
 <body>
   <div class="admin-layout">
     <%- include('sidebar') %>
+
     <main class="admin-main">
-      <div class="admin-header">
-        <h1>⚙️ Configuración</h1>
-      </div>
-      <div class="admin-form" style="max-width:500px;">
-        <div class="form-section">
-          <h3>🔒 Cambiar Contraseña</h3>
-          <% if (success) { %><div class="alert alert-success">✅ <%= success %></div><% } %>
-          <% if (error) { %><div class="alert alert-danger">⚠️ <%= error %></div><% } %>
-          <form method="POST" action="/admin/config/password">
-            <div class="form-group">
-              <label for="current_password">Contraseña Actual</label>
-              <input type="password" id="current_password" name="current_password" required placeholder="Tu contraseña actual">
+      <%- include('topbar') %>
+
+      <div class="admin-content">
+        <div class="admin-page-header">
+          <div>
+            <div class="admin-breadcrumb">Sistema / Ajustes</div>
+            <h2 class="admin-page-title">Configuración de Cuenta</h2>
+            <p class="admin-page-desc">Actualizá la clave de acceso de seguridad para el panel de administración.</p>
+          </div>
+        </div>
+
+        <div class="admin-form-container" style="max-width: 580px;">
+          <div class="form-section">
+            <div class="form-section-header">
+              <div class="section-badge-step">🔒</div>
+              <div>
+                <h3>Seguridad y Contraseña</h3>
+                <p class="section-desc">Elegí una contraseña segura de al menos 6 caracteres.</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="new_password">Nueva Contraseña</label>
-              <input type="password" id="new_password" name="new_password" required minlength="6" placeholder="Mínimo 6 caracteres">
-            </div>
-            <div class="form-group">
-              <label for="confirm_password">Confirmar Contraseña</label>
-              <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repetí la nueva contraseña">
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:0.5rem;">🔐 Actualizar Contraseña</button>
-          </form>
+
+            <% if (success) { %>
+              <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+                ✅ <%= success %>
+              </div>
+            <% } %>
+
+            <% if (error) { %>
+              <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+                ⚠️ <%= error %>
+              </div>
+            <% } %>
+
+            <form method="POST" action="/admin/config/password" class="admin-form-grid">
+              <div class="form-group">
+                <label for="current_password">Contraseña actual *</label>
+                <input type="password" id="current_password" name="current_password" required placeholder="Tu contraseña vigente" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label for="new_password">Nueva contraseña *</label>
+                <input type="password" id="new_password" name="new_password" required minlength="6" placeholder="Mínimo 6 caracteres" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label for="confirm_password">Confirmar nueva contraseña *</label>
+                <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repetí la nueva clave exactamente" class="form-input">
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-md" style="margin-top: 0.5rem;">
+                🔐 Actualizar contraseña
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </main>
