@@ -110,10 +110,24 @@ async function initSchema() {
       );
     `);
   } else {
-    // ── Esquema SQLite local con compatibilidad para estado e imágenes ──
+    // Si la tabla autos tiene id INTEGER y está vacía, migrar a TEXT para admitir UUIDs de Supabase
+    try {
+      const idCol = await activeDb.get("SELECT type FROM pragma_table_info('autos') WHERE name = 'id'");
+      if (idCol && idCol.type === 'INTEGER') {
+        const rowCount = await activeDb.get("SELECT COUNT(*) as count FROM autos");
+        if (!rowCount || rowCount.count === 0) {
+          await activeDb.exec(`
+            DROP TABLE IF EXISTS auto_imagenes;
+            DROP TABLE IF EXISTS autos;
+          `);
+        }
+      }
+    } catch (e) {}
+
+    // ── Esquema SQLite local con compatibilidad para UUIDs, estado e imágenes ──
     await activeDb.exec(`
       CREATE TABLE IF NOT EXISTS autos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
         marca VARCHAR(255) NOT NULL,
         modelo VARCHAR(255) NOT NULL,
         version VARCHAR(255) DEFAULT '',
@@ -139,7 +153,7 @@ async function initSchema() {
 
       CREATE TABLE IF NOT EXISTS auto_imagenes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        auto_id INT NOT NULL,
+        auto_id TEXT NOT NULL,
         filename VARCHAR(255) NOT NULL,
         es_principal INTEGER DEFAULT 0,
         orden INT DEFAULT 0,
@@ -158,6 +172,56 @@ async function initSchema() {
     try { await activeDb.run("ALTER TABLE autos ADD COLUMN estado VARCHAR(50) DEFAULT 'disponible'"); } catch (e) {}
     try { await activeDb.run("ALTER TABLE autos ADD COLUMN imagenes TEXT DEFAULT '[]'"); } catch (e) {}
     try { await activeDb.run("ALTER TABLE autos ADD COLUMN tipo VARCHAR(50) DEFAULT ''"); } catch (e) {}
+
+    // ── Sincronización automática desde Supabase REST hacia SQLite (Fallback Inteligente) ──
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+      try {
+        const { createClient } = require('@supabase/supabase-js');
+        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+        const { data: vehiculos, error } = await supabase.from('vehiculos').select('*');
+        if (!error && Array.isArray(vehiculos) && vehiculos.length > 0) {
+          for (const v of vehiculos) {
+            const imgsJson = JSON.stringify(v.imagenes || []);
+            await activeDb.run(`
+              INSERT INTO autos (id, marca, modelo, version, anio, precio, moneda, kilometraje, combustible, transmision, color, puertas, motor, descripcion, condicion, tipo, estado, destacado, activo, imagenes, created_at, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET
+                marca = excluded.marca,
+                modelo = excluded.modelo,
+                version = excluded.version,
+                anio = excluded.anio,
+                precio = excluded.precio,
+                moneda = excluded.moneda,
+                kilometraje = excluded.kilometraje,
+                combustible = excluded.combustible,
+                transmision = excluded.transmision,
+                color = excluded.color,
+                puertas = excluded.puertas,
+                motor = excluded.motor,
+                descripcion = excluded.descripcion,
+                condicion = excluded.condicion,
+                tipo = excluded.tipo,
+                estado = excluded.estado,
+                destacado = excluded.destacado,
+                activo = excluded.activo,
+                imagenes = excluded.imagenes,
+                updated_at = excluded.updated_at
+            `, [
+              String(v.id), v.marca, v.modelo, v.version || '', v.anio || new Date().getFullYear(),
+              parseFloat(v.precio) || 0, v.moneda || 'ARS', parseInt(v.kilometraje) || 0,
+              v.combustible || 'Nafta', v.transmision || 'Manual', v.color || '',
+              parseInt(v.puertas) || 4, v.motor || '', v.descripcion || '',
+              v.condicion || 'Usado', v.tipo || '', v.estado || 'disponible',
+              v.destacado ? 1 : 0, v.activo !== undefined ? (v.activo ? 1 : 0) : 1,
+              imgsJson, v.created_at || new Date().toISOString(), v.updated_at || new Date().toISOString()
+            ]);
+          }
+          console.log(`✓ Sincronización con Supabase completada: ${vehiculos.length} vehículos cargados`);
+        }
+      } catch (syncErr) {
+        console.warn('Nota: sincronización automática con Supabase omitida:', syncErr.message);
+      }
+    }
   }
 
   // ── Usuario Admin: crear o sincronizar con credenciales oficiales ──

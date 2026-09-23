@@ -1,11 +1,24 @@
 <%
   function getImageSrc(auto) {
+    if (!auto) return null;
     if (Array.isArray(auto.imagenes) && auto.imagenes.length > 0) {
       return auto.imagenes[0];
     }
-    if (typeof auto.imagenes === 'string' && auto.imagenes.startsWith('{')) {
-      const parsed = auto.imagenes.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
-      if (parsed.length > 0) return parsed[0];
+    if (typeof auto.imagenes === 'string') {
+      const trimmed = auto.imagenes.trim();
+      if (trimmed.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+        } catch (e) {}
+      }
+      if (trimmed.startsWith('{')) {
+        const parsed = trimmed.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+        if (parsed.length > 0) return parsed[0];
+      }
+      if (trimmed.startsWith('http') || trimmed.startsWith('/uploads/')) {
+        return trimmed;
+      }
     }
     if (auto.imagen_principal) {
       return auto.imagen_principal.startsWith('http') ? auto.imagen_principal : '/uploads/autos/' + auto.imagen_principal;

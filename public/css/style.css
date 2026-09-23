@@ -663,6 +663,15 @@ body.drawer-locked {
   transform: translateY(0);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ==================== 1. HERO CON BUSCADOR PROTAGONISTA ==================== */
 .hero-v2 {
   position: relative;

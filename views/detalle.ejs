@@ -3,13 +3,34 @@
 <%
   function getImgUrl(img) {
     if (!img) return '';
+    if (typeof img === 'string') {
+      if (img.startsWith('http') || img.startsWith('/uploads/')) return img;
+      return '/uploads/autos/' + img;
+    }
     const src = img.url || img.filename || '';
     if (src.startsWith('http') || src.startsWith('/uploads/')) return src;
     return '/uploads/autos/' + src;
   }
 
-  const allImages = (Array.isArray(imagenes) && imagenes.length > 0) 
-    ? imagenes.map(img => getImgUrl(img)).filter(Boolean)
+  // Si imagenes no viene como array pero auto.imagenes existe, parsearlo
+  let effectiveImages = Array.isArray(imagenes) ? [...imagenes] : [];
+  if (effectiveImages.length === 0 && auto && auto.imagenes) {
+    if (Array.isArray(auto.imagenes)) {
+      effectiveImages = auto.imagenes;
+    } else if (typeof auto.imagenes === 'string') {
+      const trimmed = auto.imagenes.trim();
+      if (trimmed.startsWith('[')) {
+        try { effectiveImages = JSON.parse(trimmed); } catch (e) {}
+      } else if (trimmed.startsWith('{')) {
+        effectiveImages = trimmed.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+      } else if (trimmed.startsWith('http') || trimmed.startsWith('/uploads/')) {
+        effectiveImages = [trimmed];
+      }
+    }
+  }
+
+  const allImages = (effectiveImages.length > 0) 
+    ? effectiveImages.map(img => getImgUrl(img)).filter(Boolean)
     : [];
 
   const mainPhoto = allImages.length > 0 ? allImages[0] : null;

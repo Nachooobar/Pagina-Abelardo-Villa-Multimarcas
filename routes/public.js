@@ -339,6 +339,32 @@ router.get('/auto/:slug-:id', async (req, res) => {
         SELECT * FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC
       `).all([id]);
 
+      if ((!imagenes || imagenes.length === 0) && auto.imagenes) {
+        let parsedImgs = [];
+        if (Array.isArray(auto.imagenes)) {
+          parsedImgs = auto.imagenes;
+        } else if (typeof auto.imagenes === 'string') {
+          const trimmed = auto.imagenes.trim();
+          if (trimmed.startsWith('[')) {
+            try { parsedImgs = JSON.parse(trimmed); } catch (e) {}
+          } else if (trimmed.startsWith('{')) {
+            parsedImgs = trimmed.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+          } else if (trimmed.length > 0) {
+            parsedImgs = [trimmed];
+          }
+        }
+        if (parsedImgs.length > 0) {
+          imagenes = parsedImgs.map((url, i) => ({
+            id: i + 1,
+            auto_id: auto.id,
+            filename: String(url).replace('/uploads/autos/', ''),
+            url,
+            es_principal: i === 0 ? 1 : 0,
+            orden: i
+          }));
+        }
+      }
+
       // 4 autos relacionados (misma marca o diferentes autos disponibles)
       relacionados = await db.prepare(`
         SELECT a.*, 

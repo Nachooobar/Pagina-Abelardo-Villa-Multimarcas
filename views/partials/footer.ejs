@@ -215,8 +215,9 @@
         });
       }
 
-      // ── Fade-In Observer ──
-      if ('IntersectionObserver' in window) {
+      // ── Fade-Up & Fade-In Observer con Failsafe ──
+      const fadeElements = document.querySelectorAll('.fade-up, .fade-in');
+      if ('IntersectionObserver' in window && fadeElements.length > 0) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -224,9 +225,18 @@
               observer.unobserve(entry.target);
             }
           });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }, { threshold: 0.05, rootMargin: '50px 0px 50px 0px' });
+        fadeElements.forEach(el => observer.observe(el));
+      } else {
+        fadeElements.forEach(el => el.classList.add('visible'));
       }
+
+      // Failsafe: después de la carga inicial, asegurar que ningún elemento quede bloqueado en opacity 0
+      setTimeout(() => {
+        document.querySelectorAll('.fade-up:not(.visible), .fade-in:not(.visible)').forEach(el => {
+          el.classList.add('visible');
+        });
+      }, 500);
     })();
   </script>
   </body>
