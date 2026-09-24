@@ -192,6 +192,19 @@ router.get('/', requireAuth, async (req, res) => {
       `).all();
     }
 
+    // Asegurar que cada auto tenga imagen y total_imagenes aunque no haya filas en auto_imagenes
+    ultimosAutos.forEach(auto => {
+      if (!auto.imagen && auto.imagenes) {
+        try {
+          const parsed = typeof auto.imagenes === 'string' ? JSON.parse(auto.imagenes) : auto.imagenes;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            auto.imagen = parsed[0];
+            if (!auto.total_imagenes) auto.total_imagenes = parsed.length;
+          }
+        } catch(e) {}
+      }
+    });
+
     // Consultas estimadas o reales registradas
     totalConsultas = Math.max(14, totalPublicados * 3);
 
@@ -263,6 +276,19 @@ router.get('/autos', requireAuth, async (req, res) => {
 
       marcas = await db.prepare('SELECT DISTINCT marca FROM autos ORDER BY marca ASC').all();
     }
+
+    // Asegurar que cada auto en el listado tenga imagen y total_imagenes
+    autos.forEach(auto => {
+      if (!auto.imagen && auto.imagenes) {
+        try {
+          const parsed = typeof auto.imagenes === 'string' ? JSON.parse(auto.imagenes) : auto.imagenes;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            auto.imagen = parsed[0];
+            if (!auto.total_imagenes) auto.total_imagenes = parsed.length;
+          }
+        } catch(e) {}
+      }
+    });
 
     res.render('admin/autos-list', {
       title: 'Gestión de Vehículos',
@@ -361,11 +387,22 @@ router.get('/autos/editar/:id', requireAuth, async (req, res) => {
     if (db.isPg()) {
       auto = await db.prepare('SELECT * FROM public.vehiculos WHERE id = ?').get([req.params.id]);
       if (!auto) return res.redirect('/admin/autos');
-      if (Array.isArray(auto.imagenes)) {
-        imagenes = auto.imagenes.map((url, index) => ({
+      let rawImgs = auto.imagenes;
+      if (typeof rawImgs === 'string') {
+        const t = rawImgs.trim();
+        if (t.startsWith('[')) {
+          try { rawImgs = JSON.parse(t); } catch (e) {}
+        } else if (t.startsWith('{')) {
+          rawImgs = t.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+        } else if (t.length > 0) {
+          rawImgs = [t];
+        }
+      }
+      if (Array.isArray(rawImgs)) {
+        imagenes = rawImgs.map((url, index) => ({
           id: index + 1,
           auto_id: auto.id,
-          filename: url.replace('/uploads/autos/', ''),
+          filename: url,
           url,
           es_principal: index === 0 ? 1 : 0,
           orden: index
@@ -375,6 +412,23 @@ router.get('/autos/editar/:id', requireAuth, async (req, res) => {
       auto = await db.prepare('SELECT * FROM autos WHERE id = ?').get([req.params.id]);
       if (!auto) return res.redirect('/admin/autos');
       imagenes = await db.prepare('SELECT * FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC').all([req.params.id]);
+
+      // Si auto_imagenes está vacía pero autos.imagenes tiene fotos, poblar auto_imagenes
+      if (imagenes.length === 0 && auto.imagenes) {
+        let parsed = [];
+        try {
+          parsed = typeof auto.imagenes === 'string' ? JSON.parse(auto.imagenes) : auto.imagenes;
+        } catch (e) {}
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          for (let i = 0; i < parsed.length; i++) {
+            const imgPath = parsed[i];
+            const fname = imgPath.replace('/uploads/autos/', '');
+            await db.prepare('INSERT INTO auto_imagenes (auto_id, filename, es_principal, orden) VALUES (?, ?, ?, ?)')
+              .run([auto.id, fname, i === 0 ? 1 : 0, i]);
+          }
+          imagenes = await db.prepare('SELECT * FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC').all([req.params.id]);
+        }
+      }
     }
 
     res.render('admin/auto-form', {
@@ -405,7 +459,21 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
 
     if (db.isPg()) {
       const current = await db.prepare('SELECT imagenes FROM public.vehiculos WHERE id = ?').get([req.params.id]);
-      const currentImgs = (current && Array.isArray(current.imagenes)) ? current.imagenes : [];
+      let currentImgs = [];
+      if (current && current.imagenes) {
+        if (Array.isArray(current.imagenes)) {
+          currentImgs = current.imagenes;
+        } else if (typeof current.imagenes === 'string') {
+          const t = current.imagenes.trim();
+          if (t.startsWith('[')) {
+            try { currentImgs = JSON.parse(t); } catch (e) {}
+          } else if (t.startsWith('{')) {
+            currentImgs = t.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+          } else if (t.length > 0) {
+            currentImgs = [t];
+          }
+        }
+      }
       const updatedImgs = [...currentImgs, ...newUrls];
 
       await db.prepare(`
@@ -443,6 +511,11 @@ router.post('/autos/editar/:id', requireAuth, upload.array('imagenes', 50), asyn
             .run([req.params.id, req.files[i].filename, existingCount === 0 && i === 0 ? 1 : 0, existingCount + i]);
         }
       }
+
+      // Sincronizar autos.imagenes en SQLite
+      const allDbImgs = await db.prepare('SELECT filename, es_principal FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC').all([req.params.id]);
+      const imgUrls = allDbImgs.map(img => img.filename.startsWith('http') || img.filename.startsWith('/') ? img.filename : '/uploads/autos/' + img.filename);
+      await db.prepare('UPDATE autos SET imagenes = ? WHERE id = ?').run([JSON.stringify(imgUrls), req.params.id]);
     }
 
     // Sync to Git
@@ -609,26 +682,56 @@ router.post('/autos/masivo', requireAuth, async (req, res) => {
 });
 
 // ── DELETE SINGLE IMAGE ──
-router.post('/autos/imagen/eliminar/:imgId', requireAuth, async (req, res) => {
+router.post(['/autos/imagen/eliminar/:imgId', '/autos/:autoId/imagen/eliminar/:imgId'], requireAuth, async (req, res) => {
   try {
-    const img = await db.prepare('SELECT * FROM auto_imagenes WHERE id = ?').get([req.params.imgId]);
-    if (img) {
-      const filepath = path.join(__dirname, '..', 'public', 'uploads', 'autos', img.filename);
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
-      }
-      await db.prepare('DELETE FROM auto_imagenes WHERE id = ?').run([req.params.imgId]);
+    const imgId = req.params.imgId;
+    const autoId = req.params.autoId || req.body.auto_id || req.query.auto_id;
 
-      // If it was the main image, set the next one as main
-      if (img.es_principal) {
-        const nextImg = await db.prepare('SELECT id FROM auto_imagenes WHERE auto_id = ? ORDER BY orden ASC LIMIT 1').get([img.auto_id]);
-        if (nextImg) {
-          await db.prepare('UPDATE auto_imagenes SET es_principal = 1 WHERE id = ?').run([nextImg.id]);
+    if (db.isPg()) {
+      if (autoId) {
+        const vehicle = await db.prepare('SELECT id, imagenes FROM public.vehiculos WHERE id = ?').get([autoId]);
+        if (vehicle && Array.isArray(vehicle.imagenes) && vehicle.imagenes.length > 0) {
+          const idx = parseInt(imgId) - 1;
+          if (idx >= 0 && idx < vehicle.imagenes.length) {
+            const removedUrl = vehicle.imagenes[idx];
+            const remaining = vehicle.imagenes.filter((_, i) => i !== idx);
+            await db.prepare('UPDATE public.vehiculos SET imagenes = ?, updated_at = now() WHERE id = ?').run([remaining, autoId]);
+
+            if (removedUrl && removedUrl.startsWith('/uploads/autos/')) {
+              const fname = removedUrl.replace('/uploads/autos/', '');
+              const fp = path.join(__dirname, '..', 'public', 'uploads', 'autos', fname);
+              if (fs.existsSync(fp)) fs.unlinkSync(fp);
+            }
+          }
         }
       }
+      return res.redirect(`/admin/autos/editar/${autoId || ''}`);
+    } else {
+      let targetAutoId = autoId;
+      const img = await db.prepare('SELECT * FROM auto_imagenes WHERE id = ?').get([imgId]);
+      if (img) {
+        targetAutoId = img.auto_id;
+        const filepath = path.join(__dirname, '..', 'public', 'uploads', 'autos', img.filename);
+        if (fs.existsSync(filepath)) {
+          fs.unlinkSync(filepath);
+        }
+        await db.prepare('DELETE FROM auto_imagenes WHERE id = ?').run([imgId]);
+
+        // Si era principal, marcar la siguiente como principal
+        if (img.es_principal) {
+          const nextImg = await db.prepare('SELECT id FROM auto_imagenes WHERE auto_id = ? ORDER BY orden ASC LIMIT 1').get([targetAutoId]);
+          if (nextImg) {
+            await db.prepare('UPDATE auto_imagenes SET es_principal = 1 WHERE id = ?').run([nextImg.id]);
+          }
+        }
+
+        // Sincronizar autos.imagenes JSON
+        const allDbImgs = await db.prepare('SELECT filename, es_principal FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC').all([targetAutoId]);
+        const imgUrls = allDbImgs.map(i => i.filename.startsWith('http') || i.filename.startsWith('/') ? i.filename : '/uploads/autos/' + i.filename);
+        await db.prepare('UPDATE autos SET imagenes = ? WHERE id = ?').run([JSON.stringify(imgUrls), targetAutoId]);
+      }
+      return res.redirect(`/admin/autos/editar/${targetAutoId || ''}`);
     }
-    // Redirigir explícitamente al formulario de edición del auto
-    res.redirect(`/admin/autos/editar/${img ? img.auto_id : ''}`);
   } catch (error) {
     console.error('Error al eliminar imagen:', error);
     res.redirect('/admin/autos');
@@ -636,15 +739,39 @@ router.post('/autos/imagen/eliminar/:imgId', requireAuth, async (req, res) => {
 });
 
 // ── SET MAIN IMAGE ──
-router.post('/autos/imagen/principal/:imgId', requireAuth, async (req, res) => {
+router.post(['/autos/imagen/principal/:imgId', '/autos/:autoId/imagen/principal/:imgId'], requireAuth, async (req, res) => {
   try {
-    const img = await db.prepare('SELECT * FROM auto_imagenes WHERE id = ?').get([req.params.imgId]);
-    if (img) {
-      await db.prepare('UPDATE auto_imagenes SET es_principal = 0 WHERE auto_id = ?').run([img.auto_id]);
-      await db.prepare('UPDATE auto_imagenes SET es_principal = 1 WHERE id = ?').run([req.params.imgId]);
+    const imgId = req.params.imgId;
+    const autoId = req.params.autoId || req.body.auto_id || req.query.auto_id;
+
+    if (db.isPg()) {
+      if (autoId) {
+        const vehicle = await db.prepare('SELECT id, imagenes FROM public.vehiculos WHERE id = ?').get([autoId]);
+        if (vehicle && Array.isArray(vehicle.imagenes) && vehicle.imagenes.length > 0) {
+          const idx = parseInt(imgId) - 1;
+          if (idx >= 0 && idx < vehicle.imagenes.length) {
+            const chosen = vehicle.imagenes[idx];
+            const reordered = [chosen, ...vehicle.imagenes.filter((_, i) => i !== idx)];
+            await db.prepare('UPDATE public.vehiculos SET imagenes = ?, updated_at = now() WHERE id = ?').run([reordered, autoId]);
+          }
+        }
+      }
+      return res.redirect(`/admin/autos/editar/${autoId || ''}`);
+    } else {
+      let targetAutoId = autoId;
+      const img = await db.prepare('SELECT * FROM auto_imagenes WHERE id = ?').get([imgId]);
+      if (img) {
+        targetAutoId = img.auto_id;
+        await db.prepare('UPDATE auto_imagenes SET es_principal = 0 WHERE auto_id = ?').run([targetAutoId]);
+        await db.prepare('UPDATE auto_imagenes SET es_principal = 1 WHERE id = ?').run([imgId]);
+
+        // Sincronizar autos.imagenes JSON con la foto principal primero
+        const allDbImgs = await db.prepare('SELECT filename, es_principal FROM auto_imagenes WHERE auto_id = ? ORDER BY es_principal DESC, orden ASC').all([targetAutoId]);
+        const imgUrls = allDbImgs.map(i => i.filename.startsWith('http') || i.filename.startsWith('/') ? i.filename : '/uploads/autos/' + i.filename);
+        await db.prepare('UPDATE autos SET imagenes = ? WHERE id = ?').run([JSON.stringify(imgUrls), targetAutoId]);
+      }
+      return res.redirect(`/admin/autos/editar/${targetAutoId || ''}`);
     }
-    // Redirigir explícitamente al formulario de edición del auto
-    res.redirect(`/admin/autos/editar/${img ? img.auto_id : ''}`);
   } catch (error) {
     console.error('Error al cambiar imagen principal:', error);
     res.redirect('/admin/autos');

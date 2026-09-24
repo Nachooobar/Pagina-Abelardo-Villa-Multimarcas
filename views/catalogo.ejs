@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
 
   <main class="catalog-page-v2" id="mainContent">
-    <div class="container">
+    <div class="container catalog-full-container">
       <!-- Breadcrumb & Header -->
       <div class="catalog-top-header fade-up">
         <nav class="catalog-breadcrumb" aria-label="Navegación secundaria">
@@ -10,361 +10,341 @@
           <span class="current">Catálogo de Vehículos</span>
           <% if (filtros.condicion) { %>
             <span class="sep">/</span>
-            <span class="current">
-              <%= filtros.condicion %>
-            </span>
-            <% } %>
+            <span class="current"><%= filtros.condicion %></span>
+          <% } %>
         </nav>
 
         <div class="catalog-heading-row">
           <div>
             <span class="hero-eyebrow" style="margin-bottom: 0.5rem; display: inline-block;">STOCK SELECCIONADO</span>
             <h1 class="catalog-main-title">
-              <% if (filtros.condicion==='0km' ) { %>
+              <% if (filtros.condicion === '0km') { %>
                 Vehículos 0km
-                <% } else if (filtros.condicion==='Usado' ) { %>
-                  Autos Usados Seleccionados
-                  <% } else if (filtros.marca) { %>
-                    Vehículos <%= filtros.marca %>
-                      <% } else { %>
-                        Todos los Vehículos en Stock
-                        <% } %>
+              <% } else if (filtros.condicion === 'Usado') { %>
+                Autos Usados Seleccionados
+              <% } else if (filtros.marca) { %>
+                Vehículos <%= filtros.marca %>
+              <% } else { %>
+                Todos los Vehículos en Stock
+              <% } %>
             </h1>
           </div>
-
-          <!-- Mobile Trigger Button -->
-          <button type="button" class="catalog-mobile-filter-trigger" id="openFiltersBtn" aria-expanded="false"
-            aria-controls="catalogDrawer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <line x1="4" y1="21" x2="4" y2="14"></line>
-              <line x1="4" y1="10" x2="4" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12" y2="3"></line>
-              <line x1="20" y1="21" x2="20" y2="16"></line>
-              <line x1="20" y1="12" x2="20" y2="3"></line>
-              <line x1="1" y1="14" x2="7" y2="14"></line>
-              <line x1="9" y1="8" x2="15" y2="8"></line>
-              <line x1="17" y1="16" x2="23" y2="16"></line>
-            </svg>
-            <span>Filtros</span>
-            <% if (activeChips && activeChips.length> 0) { %>
-              <span class="filter-count-badge">
-                <%= activeChips.length %>
-              </span>
-              <% } %>
-          </button>
         </div>
       </div>
 
-      <!-- Active Filter Chips (if any) -->
-      <% if (activeChips && activeChips.length> 0) { %>
-        <div class="active-chips-bar fade-up">
-          <span class="active-chips-label">Filtros activos:</span>
-            <% activeChips.forEach(chip => { 
-                const newParams = { ...filtros };
-                delete newParams[chip.key];
-                delete newParams.page;
-                const removeUrl = '/catalogo?' + Object.entries(newParams)
-                  .filter(([k, v]) => v !== undefined && v !== '')
-                  .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
-                  .join('&');
-            %>
-                <a href="<%= removeUrl || '/catalogo' %>" class="filter-chip"
-                  title="Quitar filtro <%= chip.label %>: <%= chip.value %>">
-                  <span class="chip-label">
-                    <%= chip.label %>:
-                  </span>
-                  <strong>
-                    <%= chip.value %>
-                  </strong>
-                  <span class="chip-remove" aria-hidden="true">✕</span>
-                </a>
-                <% }) %>
-                  <a href="/catalogo" class="filter-chip-clear" title="Quitar todos los filtros">
-                    Limpiar todo
-                  </a>
-          </div>
-        <% } %>
+      <!-- ── BUSCADOR SUPERIOR COMPLETO (SOBRE LA CUADRÍCULA) ── -->
+      <section class="catalog-search-card fade-up" aria-label="Buscador y filtros de vehículos">
+        <form action="/catalogo" method="GET" id="catalogForm" class="catalog-search-form">
+          <input type="hidden" name="orden" id="hiddenOrden" value="<%= filtros.orden || '' %>">
+          <input type="hidden" name="per_page" id="hiddenPerPage" value="<%= perPage || 15 %>">
 
-          <!-- Main 2-Column Catalog Layout -->
-          <div class="catalog-layout">
-
-            <!-- ── DESKTOP STICKY SIDEBAR / MOBILE DRAWER ── -->
-            <aside class="catalog-sidebar-drawer" id="catalogDrawer" aria-label="Filtros de búsqueda">
-              <div class="catalog-sidebar-content">
-                <div class="drawer-header">
-                  <h2 class="drawer-title">Filtrar Vehículos</h2>
-                  <button type="button" class="drawer-close-btn" id="closeFiltersBtn"
-                    aria-label="Cerrar filtros">✕</button>
-                </div>
-
-                <form action="/catalogo" method="GET" id="catalogForm" class="sidebar-form">
-                  <!-- Hidden sort input so it persists when filtering from sidebar -->
-                  <input type="hidden" name="orden" id="hiddenOrden" value="<%= filtros.orden || '' %>">
-
-                  <!-- 1. Condición: Segmented Tabs -->
-                  <div class="sidebar-filter-group">
-                    <label class="sidebar-label">Condición</label>
-                    <div class="condition-tabs-group">
-                      <label
-                        class="cond-tab <%= !filtros.condicion || filtros.condicion === 'Todos' ? 'active' : '' %>">
-                        <input type="radio" name="condicion" value="" <%=!filtros.condicion ||
-                          filtros.condicion==='Todos' ? 'checked' : '' %> onchange="this.form.submit()">
-                        <span>Todos</span>
-                      </label>
-                      <label class="cond-tab <%= filtros.condicion === 'Usado' ? 'active' : '' %>">
-                        <input type="radio" name="condicion" value="Usado" <%=filtros.condicion==='Usado' ? 'checked'
-                          : '' %> onchange="this.form.submit()">
-                        <span>Usados</span>
-                      </label>
-                      <label class="cond-tab <%= filtros.condicion === '0km' ? 'active' : '' %>">
-                        <input type="radio" name="condicion" value="0km" <%=filtros.condicion==='0km' ? 'checked' : ''
-                          %> onchange="this.form.submit()">
-                        <span>0km</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- 2. Marca -->
-                  <div class="sidebar-filter-group">
-                    <label for="sideMarca" class="sidebar-label">Marca</label>
-                    <select name="marca" id="sideMarca" class="sidebar-select" onchange="onBrandChange(this.value)">
-                      <option value="">Todas las marcas</option>
-                      <% if (Array.isArray(marcas)) { %>
-                        <% marcas.forEach(m=> { %>
-                          <option value="<%= m.marca %>" <%=filtros.marca===m.marca ? 'selected' : '' %>><%= m.marca %>
-                          </option>
-                          <% }) %>
-                            <% } %>
-                    </select>
-                  </div>
-
-                  <!-- 3. Modelo -->
-                  <div class="sidebar-filter-group">
-                    <label for="sideModelo" class="sidebar-label">Modelo</label>
-                    <input type="text" name="modelo" id="sideModelo" class="sidebar-input"
-                      placeholder="Ej. Corolla, Hilux, Gol..." value="<%= filtros.modelo || '' %>">
-                  </div>
-
-                  <!-- 4. Tipo de Carrocería -->
-                  <div class="sidebar-filter-group">
-                    <label class="sidebar-label">Tipo de Carrocería</label>
-                    <div class="type-pills-list">
-                      <% const bodyTypes=['SUV', 'Pick-up' , 'Sedan' , 'Hatchback' , 'Utilitario' ]; %>
-                        <% bodyTypes.forEach(t=> { %>
-                          <label class="type-pill <%= filtros.tipo === t ? 'active' : '' %>">
-                            <input type="radio" name="tipo" value="<%= t %>" <%=filtros.tipo===t ? 'checked' : '' %>>
-                            <span>
-                              <%= t==='Sedan' ? 'Sedán' : t %>
-                            </span>
-                          </label>
-                          <% }) %>
-                    </div>
-                  </div>
-
-                  <!-- 5. Rango de Años -->
-                  <div class="sidebar-filter-group">
-                    <label class="sidebar-label">Año</label>
-                    <div class="range-row">
-                      <select name="anio_min" class="sidebar-select range-select" aria-label="Año desde">
-                        <option value="">Desde</option>
-                        <% if (Array.isArray(anios)) { %>
-                          <% [...anios].reverse().forEach(a=> { %>
-                            <option value="<%= a.anio %>" <%=filtros.anio_min==a.anio ? 'selected' : '' %>><%= a.anio %>
-                            </option>
-                            <% }) %>
-                              <% } %>
-                      </select>
-                      <span class="range-sep">—</span>
-                      <select name="anio_max" class="sidebar-select range-select" aria-label="Año hasta">
-                        <option value="">Hasta</option>
-                        <% if (Array.isArray(anios)) { %>
-                          <% anios.forEach(a=> { %>
-                            <option value="<%= a.anio %>" <%=filtros.anio_max==a.anio ? 'selected' : '' %>><%= a.anio %>
-                            </option>
-                            <% }) %>
-                              <% } %>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- 6. Rango de Precio -->
-                  <div class="sidebar-filter-group">
-                    <label class="sidebar-label">Precio ($ ARS)</label>
-                    <div class="range-row">
-                      <input type="number" name="precio_min" class="sidebar-input range-input" placeholder="Mínimo"
-                        value="<%= filtros.precio_min || '' %>" step="500000">
-                      <span class="range-sep">—</span>
-                      <input type="number" name="precio_max" class="sidebar-input range-input" placeholder="Máximo"
-                        value="<%= filtros.precio_max || '' %>" step="500000">
-                    </div>
-                  </div>
-
-                  <!-- 7. Combustible -->
-                  <div class="sidebar-filter-group">
-                    <label for="sideCombustible" class="sidebar-label">Combustible</label>
-                    <select name="combustible" id="sideCombustible" class="sidebar-select">
-                      <option value="">Todos</option>
-                      <% const standardCombustibles=['Nafta', 'Diesel' , 'Nafta/GNC' , 'Híbrido' , 'Eléctrico' ]; %>
-                        <% standardCombustibles.forEach(c=> { %>
-                          <option value="<%= c %>" <%=filtros.combustible===c ? 'selected' : '' %>><%= c %>
-                          </option>
-                          <% }) %>
-                    </select>
-                  </div>
-
-                  <!-- 8. Transmisión -->
-                  <div class="sidebar-filter-group">
-                    <label for="sideTransmision" class="sidebar-label">Transmisión</label>
-                    <select name="transmision" id="sideTransmision" class="sidebar-select">
-                      <option value="">Todas</option>
-                      <option value="Manual" <%=filtros.transmision==='Manual' ? 'selected' : '' %>>Manual</option>
-                      <option value="Automatica" <%=(filtros.transmision==='Automatica' ||
-                        filtros.transmision==='Automática' ) ? 'selected' : '' %>>Automática</option>
-                    </select>
-                  </div>
-
-                  <!-- Botones de Acción -->
-                  <div class="sidebar-actions">
-                    <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">
-                      Aplicar Filtros
-                    </button>
-                    <% if (activeChips && activeChips.length> 0) { %>
-                      <a href="/catalogo" class="ds-btn ds-btn--outline ds-btn--block"
-                        style="margin-top: 0.5rem; text-align: center;">
-                        Limpiar Filtros
-                      </a>
-                      <% } %>
-                  </div>
-                </form>
+          <!-- Fila Principal del Buscador -->
+          <div class="search-main-grid">
+            <!-- 1. Búsqueda por texto (Modelo o palabra clave) -->
+            <div class="search-input-group">
+              <label for="searchModelo" class="search-label">Buscar vehículo</label>
+              <div class="search-field-icon-wrap">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input 
+                  type="text" 
+                  name="modelo" 
+                  id="searchModelo" 
+                  class="search-input" 
+                  placeholder="Modelo, versión o palabra clave..." 
+                  value="<%= filtros.modelo || '' %>"
+                >
+                <% if (filtros.modelo) { %>
+                  <button type="button" class="search-clear-input-btn" onclick="document.getElementById('searchModelo').value=''; document.getElementById('catalogForm').submit();" title="Borrar texto">✕</button>
+                <% } %>
               </div>
-            </aside>
+            </div>
 
-            <!-- Overlay backdrop for mobile drawer -->
-            <div class="catalog-drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+            <!-- 2. Marca -->
+            <div class="search-select-group">
+              <label for="searchMarca" class="search-label">Marca</label>
+              <select name="marca" id="searchMarca" class="search-select" onchange="this.form.submit()">
+                <option value="">Todas las marcas</option>
+                <% if (Array.isArray(marcas)) { %>
+                  <% marcas.forEach(m => { %>
+                    <option value="<%= m.marca %>" <%= filtros.marca === m.marca ? 'selected' : '' %>><%= m.marca %></option>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
 
-            <!-- ── RESULTS MAIN COLUMN ── -->
-            <section class="catalog-main-content" aria-label="Resultados de vehículos">
+            <!-- 3. Condición -->
+            <div class="search-select-group">
+              <label for="searchCondicion" class="search-label">Condición</label>
+              <select name="condicion" id="searchCondicion" class="search-select" onchange="this.form.submit()">
+                <option value="" <%= !filtros.condicion || filtros.condicion === 'Todos' ? 'selected' : '' %>>Todos (0km y Usados)</option>
+                <option value="Usado" <%= filtros.condicion === 'Usado' ? 'selected' : '' %>>Usados</option>
+                <option value="0km" <%= filtros.condicion === '0km' ? 'selected' : '' %>>0km</option>
+              </select>
+            </div>
 
-              <!-- Controls Bar: Count + Sorting -->
-              <div class="catalog-controls-bar">
-                <div class="catalog-count-info">
-                  <span class="count-number">
-                    <%= totalAutos %>
-                  </span>
-                  <span class="count-text">
-                    <%= totalAutos===1 ? 'vehículo encontrado' : 'vehículos encontrados' %>
-                  </span>
-                </div>
+            <!-- 4. Carrocería -->
+            <div class="search-select-group">
+              <label for="searchTipo" class="search-label">Tipo</label>
+              <select name="tipo" id="searchTipo" class="search-select" onchange="this.form.submit()">
+                <option value="">Todos los tipos</option>
+                <% const bodyTypes = ['SUV', 'Pick-up', 'Sedan', 'Hatchback', 'Utilitario']; %>
+                <% bodyTypes.forEach(t => { %>
+                  <option value="<%= t %>" <%= filtros.tipo === t ? 'selected' : '' %>><%= t === 'Sedan' ? 'Sedán' : t %></option>
+                <% }) %>
+              </select>
+            </div>
 
-                <div class="catalog-sort-wrapper">
-                  <label for="topSortSelect" class="sort-label">Ordenar por:</label>
-                  <select id="topSortSelect" class="sort-select" onchange="changeOrder(this.value)">
-                    <option value="" <%=!filtros.orden ? 'selected' : '' %>>Más recientes</option>
-                    <option value="precio_asc" <%=filtros.orden==='precio_asc' ? 'selected' : '' %>>Menor precio
-                    </option>
-                    <option value="precio_desc" <%=filtros.orden==='precio_desc' ? 'selected' : '' %>>Mayor precio
-                    </option>
-                    <option value="km_asc" <%=filtros.orden==='km_asc' ? 'selected' : '' %>>Menor km</option>
-                    <option value="anio_desc" <%=filtros.orden==='anio_desc' ? 'selected' : '' %>>Más nuevo</option>
-                    <option value="anio_asc" <%=filtros.orden==='anio_asc' ? 'selected' : '' %>>Más antiguo</option>
+            <!-- 5. Botones de Acción -->
+            <div class="search-buttons-group">
+              <button type="submit" class="ds-btn ds-btn--primary search-submit-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Buscar</span>
+              </button>
+
+              <button type="button" class="ds-btn ds-btn--outline search-advanced-toggle" id="toggleAdvFiltersBtn" aria-expanded="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="4" y1="21" x2="4" y2="14"></line>
+                  <line x1="4" y1="10" x2="4" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12" y2="3"></line>
+                  <line x1="20" y1="21" x2="20" y2="16"></line>
+                  <line x1="20" y1="12" x2="20" y2="3"></line>
+                </svg>
+                <span id="advFilterToggleText">Filtros</span>
+                <span class="chevron-indicator" id="advChevron">▼</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Fila Expandible: Filtros Avanzados (Año, Precio, Combustible, Transmisión) -->
+          <% 
+            const hasAdvancedActive = Boolean(filtros.anio_min || filtros.anio_max || filtros.precio_min || filtros.precio_max || filtros.combustible || filtros.transmision); 
+          %>
+          <div class="search-advanced-panel" id="advancedPanel" style="<%= hasAdvancedActive ? 'display: block;' : 'display: none;' %>">
+            <div class="search-advanced-grid">
+              <!-- Año Desde / Hasta -->
+              <div class="advanced-filter-item">
+                <label class="search-label">Año</label>
+                <div class="range-inputs-row">
+                  <select name="anio_min" class="search-select range-select" aria-label="Año desde">
+                    <option value="">Desde</option>
+                    <% if (Array.isArray(anios)) { %>
+                      <% [...anios].reverse().forEach(a => { %>
+                        <option value="<%= a.anio %>" <%= filtros.anio_min == a.anio ? 'selected' : '' %>><%= a.anio %></option>
+                      <% }) %>
+                    <% } %>
+                  </select>
+                  <span class="range-dash">—</span>
+                  <select name="anio_max" class="search-select range-select" aria-label="Año hasta">
+                    <option value="">Hasta</option>
+                    <% if (Array.isArray(anios)) { %>
+                      <% anios.forEach(a => { %>
+                        <option value="<%= a.anio %>" <%= filtros.anio_max == a.anio ? 'selected' : '' %>><%= a.anio %></option>
+                      <% }) %>
+                    <% } %>
                   </select>
                 </div>
               </div>
 
-              <!-- Vehicle Grid or Empty State -->
-              <% if (autos && autos.length> 0) { %>
-                <div class="vehicles-grid catalog-grid-v2">
-                  <% autos.forEach(auto=> { %>
-                    <%- include('partials/vehicle-card', { auto, generateSlug }) %>
-                      <% }) %>
+              <!-- Precio Mín / Máx -->
+              <div class="advanced-filter-item">
+                <label class="search-label">Precio ($ ARS)</label>
+                <div class="range-inputs-row">
+                  <input type="number" name="precio_min" class="search-input range-input" placeholder="Mínimo" value="<%= filtros.precio_min || '' %>" step="500000">
+                  <span class="range-dash">—</span>
+                  <input type="number" name="precio_max" class="search-input range-input" placeholder="Máximo" value="<%= filtros.precio_max || '' %>" step="500000">
                 </div>
+              </div>
 
-                <!-- Pagination -->
-                <% if (totalPages> 1) { %>
-                  <nav class="catalog-pagination fade-up" aria-label="Paginación del catálogo">
-                    <% function buildPageUrl(p) { const q={ ...filtros, page: p }; return '/catalogo?' +
-                      Object.entries(q) .filter(([k, v])=> v !== undefined && v !== '')
-                      .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
-                      .join('&');
-                      }
-                      %>
+              <!-- Combustible -->
+              <div class="advanced-filter-item">
+                <label for="searchCombustible" class="search-label">Combustible</label>
+                <select name="combustible" id="searchCombustible" class="search-select">
+                  <option value="">Todos</option>
+                  <% ['Nafta', 'Diesel', 'Nafta/GNC', 'Híbrido', 'Eléctrico'].forEach(c => { %>
+                    <option value="<%= c %>" <%= filtros.combustible === c ? 'selected' : '' %>><%= c %></option>
+                  <% }) %>
+                </select>
+              </div>
 
-                      <% if (currentPage> 1) { %>
-                        <a href="<%= buildPageUrl(currentPage - 1) %>" class="page-btn page-btn-arrow"
-                          aria-label="Página anterior">
-                          ← Anterior
-                        </a>
-                        <% } %>
+              <!-- Transmisión -->
+              <div class="advanced-filter-item">
+                <label for="searchTransmision" class="search-label">Transmisión</label>
+                <select name="transmision" id="searchTransmision" class="search-select">
+                  <option value="">Todas</option>
+                  <option value="Manual" <%= filtros.transmision === 'Manual' ? 'selected' : '' %>>Manual</option>
+                  <option value="Automatica" <%= (filtros.transmision === 'Automatica' || filtros.transmision === 'Automática') ? 'selected' : '' %>>Automática</option>
+                </select>
+              </div>
+            </div>
 
-                          <div class="page-numbers">
-                            <% for (let i=1; i <=totalPages; i++) { %>
-                              <% if (i===currentPage) { %>
-                                <span class="page-num active" aria-current="page">
-                                  <%= i %>
-                                </span>
-                                <% } else if (Math.abs(i - currentPage) <=2 || i===1 || i===totalPages) { %>
-                                  <a href="<%= buildPageUrl(i) %>" class="page-num">
-                                    <%= i %>
-                                  </a>
-                                  <% } else if (i===2 && currentPage> 4) { %>
-                                    <span class="page-ellipsis">…</span>
-                                    <% } else if (i===totalPages - 1 && currentPage < totalPages - 3) { %>
-                                      <span class="page-ellipsis">…</span>
-                                      <% } %>
-                                        <% } %>
-                          </div>
-
-                          <% if (currentPage < totalPages) { %>
-                            <a href="<%= buildPageUrl(currentPage + 1) %>" class="page-btn page-btn-arrow"
-                              aria-label="Página siguiente">
-                              Siguiente →
-                            </a>
-                            <% } %>
-                  </nav>
-                  <% } %>
-
-                    <% } else { %>
-                      <!-- Empty State Amable y Persuasivo -->
-                      <div class="catalog-empty-state fade-up">
-                        <div class="empty-icon-circle">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                          </svg>
-                        </div>
-                        <h3 class="empty-title">No encontramos autos con esos filtros</h3>
-                        <p class="empty-desc">
-                          Probá ampliando el rango de precios o años, o quitá algunos filtros para ver más opciones
-                          disponibles en nuestro stock.
-                        </p>
-                        <div class="empty-suggestions">
-                          <span class="sugg-title">Sugerencias:</span>
-                          <ul>
-                            <li>Verificá que la marca y modelo estén bien escritos.</li>
-                            <li>Elegí <em>"Todos"</em> en condición para ver opciones usadas y 0km.</li>
-                            <li>Comunicate con nosotros si estás buscando un modelo específico que aún no ingresó a la
-                              web.</li>
-                          </ul>
-                        </div>
-                        <div class="empty-actions">
-                          <a href="/catalogo" class="ds-btn ds-btn--primary">
-                            Ver Todo el Stock Disponible
-                          </a>
-                          <a href="https://wa.me/5493425352093?text=Hola!%20Busco%20un%20veh%C3%ADculo%20espec%C3%ADfico%20que%20no%20encontr%C3%A9%20en%20el%20cat%C3%A1logo."
-                            target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--outline"
-                            style="color: var(--color-secondary); border-color: var(--color-secondary);">
-                            Consultar por Encargo en WhatsApp
-                          </a>
-                        </div>
-                      </div>
-                      <% } %>
-
-            </section>
-
+            <div class="advanced-actions-row">
+              <button type="submit" class="ds-btn ds-btn--primary ds-btn--sm">
+                Aplicar Filtros Avanzados
+              </button>
+              <% if (activeChips && activeChips.length > 0) { %>
+                <a href="/catalogo" class="ds-btn ds-btn--ghost ds-btn--sm">
+                  Restablecer Todo
+                </a>
+              <% } %>
+            </div>
           </div>
+        </form>
+      </section>
+
+      <!-- Active Filter Chips (if any) -->
+      <% if (activeChips && activeChips.length > 0) { %>
+        <div class="active-chips-bar fade-up">
+          <span class="active-chips-label">Filtros activos:</span>
+          <% activeChips.forEach(chip => { 
+              const newParams = { ...filtros };
+              delete newParams[chip.key];
+              delete newParams.page;
+              const removeUrl = '/catalogo?' + Object.entries(newParams)
+                .filter(([k, v]) => v !== undefined && v !== '')
+                .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+                .join('&');
+          %>
+            <a href="<%= removeUrl || '/catalogo' %>" class="filter-chip" title="Quitar filtro <%= chip.label %>: <%= chip.value %>">
+              <span class="chip-label"><%= chip.label %>:</span>
+              <strong><%= chip.value %></strong>
+              <span class="chip-remove" aria-hidden="true">✕</span>
+            </a>
+          <% }) %>
+          <a href="/catalogo" class="filter-chip-clear" title="Quitar todos los filtros">
+            Limpiar todo
+          </a>
+        </div>
+      <% } %>
+
+      <!-- ── BARRA DE CONTROLES: CONTEO, ORDEN Y CANTIDAD MÁXIMA (3x5 = 15 MÍNIMO) ── -->
+      <div class="catalog-controls-bar fade-up">
+        <div class="catalog-count-info">
+          <span class="count-number"><%= totalAutos %></span>
+          <span class="count-text"><%= totalAutos === 1 ? 'vehículo encontrado' : 'vehículos encontrados' %></span>
+          <% if (totalAutos > 0) { %>
+            <span class="count-highlight-hint">(Destacados primero)</span>
+          <% } %>
+        </div>
+
+        <div class="catalog-controls-selectors">
+          <!-- Selector de Cantidad Máxima por Página (Mínimo 15 en 3x5) -->
+          <div class="control-group-item">
+            <label for="perPageSelect" class="control-label">Mostrar:</label>
+            <select id="perPageSelect" class="control-select" onchange="changePerPage(this.value)">
+              <option value="15" <%= (perPage === 15 || !perPage) ? 'selected' : '' %>>15 por pág. (3×5)</option>
+              <option value="30" <%= perPage === 30 ? 'selected' : '' %>>30 por pág.</option>
+              <option value="45" <%= perPage === 45 ? 'selected' : '' %>>45 por pág.</option>
+              <option value="60" <%= perPage === 60 ? 'selected' : '' %>>60 por pág.</option>
+              <option value="100" <%= perPage === 100 ? 'selected' : '' %>>100 por pág.</option>
+            </select>
+          </div>
+
+          <!-- Selector de Ordenamiento -->
+          <div class="control-group-item">
+            <label for="topSortSelect" class="control-label">Ordenar:</label>
+            <select id="topSortSelect" class="control-select" onchange="changeOrder(this.value)">
+              <option value="" <%= !filtros.orden ? 'selected' : '' %>>Destacados / Recientes</option>
+              <option value="precio_asc" <%= filtros.orden === 'precio_asc' ? 'selected' : '' %>>Menor precio</option>
+              <option value="precio_desc" <%= filtros.orden === 'precio_desc' ? 'selected' : '' %>>Mayor precio</option>
+              <option value="km_asc" <%= filtros.orden === 'km_asc' ? 'selected' : '' %>>Menor km</option>
+              <option value="anio_desc" <%= filtros.orden === 'anio_desc' ? 'selected' : '' %>>Más nuevo</option>
+              <option value="anio_asc" <%= filtros.orden === 'anio_asc' ? 'selected' : '' %>>Más antiguo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN DE CUADRÍCULA DE VEHÍCULOS (DEBAJO DEL BUSCADOR, ANCHO COMPLETO) ── -->
+      <% if (autos && autos.length > 0) { %>
+        <section class="catalog-vehicles-section fade-up" aria-label="Listado de vehículos disponibles">
+          <div class="vehicles-grid catalog-grid-v2">
+            <% autos.forEach(auto => { %>
+              <%- include('partials/vehicle-card', { auto, generateSlug }) %>
+            <% }) %>
+          </div>
+
+          <!-- Paginación -->
+          <% if (totalPages > 1) { %>
+            <nav class="catalog-pagination fade-up" aria-label="Paginación del catálogo">
+              <% 
+                function buildPageUrl(p) { 
+                  const q = { ...filtros, page: p, per_page: perPage }; 
+                  return '/catalogo?' + Object.entries(q)
+                    .filter(([k, v]) => v !== undefined && v !== '')
+                    .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+                    .join('&');
+                }
+              %>
+
+              <% if (currentPage > 1) { %>
+                <a href="<%= buildPageUrl(currentPage - 1) %>" class="page-btn page-btn-arrow" aria-label="Página anterior">
+                  ← Anterior
+                </a>
+              <% } %>
+
+              <div class="page-numbers">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <% if (i === currentPage) { %>
+                    <span class="page-num active" aria-current="page"><%= i %></span>
+                  <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+                    <a href="<%= buildPageUrl(i) %>" class="page-num"><%= i %></a>
+                  <% } else if (i === 2 && currentPage > 4) { %>
+                    <span class="page-ellipsis">…</span>
+                  <% } else if (i === totalPages - 1 && currentPage < totalPages - 3) { %>
+                    <span class="page-ellipsis">…</span>
+                  <% } %>
+                <% } %>
+              </div>
+
+              <% if (currentPage < totalPages) { %>
+                <a href="<%= buildPageUrl(currentPage + 1) %>" class="page-btn page-btn-arrow" aria-label="Página siguiente">
+                  Siguiente →
+                </a>
+              <% } %>
+            </nav>
+          <% } %>
+        </section>
+
+      <% } else { %>
+        <!-- Empty State -->
+        <div class="catalog-empty-state fade-up">
+          <div class="empty-icon-circle">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="empty-title">No encontramos autos con esos filtros</h3>
+          <p class="empty-desc">
+            Probá ampliando el rango de precios o años, o quitá algunos filtros para ver más opciones disponibles en nuestro stock.
+          </p>
+          <div class="empty-suggestions">
+            <span class="sugg-title">Sugerencias:</span>
+            <ul>
+              <li>Verificá que la marca y modelo estén bien escritos.</li>
+              <li>Elegí <em>"Todos"</em> en condición para ver opciones usadas y 0km.</li>
+              <li>Comunicate con nosotros si estás buscando un modelo específico que aún no ingresó a la web.</li>
+            </ul>
+          </div>
+          <div class="empty-actions">
+            <a href="/catalogo" class="ds-btn ds-btn--primary">
+              Ver Todo el Stock Disponible
+            </a>
+            <a href="https://wa.me/5493425352093?text=Hola!%20Busco%20un%20veh%C3%ADculo%20espec%C3%ADfico%20que%20no%20encontr%C3%A9%20en%20el%20cat%C3%A1logo."
+              target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--outline"
+              style="color: var(--color-secondary); border-color: var(--color-secondary);">
+              Consultar por Encargo en WhatsApp
+            </a>
+          </div>
+        </div>
+      <% } %>
     </div>
   </main>
 
@@ -376,36 +356,29 @@
       document.getElementById('catalogForm').submit();
     }
 
-    // Mobile Drawer Toggle
+    // Sincronizar cantidad por página
+    function changePerPage(val) {
+      const hidden = document.getElementById('hiddenPerPage');
+      if (hidden) hidden.value = val;
+      document.getElementById('catalogForm').submit();
+    }
+
+    // Toggle Filtros Avanzados
     document.addEventListener('DOMContentLoaded', () => {
-      const openBtn = document.getElementById('openFiltersBtn');
-      const closeBtn = document.getElementById('closeFiltersBtn');
-      const drawer = document.getElementById('catalogDrawer');
-      const backdrop = document.getElementById('drawerBackdrop');
+      const toggleBtn = document.getElementById('toggleAdvFiltersBtn');
+      const advPanel = document.getElementById('advancedPanel');
+      const chevron = document.getElementById('advChevron');
 
-      function openDrawer() {
-        drawer.classList.add('open');
-        backdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        openBtn.setAttribute('aria-expanded', 'true');
+      if (toggleBtn && advPanel) {
+        toggleBtn.addEventListener('click', () => {
+          const isVisible = advPanel.style.display !== 'none';
+          advPanel.style.display = isVisible ? 'none' : 'block';
+          toggleBtn.setAttribute('aria-expanded', !isVisible);
+          if (chevron) {
+            chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+          }
+        });
       }
-
-      function closeDrawer() {
-        drawer.classList.remove('open');
-        backdrop.classList.remove('active');
-        document.body.style.overflow = '';
-        openBtn.setAttribute('aria-expanded', 'false');
-      }
-
-      if (openBtn) openBtn.addEventListener('click', openDrawer);
-      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-      if (backdrop) backdrop.addEventListener('click', closeDrawer);
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && drawer.classList.contains('open')) {
-          closeDrawer();
-        }
-      });
     });
   </script>
 

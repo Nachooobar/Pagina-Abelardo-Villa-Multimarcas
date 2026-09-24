@@ -215,6 +215,19 @@ async function initSchema() {
               v.destacado ? 1 : 0, v.activo !== undefined ? (v.activo ? 1 : 0) : 1,
               imgsJson, v.created_at || new Date().toISOString(), v.updated_at || new Date().toISOString()
             ]);
+
+            if (Array.isArray(v.imagenes) && v.imagenes.length > 0) {
+              const existingCount = await activeDb.get('SELECT COUNT(*) as c FROM auto_imagenes WHERE auto_id = ?', [String(v.id)]);
+              if (!existingCount || existingCount.c === 0) {
+                for (let i = 0; i < v.imagenes.length; i++) {
+                  const fname = v.imagenes[i].replace('/uploads/autos/', '');
+                  await activeDb.run(
+                    'INSERT INTO auto_imagenes (auto_id, filename, es_principal, orden) VALUES (?, ?, ?, ?)',
+                    [String(v.id), fname, i === 0 ? 1 : 0, i]
+                  );
+                }
+              }
+            }
           }
           console.log(`✓ Sincronización con Supabase completada: ${vehiculos.length} vehículos cargados`);
         }

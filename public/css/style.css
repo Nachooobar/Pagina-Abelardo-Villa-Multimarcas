@@ -1573,38 +1573,21 @@ body.drawer-locked {
 /* ── VEHICLE CARDS (Reglas 1, 2, 3, 4, 5, 7, 12 - Inspiración Vision Motors) ── */
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 991px) {
   .vehicles-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .vehicles-grid:has(> :only-child) {
-    grid-template-columns: 1fr;
-    max-width: 380px;
-    margin: 0 auto;
-  }
-
-  .vehicles-grid:has(> :nth-child(2):last-child) {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 780px;
-    margin: 0 auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .vehicles-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .vehicles-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -2072,86 +2055,84 @@ body.drawer-locked {
   opacity: 0.8;
 }
 
-/* 2-Column Catalog Layout */
-.catalog-layout {
-  display: grid;
-  grid-template-columns: 290px 1fr;
-  gap: 2.5rem;
-  align-items: start;
+/* ── FULL WIDTH CATALOG CONTAINER & TOP SEARCH CARD ── */
+.catalog-full-container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-/* Desktop Sidebar */
-.catalog-sidebar-drawer {
-  position: sticky;
-  top: 85px;
-  max-height: calc(100vh - 105px);
-  overflow-y: auto;
+.catalog-search-card {
   background: var(--neutral-900, #0E1116);
   border: 1px solid var(--neutral-800, #1F2733);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg, 14px);
   padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.catalog-sidebar-drawer::-webkit-scrollbar {
-  width: 6px;
+.search-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr auto;
+  gap: 1rem;
+  align-items: flex-end;
 }
 
-.catalog-sidebar-drawer::-webkit-scrollbar-thumb {
-  background: var(--neutral-700, #2E3846);
-  border-radius: 4px;
-}
-
-.drawer-header {
+.search-input-group,
+.search-select-group,
+.advanced-filter-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid var(--neutral-800, #1F2733);
+  flex-direction: column;
 }
 
-.drawer-title {
-  font-family: var(--font-heading, 'Sora', sans-serif);
-  font-size: 1.15rem;
+.search-label {
+  font-size: 0.775rem;
   font-weight: 700;
-  color: #FFFFFF;
-  margin: 0;
-}
-
-.drawer-close-btn {
-  display: none;
-  background: transparent;
-  border: none;
   color: var(--neutral-400, #939EB0);
-  font-size: 1.25rem;
-  cursor: pointer;
-}
-
-.sidebar-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.sidebar-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.sidebar-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--neutral-300, #C2C9D6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-bottom: 0.45rem;
+  display: block;
 }
 
-.sidebar-select,
-.sidebar-input {
+.search-field-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-field-icon-wrap .search-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--neutral-500, #616F84);
+  pointer-events: none;
+}
+
+.search-field-icon-wrap .search-input {
+  padding-left: 2.5rem;
+  padding-right: 2.2rem;
+}
+
+.search-clear-input-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--neutral-400, #939EB0);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.search-clear-input-btn:hover {
+  color: #FFFFFF;
+}
+
+.search-input,
+.search-select {
   width: 100%;
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 0.9rem;
   background: var(--neutral-950, #090B0F);
   border: 1px solid var(--neutral-700, #2E3846);
   border-radius: var(--radius-md, 8px);
@@ -2161,105 +2142,83 @@ body.drawer-locked {
   transition: border-color var(--transition-fast, 150ms ease);
 }
 
-.sidebar-select:focus,
-.sidebar-input:focus {
+.search-input:focus,
+.search-select:focus {
   border-color: var(--color-secondary, #1479BE);
 }
 
-/* Condition Segmented Tabs */
-.condition-tabs-group {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: var(--neutral-950, #090B0F);
-  border: 1px solid var(--neutral-700, #2E3846);
-  border-radius: var(--radius-md, 8px);
-  padding: 3px;
-  gap: 3px;
-}
-
-.cond-tab {
+.search-buttons-group {
   display: flex;
+  gap: 0.6rem;
   align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.25rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--neutral-400, #939EB0);
-  transition: all var(--transition-fast, 150ms ease);
-  user-select: none;
 }
 
-.cond-tab input {
-  display: none;
-}
-
-.cond-tab.active {
-  background: var(--color-primary, #E11D2A);
-  color: #FFFFFF;
-}
-
-/* Type Pills List */
-.type-pills-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.type-pill {
+.search-submit-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.4rem 0.75rem;
-  background: var(--neutral-950, #090B0F);
-  border: 1px solid var(--neutral-700, #2E3846);
-  border-radius: 50px;
-  font-size: 0.775rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  font-weight: 700;
+  border-radius: var(--radius-md, 8px);
+  white-space: nowrap;
+}
+
+.search-advanced-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md, 8px);
   color: var(--neutral-300, #C2C9D6);
+  border: 1px solid var(--neutral-700, #2E3846);
   cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
   transition: all var(--transition-fast, 150ms ease);
 }
 
-.type-pill input {
-  display: none;
-}
-
-.type-pill:hover {
+.search-advanced-toggle:hover {
   border-color: var(--color-secondary, #1479BE);
   color: #FFFFFF;
 }
 
-.type-pill.active {
-  background: var(--color-secondary, #1479BE);
-  border-color: var(--color-secondary, #1479BE);
-  color: #FFFFFF;
+.chevron-indicator {
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
 }
 
-/* Range Rows (Año & Precio) */
-.range-row {
+.search-advanced-panel {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--neutral-800, #1F2733);
+}
+
+.search-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.range-inputs-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.range-sep {
+.range-dash {
   color: var(--neutral-500, #616F84);
-  font-size: 0.85rem;
 }
 
-.range-select,
-.range-input {
-  flex: 1;
-  min-width: 0;
+.advanced-actions-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-.sidebar-actions {
-  margin-top: 0.5rem;
-}
-
-/* ── CONTROLS BAR (Top results count + sort) ── */
+/* ── CONTROLS BAR (Top results count + sort + per page) ── */
 .catalog-controls-bar {
   display: flex;
   align-items: center;
@@ -2271,6 +2230,7 @@ body.drawer-locked {
   border-radius: var(--radius-md, 8px);
   padding: 0.85rem 1.5rem;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .catalog-count-info {
@@ -2291,18 +2251,33 @@ body.drawer-locked {
   color: var(--neutral-400, #939EB0);
 }
 
-.catalog-sort-wrapper {
+.count-highlight-hint {
+  font-size: 0.775rem;
+  color: #F59E0B;
+  font-weight: 600;
+  margin-left: 0.4rem;
+}
+
+.catalog-controls-selectors {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
-.sort-label {
+.control-group-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-label {
   font-size: 0.85rem;
   color: var(--neutral-400, #939EB0);
+  font-weight: 500;
 }
 
-.sort-select {
+.control-select {
   background: var(--neutral-950, #090B0F);
   border: 1px solid var(--neutral-700, #2E3846);
   color: #FFFFFF;
@@ -2312,12 +2287,77 @@ body.drawer-locked {
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.control-select:focus {
+  border-color: var(--color-secondary, #1479BE);
 }
 
 /* Grid Override for Catalog */
 .catalog-grid-v2 {
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .search-main-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .search-buttons-group {
+    grid-column: span 2;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 991px) {
+  .catalog-grid-v2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .search-advanced-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .search-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-buttons-group {
+    grid-column: span 1;
+    width: 100%;
+  }
+
+  .search-buttons-group .ds-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .search-advanced-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-controls-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .catalog-controls-selectors {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .catalog-grid-v2 {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
 }
 
 /* ── EMPTY STATE AMABLE ── */
@@ -3924,7 +3964,7 @@ body.drawer-locked {
   }
 
   .vehicles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .contact-grid {
@@ -3947,13 +3987,19 @@ body.drawer-locked {
   }
 }
 
+@media (max-width: 640px) {
+  .vehicles-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 @media (max-width: 480px) {
   .hero h1 {
     font-size: 1.8rem;
   }
 
   .vehicles-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .specs-grid {

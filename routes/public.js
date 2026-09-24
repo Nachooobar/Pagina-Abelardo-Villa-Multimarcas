@@ -124,7 +124,9 @@ router.get('/catalogo', async (req, res) => {
     } = req.query;
 
     const currentPage = parseInt(page) || 1;
-    const perPage = 12;
+    const allowedPerPage = [15, 30, 45, 60, 100];
+    const requestedPerPage = parseInt(req.query.per_page || req.query.limite);
+    const perPage = allowedPerPage.includes(requestedPerPage) ? requestedPerPage : 15;
     const offset = (currentPage - 1) * perPage;
 
     let whereConditions = [db.isPg() ? "estado = 'disponible'" : "(activo = 1 OR estado = 'disponible')"];
@@ -193,7 +195,7 @@ router.get('/catalogo', async (req, res) => {
 
     const whereClause = whereConditions.join(' AND ');
 
-    // Cláusula de ordenamiento
+    // Cláusula de ordenamiento (siempre prioriza vehículos destacados primero)
     let orderClause = 'created_at DESC';
     if (orden === 'precio_asc') orderClause = 'precio ASC';
     else if (orden === 'precio_desc') orderClause = 'precio DESC';
@@ -218,7 +220,7 @@ router.get('/catalogo', async (req, res) => {
           CASE WHEN array_length(v.imagenes, 1) > 0 THEN v.imagenes[1] ELSE NULL END as imagen_fallback
         FROM public.vehiculos v
         WHERE ${whereClause}
-        ORDER BY ${orderClause}
+        ORDER BY destacado DESC, ${orderClause}
         LIMIT ? OFFSET ?
       `).all([...params, perPage, offset]);
 
@@ -234,7 +236,7 @@ router.get('/catalogo', async (req, res) => {
           (SELECT filename FROM auto_imagenes WHERE auto_id = a.id ORDER BY es_principal DESC, orden ASC LIMIT 1) as imagen_fallback
         FROM autos a
         WHERE ${whereClause}
-        ORDER BY ${orderClause}
+        ORDER BY destacado DESC, ${orderClause}
         LIMIT ? OFFSET ?
       `).all([...params, perPage, offset]);
 
@@ -275,6 +277,7 @@ router.get('/catalogo', async (req, res) => {
       currentPage,
       totalPages,
       totalAutos,
+      perPage,
       generateSlug
     });
   } catch (error) {

@@ -35,9 +35,8 @@
         </div>
 
         <% if (error) { %>
-            <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
-              <%= error %>
-            </div>
+          <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <%= error %>
           </div>
         <% } %>
 
@@ -318,20 +317,26 @@
                       </div>
                       <div class="existing-photos-grid">
                         <% imagenes.forEach(img => { %>
+                          <%
+                            let displaySrc = img.url || '';
+                            if (!displaySrc && img.filename) {
+                              displaySrc = (img.filename.startsWith('http://') || img.filename.startsWith('https://') || img.filename.startsWith('/')) ? img.filename : '/uploads/autos/' + img.filename;
+                            }
+                          %>
                           <div class="photo-thumb-card <%= img.es_principal ? 'is-cover' : '' %>">
                             <div class="photo-thumb-img-wrap">
-                              <img src="/uploads/autos/<%= img.filename %>" alt="Foto auto" loading="lazy">
+                              <img src="<%= displaySrc %>" alt="Foto auto" loading="lazy">
                               <% if (img.es_principal) { %>
                                 <span class="photo-cover-badge">PORTADA</span>
                               <% } %>
                             </div>
                             <div class="photo-thumb-actions">
                               <% if (!img.es_principal) { %>
-                                <button type="button" class="photo-action-btn btn-star" onclick="setMainImage('<%= img.id %>')" title="Hacer foto principal">
+                                <button type="button" class="photo-action-btn btn-star" onclick="setMainImage('<%= img.id %>', '<%= auto ? auto.id : '' %>')" title="Hacer foto de portada">
                                   Portada
                                 </button>
                               <% } %>
-                              <button type="button" class="photo-action-btn btn-delete" onclick="deleteExistingImage('<%= img.id %>')" title="Eliminar foto">
+                              <button type="button" class="photo-action-btn btn-delete" onclick="deleteExistingImage('<%= img.id %>', '<%= auto ? auto.id : '' %>')" title="Eliminar foto">
                                 Eliminar
                               </button>
                             </div>
@@ -436,9 +441,16 @@
               <!-- CarCard exacta compartida con Fase 2 -->
               <div class="card car-card live-car-card">
                 <div class="car-card-image-wrap">
+                  <%
+                    let livePreviewSrc = '/images/hero-car-opt.png';
+                    if (imagenes && imagenes.length > 0) {
+                      let firstImg = imagenes[0];
+                      livePreviewSrc = firstImg.url || ((firstImg.filename && (firstImg.filename.startsWith('http://') || firstImg.filename.startsWith('https://') || firstImg.filename.startsWith('/'))) ? firstImg.filename : '/uploads/autos/' + (firstImg.filename || ''));
+                    }
+                  %>
                   <img 
                     id="previewCardImg" 
-                    src="<%= (imagenes && imagenes.length > 0) ? '/uploads/autos/' + imagenes[0].filename : '/images/hero-car-opt.png' %>" 
+                    src="<%= livePreviewSrc %>" 
                     alt="Previsualización de vehículo" 
                     class="car-card-img"
                   >
@@ -726,17 +738,25 @@
       }
     })();
 
-    // ── AUXILIARY PHOTO ACTIONS (Hacer Principal y Eliminar) ──
-    function setMainImage(imgId) {
+    // ── AUXILIARY PHOTO ACTIONS (Hacer Portada y Eliminar) ──
+    function setMainImage(imgId, autoId) {
       var form = document.getElementById('auxMainPhotoForm');
-      form.action = '/admin/autos/imagen/principal/' + imgId;
+      if (autoId) {
+        form.action = '/admin/autos/' + encodeURIComponent(autoId) + '/imagen/principal/' + encodeURIComponent(imgId);
+      } else {
+        form.action = '/admin/autos/imagen/principal/' + encodeURIComponent(imgId);
+      }
       form.submit();
     }
 
-    function deleteExistingImage(imgId) {
+    function deleteExistingImage(imgId, autoId) {
       if (confirm('¿Eliminar esta foto del vehículo?')) {
         var form = document.getElementById('auxDeletePhotoForm');
-        form.action = '/admin/autos/imagen/eliminar/' + imgId;
+        if (autoId) {
+          form.action = '/admin/autos/' + encodeURIComponent(autoId) + '/imagen/eliminar/' + encodeURIComponent(imgId);
+        } else {
+          form.action = '/admin/autos/imagen/eliminar/' + encodeURIComponent(imgId);
+        }
         form.submit();
       }
     }

@@ -126,11 +126,41 @@
                       <input type="checkbox" class="auto-row-checkbox" value="<%= auto.id %>" aria-label="Seleccionar auto <%= auto.marca %> <%= auto.modelo %>">
                     </td>
 
+<%
+  function getThumbUrl(auto) {
+    if (!auto) return null;
+    let img = auto.imagen;
+    if (!img && auto.imagenes) {
+      if (Array.isArray(auto.imagenes) && auto.imagenes.length > 0) img = auto.imagenes[0];
+      else if (typeof auto.imagenes === 'string') {
+        const t = auto.imagenes.trim();
+        if (t.startsWith('[')) {
+          try {
+            const arr = JSON.parse(t);
+            if (arr && arr.length > 0) img = arr[0];
+          } catch(e) {}
+        } else if (t.startsWith('{')) {
+          const arr = t.replace(/[{}]/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+          if (arr.length > 0) img = arr[0];
+        } else if (t.length > 0) {
+          img = t;
+        }
+      }
+    }
+    if (!img) return null;
+    if (typeof img === 'string') {
+      if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) return img;
+      return '/uploads/autos/' + img;
+    }
+    return null;
+  }
+%>
                     <!-- Miniatura 4:3 -->
                     <td>
                       <div class="table-thumbnail-4-3">
-                        <% if (auto.imagen) { %>
-                          <img src="/uploads/autos/<%= auto.imagen %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy">
+                        <% const thumbSrc = getThumbUrl(auto); %>
+                        <% if (thumbSrc) { %>
+                          <img src="<%= thumbSrc %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy">
                         <% } else { %>
                           <div class="table-thumbnail-placeholder">Sin foto</div>
                         <% } %>

@@ -150,8 +150,21 @@
                   <tr>
                     <td>
                       <div class="table-thumbnail-4-3">
-                        <% if (auto.imagen) { %>
-                          <img src="/uploads/autos/<%= auto.imagen %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy">
+                        <% 
+                          let dImg = auto.imagen;
+                          if (!dImg && auto.imagenes) {
+                            try {
+                              let arr = typeof auto.imagenes === 'string' ? JSON.parse(auto.imagenes) : auto.imagenes;
+                              if (Array.isArray(arr) && arr.length > 0) dImg = arr[0];
+                            } catch(e) {}
+                          }
+                          let dSrc = null;
+                          if (dImg) {
+                            dSrc = (dImg.startsWith('http://') || dImg.startsWith('https://') || dImg.startsWith('/')) ? dImg : '/uploads/autos/' + dImg;
+                          }
+                        %>
+                        <% if (dSrc) { %>
+                          <img src="<%= dSrc %>" alt="<%= auto.marca %> <%= auto.modelo %>" loading="lazy">
                         <% } else { %>
                           <div class="table-thumbnail-placeholder">Sin foto</div>
                         <% } %>
